@@ -1,6 +1,5 @@
-// src/firebase/admin/products/products.ts
 import { Timestamp } from "firebase-admin/firestore";
-import { adminDb, adminStorage } from "./firebase-admin-init";
+import { adminDb, adminStorage } from "@/firebase/admin/firebase-admin-init";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import type {
   GetProductByIdFromFirestoreResult,
@@ -11,8 +10,11 @@ import type {
   HeroSlide
 } from "@/types/product";
 import { serializeProduct, serializeProductArray } from "@/utils/serializeProduct";
-import { productSchema } from "@/schemas/products/product";
+import { productSchema } from "@/schemas/product";
 
+// ===================
+// GET ALL PRODUCTS
+// ===================
 export async function getAllProducts(): Promise<
   { success: true; data: Product[] } | { success: false; error: string }
 > {
@@ -25,11 +27,11 @@ export async function getAllProducts(): Promise<
       return {
         id: doc.id,
         name: data.name,
-        description: data.description,
+        description: data.description || "",
         image: data.image || "/placeholder.svg",
         price: data.price,
-        inStock: data.inStock,
-        badge: data.badge,
+        inStock: data.inStock ?? true,
+        badge: data.badge || "",
         isFeatured: data.isFeatured ?? false,
         isHero: data.isHero ?? false,
         createdAt: data.createdAt,
@@ -37,7 +39,6 @@ export async function getAllProducts(): Promise<
       };
     });
 
-    // ✅ Use the serializer here
     return { success: true, data: serializeProductArray(products) };
   } catch (error) {
     const message = isFirebaseError(error)
@@ -49,11 +50,14 @@ export async function getAllProducts(): Promise<
   }
 }
 
+// ===================
+// ADD PRODUCT
+// ===================
 export async function addProduct(
   data: Omit<Product, "id" | "createdAt" | "updatedAt">
 ): Promise<{ success: true; id: string; product: SerializedProduct } | { success: false; error: string }> {
   try {
-    const parsed = productSchema.safeParse(data);
+    const parsed = productSchema.omit({ id: true, createdAt: true, updatedAt: true }).safeParse(data);
 
     if (!parsed.success) {
       console.error("❌ Invalid product data:", parsed.error.flatten());
@@ -74,25 +78,26 @@ export async function addProduct(
       ...productData
     };
 
-    const serializedProduct = serializeProduct(fullProduct);
-
     return {
       success: true,
       id: docRef.id,
-      product: serializedProduct
+      product: serializeProduct(fullProduct)
     };
   } catch (error: unknown) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
       ? error.message
-      : "Unknown error occurred while adding product";
+      : "Unknown error adding product";
 
     console.error("Error adding product:", message);
     return { success: false, error: message };
   }
 }
 
+// ===================
+// GET PRODUCT BY ID
+// ===================
 export async function getProductById(id: string): Promise<GetProductByIdFromFirestoreResult> {
   try {
     const docRef = adminDb.collection("products").doc(id);
@@ -110,9 +115,10 @@ export async function getProductById(id: string): Promise<GetProductByIdFromFire
       description: data?.description || "",
       image: data?.image || "/placeholder.svg",
       price: data?.price,
-      inStock: data?.inStock,
+      inStock: data?.inStock ?? true,
       badge: data?.badge || "",
-      isFeatured: data?.isFeatured === true,
+      isFeatured: data?.isFeatured ?? false,
+      isHero: data?.isHero ?? false,
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt
     };
@@ -128,15 +134,14 @@ export async function getProductById(id: string): Promise<GetProductByIdFromFire
   }
 }
 
-/**
- * Update a product document in Firestore
- */
-
+// ===================
+// UPDATE PRODUCT
+// ===================
 type SafeUpdateProductInput = Omit<UpdateProductInput, "id" | "createdAt">;
 
 export async function updateProduct(id: string, updatedData: SafeUpdateProductInput): Promise<UpdateProductResult> {
   try {
-    const parsed = productSchema.partial().safeParse(updatedData); // allow partial updates
+    const parsed = productSchema.partial().omit({ id: true, createdAt: true }).safeParse(updatedData);
 
     if (!parsed.success) {
       console.error("❌ Invalid updated product data:", parsed.error.flatten());
@@ -162,9 +167,10 @@ export async function updateProduct(id: string, updatedData: SafeUpdateProductIn
       description: data.description || "",
       image: data.image || "/placeholder.svg",
       price: data.price,
-      inStock: data.inStock,
+      inStock: data.inStock ?? true,
       badge: data.badge || "",
-      isFeatured: data.isFeatured === true,
+      isFeatured: data.isFeatured ?? false,
+      isHero: data.isHero ?? false,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt
     };
@@ -185,6 +191,9 @@ export async function updateProduct(id: string, updatedData: SafeUpdateProductIn
   }
 }
 
+// ===================
+// DELETE PRODUCT
+// ===================
 export async function deleteProduct(productId: string): Promise<{ success: true } | { success: false; error: string }> {
   try {
     const docRef = adminDb.collection("products").doc(productId);
@@ -196,7 +205,6 @@ export async function deleteProduct(productId: string): Promise<{ success: true 
 
     const data = docSnap.data();
     const imageUrl = data?.image;
-    console.log("🧼 !!!!!!!Attempting to delete PRODUCT!!!!:", imageUrl);
 
     // Delete product from Firestore
     await docRef.delete();
@@ -219,21 +227,21 @@ export async function deleteProduct(productId: string): Promise<{ success: true 
   }
 }
 
-// Utility function
+// ===================
+// DELETE PRODUCT IMAGE
+// ===================
 export async function deleteProductImage(
   imageUrl: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
     const bucket = adminStorage.bucket();
 
-    // 🔥 Use URL parsing to get the correct file path
     const url = new URL(imageUrl);
-    const fullPath = url.pathname.slice(1); // e.g., "my-bucket-name/products/product.jpg"
+    const fullPath = url.pathname.slice(1);
 
-    // Remove bucket prefix from path
-    const bucketName = adminStorage.bucket().name; // "my-firebase-playground-5db22"
-    const storagePath = fullPath.replace(`${bucketName}/`, ""); // ✅ just "products/product.jpg"
-    console.log("🧼 *****Attempting to delete image*****:", storagePath);
+    const bucketName = bucket.name;
+    const storagePath = fullPath.replace(`${bucketName}/`, "");
+
     const file = bucket.file(storagePath);
     await file.delete();
 
@@ -250,6 +258,9 @@ export async function deleteProductImage(
   }
 }
 
+// ===================
+// GET FEATURED PRODUCTS
+// ===================
 export async function getFeaturedProducts(): Promise<
   { success: true; data: Product[] } | { success: false; error: string }
 > {
@@ -265,9 +276,10 @@ export async function getFeaturedProducts(): Promise<
         description: data.description || "",
         image: data.image || "/placeholder.svg",
         price: data.price,
-        inStock: data.inStock,
+        inStock: data.inStock ?? true,
         badge: data.badge || "",
-        isFeatured: data.isFeatured === true,
+        isFeatured: data.isFeatured ?? false,
+        isHero: data.isHero ?? false,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt
       };
@@ -275,12 +287,18 @@ export async function getFeaturedProducts(): Promise<
 
     return { success: true, data: serializeProductArray(products) };
   } catch (error) {
-    const message =
-      isFirebaseError(error) || error instanceof Error ? error.message : "Unknown error fetching featured products";
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching featured products";
     return { success: false, error: message };
   }
 }
 
+// ===================
+// GET HERO SLIDES
+// ===================
 export async function getHeroSlidesFromFirestore(): Promise<
   { success: true; data: HeroSlide[] } | { success: false; error: string }
 > {
@@ -300,8 +318,11 @@ export async function getHeroSlidesFromFirestore(): Promise<
 
     return { success: true, data: slides };
   } catch (error) {
-    const message =
-      isFirebaseError(error) || error instanceof Error ? error.message : "Unknown error fetching hero slides";
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching hero slides";
     return { success: false, error: message };
   }
 }

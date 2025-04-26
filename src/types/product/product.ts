@@ -1,5 +1,6 @@
 // types/product.ts
-import { Timestamp } from "firebase-admin/firestore";
+import { Timestamp } from "firebase-admin/firestore"; // ✅ Correct import for client-side types
+
 export interface Product {
   id: string;
   name: string;
@@ -25,15 +26,16 @@ export interface SerializedProduct {
   badge?: string;
   isFeatured?: boolean;
   isHero?: boolean;
-  createdAt: Timestamp | string;
-  updatedAt?: Timestamp | string;
+  createdAt: string; // ✅ serialized always as string
+  updatedAt?: string;
 }
 
-// get product by ID
+// Get product by ID result types
 export interface GetProductByIdSuccess {
   success: true;
   product: Product;
 }
+
 export interface GetProductByIdError {
   success: false;
   error: string;
@@ -42,7 +44,7 @@ export interface GetProductByIdError {
 export type GetProductByIdFromFirestoreResult = GetProductByIdSuccess | GetProductByIdError;
 export type GetProductByIdResponse = GetProductByIdFromFirestoreResult;
 
-// Update product input (only allow partial updates, excluding id/createdAt)
+// Update product input (allow partial updates, excluding id/createdAt)
 export type UpdateProductInput = Partial<Omit<Product, "id" | "createdAt">>;
 
 // Update result types
@@ -58,6 +60,7 @@ export interface UpdateProductError {
 
 export type UpdateProductResult = UpdateProductSuccess | UpdateProductError;
 
+// Hero slide type (for featured products / carousel)
 export interface HeroSlide {
   title: string;
   description: string;

@@ -1,10 +1,10 @@
-// src/schemas/product.ts
+//src/schemas/products/product.ts
 import { z } from "zod";
 
-// Base schema
+// Base product schema (for stickers)
 export const productSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(2, "Product name must be at least 2 characters"),
+  name: z.string().min(2, "Sticker name must be at least 2 characters"),
   description: z.string().min(5, "Description must be at least 5 characters").optional(),
   image: z.string().url("Must be a valid image URL"),
   price: z.number().positive("Price must be a positive number"),
@@ -16,17 +16,16 @@ export const productSchema = z.object({
   updatedAt: z.date().optional()
 });
 
-// Creation schema (strictly required fields only)
-// Using object syntax instead of array syntax
+// Schema for creating a new sticker (new product)
 export const createProductSchema = productSchema
   .omit({
     id: true,
     createdAt: true,
     updatedAt: true
   })
-  .strict();
+  .strict(); // Enforce no unknown fields on creation
 
-// Update schema (all fields optional for partial updates)
+// Schema for updating an existing sticker (partial fields allowed)
 export const updateProductSchema = productSchema
   .omit({
     id: true,
@@ -36,5 +35,6 @@ export const updateProductSchema = productSchema
   .partial()
   .strict();
 
+// TypeScript types generated from schemas
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;

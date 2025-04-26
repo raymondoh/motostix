@@ -73,13 +73,9 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
-      return;
-    }
-    if (!state?.success) {
-      toast.error(state?.error || "Registration failed");
-      window.location.reload();
       return;
     }
 
@@ -151,9 +147,10 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
       };
 
       handleSignInForVerification();
-    } else if (state?.error) {
+    } else if (state.error && !errorToastShown.current) {
       errorToastShown.current = true;
-      toast.error(state.error);
+      toast.error(state.error || "Registration failed");
+      window.location.reload();
     }
   }, [state, email, password, router]);
 
