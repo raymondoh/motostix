@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductCarousel } from "@/components/product-carousel";
+import { ProductCarousel } from "@/components/products/ProductCarousel";
 import type { SerializedProduct } from "@/types/product";
 
 interface FeaturedProductsCarouselProps {

@@ -5,7 +5,13 @@ export interface Product {
   id: string;
   name: string;
   description?: string;
+  details?: string;
+  dimensions?: string;
+  material?: string;
+  color?: string;
+  stickySide?: "Front" | "Back"; // ✨ NEW
   image: string;
+  category?: string;
   price: number;
   inStock: boolean;
   badge?: string;
@@ -18,15 +24,20 @@ export interface Product {
 export interface SerializedProduct {
   id: string;
   name: string;
-  title?: string;
   description?: string;
+  details?: string;
+  dimensions?: string;
+  material?: string;
+  color?: string;
+  stickySide?: "Front" | "Back"; // ✨ NEW
   image: string;
+  category?: string;
   price: number;
   inStock: boolean;
   badge?: string;
   isFeatured?: boolean;
   isHero?: boolean;
-  createdAt: string; // ✅ serialized always as string
+  createdAt: string; // Always a string after serialization
   updatedAt?: string;
 }
 

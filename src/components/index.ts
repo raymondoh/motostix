@@ -3,7 +3,7 @@ export { Footer } from "./footer/Footer";
 export { Navbar } from "./header/Navbar";
 export { ModeToggle } from "./header/ModeToggle";
 export { HeroCarousel } from "./hero-carousel";
-export { ProductCarousel } from "./product-carousel";
+export { ProductCarousel } from "./products/ProductCarousel";
 export { FeaturedProductsCarousel } from "./FeaturedProductsCarousel";
 
 export * from "./auth";
