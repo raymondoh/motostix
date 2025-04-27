@@ -4,6 +4,8 @@ import * as adminActivity from "./admin/activity";
 import * as adminProducts from "./admin/products";
 import * as adminUsers from "./admin/user";
 import * as adminAuthFunctions from "./admin/auth";
+import * as adminOrders from "./admin/orders";
+
 //import * as adminStorage from "./admin/storage";
 
 // ================= User CRUD =================
@@ -127,10 +129,10 @@ export async function getFeaturedProducts(...args: Parameters<typeof adminProduc
   return adminProducts.getFeaturedProducts(...args);
 }
 
-// export async function deleteProduct(...args: Parameters<typeof adminProducts.deleteProduct>) {
-//   return adminProducts.deleteProduct(...args);
-// }
-
+// ================= Admin Auth Orders =================
+export async function createOrder(...args: Parameters<typeof adminOrders.createOrder>) {
+  return adminOrders.createOrder(...args);
+}
 // ================= Hero Slides =================
 
 export async function getHeroSlidesFromFirestore(...args: Parameters<typeof adminProducts.getHeroSlidesFromFirestore>) {

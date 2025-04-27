@@ -59,6 +59,7 @@ export type {
 
 // Product types
 export type { Product } from "./product/product";
+export type { OrderData } from "./order/order";
 
 // Common types (once you've created the common folder)
 export type { ActionResponse } from "./common/response";
