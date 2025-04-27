@@ -5,14 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ProductActions } from "@/components/products/ProductActions";
+import { formatCurrency } from "@/lib/utils";
 
-interface ProductPageProps {
-  params: { id: string };
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = params;
-
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const result = await getProductById(id);
 
   if (!result.success) {
@@ -66,7 +63,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
           {/* Price */}
           <div>
-            <p className="text-2xl font-semibold">${product.price.toFixed(2)}</p>
+            <p className="text-2xl font-semibold">{formatCurrency(product.price)}</p>
           </div>
 
           {/* In Stock Status */}
@@ -77,6 +74,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <Badge variant="destructive">Out of Stock</Badge>
             )}
           </div>
+
+          {/* Add to Cart Section */}
+          {product.inStock && (
+            <div className="flex flex-col space-y-4">
+              <ProductActions product={product} />
+            </div>
+          )}
 
           {/* Divider */}
           <div className="border-t pt-4 space-y-4 text-sm">
@@ -120,9 +124,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             )}
           </div>
-
-          {/* (Optional) Add to Cart Button Later */}
-          {/* <Button>Add to Cart</Button> */}
         </div>
       </div>
     </div>

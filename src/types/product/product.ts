@@ -41,6 +41,12 @@ export interface SerializedProduct {
   updatedAt?: string;
 }
 
+export interface CartItem {
+  id: string;
+  product: Product;
+  quantity: number;
+}
+
 // Get product by ID result types
 export interface GetProductByIdSuccess {
   success: true;
