@@ -11,6 +11,8 @@ import {
   Users,
   Shield,
   //BarChart,
+  Receipt,
+  Package,
 
   //Key,
   ShoppingBag
@@ -59,6 +61,11 @@ export const userNavItems: NavItem[] = [
     title: "Dashboard",
     href: "/user",
     icon: LayoutDashboard
+  },
+  {
+    title: "Orders",
+    href: "/user/orders",
+    icon: Package
   },
   {
     title: "Profile",

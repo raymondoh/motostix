@@ -88,56 +88,7 @@ export async function createUserInFirebase({
     return { success: false, error: message };
   }
 }
-/**
- * Delete a user As Amin from Admin Dashboard
- */
-// export async function deleteUserAsAdmin(
-//   userId: string
-// ): Promise<{ success: true } | { success: false; error: string }> {
-//   try {
-//     const userRef = adminDb.collection("users").doc(userId);
-//      // 1. Clear image field before deleting the doc
-//      await userRef.update({ image: null });
-//       // 2. Delete Firestore document
-//     await userRef.delete();
-//     // 3. Delete Firebase Auth user
-//     await adminAuth.deleteUser(userId);
 
-//     // 3. Attempt to delete profile image
-//     const fileRef = adminStorage.bucket().file(`users/${userId}/profile.jpg`);
-//     try {
-//       await fileRef.delete();
-//     } catch (error: unknown) {
-//       if (typeof error === "object" && error !== null && "code" in error && (error as { code?: number }).code === 404) {
-//         console.log("Profile image not found, skipping delete.");
-//       } else {
-//         console.error("Error deleting profile image:", error);
-//       }
-//     }
-
-//     // 4. Log activity
-//     await logActivity({
-//       userId,
-//       type: "admin_deleted_user",
-//       description: "User deleted by admin",
-//       status: "success",
-//       metadata: {
-//         deletedUserId: userId
-//       }
-//     });
-
-//     return { success: true };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : error instanceof Error
-//       ? error.message
-//       : "Unknown error deleting user";
-
-//     console.error("Error in deleteUserAsAdmin:", message);
-//     return { success: false, error: message };
-//   }
-// }
 export async function deleteUserAsAdmin(
   userId: string,
   adminId?: string

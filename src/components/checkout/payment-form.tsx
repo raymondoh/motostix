@@ -1,3 +1,4 @@
+//src/components/checkout/payment-form.tsx
 "use client";
 
 import type React from "react";
@@ -8,7 +9,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { createPaymentIntent } from "@/actions/orders/stripe";
-import { createOrder } from "@/actions/orders/orders";
+import { createOrderAction } from "@/actions/orders/create-order";
+
 import type { CartItem } from "@/contexts/CartContext";
 
 // Load Stripe outside of component to avoid recreating it on each render
@@ -47,8 +49,8 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
       // Confirm the payment with Stripe.js
       const cardElement = elements.getElement(CardElement);
 
-      if (!cardElement) {
-        throw new Error("Card element not found");
+      if (!clientSecret) {
+        throw new Error("Missing client secret from payment intent");
       }
 
       const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
@@ -80,7 +82,7 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
           quantity: item.quantity
         }));
 
-        const orderResult = await createOrder({
+        const orderResult = await createOrderAction({
           paymentIntentId: paymentIntent.id,
           amount: amount,
           customerEmail: shippingDetails.email,

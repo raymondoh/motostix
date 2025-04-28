@@ -1,6 +1,9 @@
 // src/firebase/utils/firestore.ts
+
 import { Timestamp as AdminTimestamp } from "firebase-admin/firestore";
 import { Timestamp as ClientTimestamp } from "firebase/firestore";
+
+// ================= Admin Timestamp Helpers =================
 
 /**
  * Convert a Date to a Firestore Timestamp (admin)
@@ -16,6 +19,8 @@ export function adminTimestampToDate(timestamp: AdminTimestamp): Date {
   return timestamp.toDate();
 }
 
+// ================= Client Timestamp Helpers =================
+
 /**
  * Convert a Date to a Firestore Timestamp (client)
  */
@@ -29,6 +34,8 @@ export function clientDateToTimestamp(date: Date): ClientTimestamp {
 export function clientTimestampToDate(timestamp: ClientTimestamp): Date {
   return timestamp.toDate();
 }
+
+// ================= General Helpers =================
 
 /**
  * Recursively converts Firestore Timestamp objects to ISO strings
