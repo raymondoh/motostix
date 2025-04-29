@@ -34,5 +34,9 @@ export {
   updateProduct,
   deleteProduct,
   getFeaturedProducts,
-  getHeroSlidesFromFirestore
+  getHeroSlidesFromFirestore,
+
+  // orders
+  createOrder,
+  getAllOrders
 } from "./actions";

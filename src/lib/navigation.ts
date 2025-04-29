@@ -12,7 +12,6 @@ import {
   Shield,
   //BarChart,
   Receipt,
-  Package,
 
   //Key,
   ShoppingBag
@@ -39,6 +38,11 @@ export const generalNavItems: NavItem[] = [
     icon: Home
   },
   {
+    title: "Products",
+    href: "/products",
+    icon: ShoppingBag
+  },
+  {
     title: "About",
     href: "/about",
     icon: Info
@@ -47,11 +51,6 @@ export const generalNavItems: NavItem[] = [
     title: "Contact",
     href: "/contact",
     icon: Mail
-  },
-  {
-    title: "Products",
-    href: "/products",
-    icon: ShoppingBag
   }
 ];
 
@@ -65,7 +64,7 @@ export const userNavItems: NavItem[] = [
   {
     title: "Orders",
     href: "/user/orders",
-    icon: Package
+    icon: Receipt
   },
   {
     title: "Profile",
@@ -111,6 +110,11 @@ export const adminNavItems: NavItem[] = [
     title: "Products",
     href: "/admin/products",
     icon: ShoppingBag
+  },
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    icon: Receipt
   },
   {
     title: "Admin Profile",

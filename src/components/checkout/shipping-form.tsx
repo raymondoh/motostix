@@ -1,28 +1,13 @@
-//src/components/checkout/shipping-form.tsx
-"use client";
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const shippingFormSchema = z.object({
-  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
-  address: z.string().min(5, { message: "Address must be at least 5 characters" }),
-  city: z.string().min(2, { message: "City must be at least 2 characters" }),
-  state: z.string().min(2, { message: "Please select a state" }),
-  zipCode: z.string().min(5, { message: "Please enter a valid ZIP code" }),
-  country: z.string().min(2, { message: "Please select a country" })
-});
-
-type ShippingFormValues = z.infer<typeof shippingFormSchema>;
+import { shippingFormSchema, type ShippingFormValues } from "@/schemas/ecommerce/ecommerce";
 
 interface ShippingFormProps {
   onSubmit: (values: ShippingFormValues) => void;
@@ -136,7 +121,7 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>State</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value ?? ""}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select state" />
@@ -183,7 +168,7 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Country</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value ?? ""}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select country" />

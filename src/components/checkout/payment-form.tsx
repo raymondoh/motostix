@@ -1,24 +1,27 @@
-//src/components/checkout/payment-form.tsx
+// src/components/checkout/payment-form.tsx
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import { CardElement, useStripe, useElements, Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, type StripeCardElement } from "@stripe/stripe-js";
+
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { createPaymentIntent } from "@/actions/orders/stripe";
 import { createOrderAction } from "@/actions/orders/create-order";
 
 import type { CartItem } from "@/contexts/CartContext";
+import type { ShippingFormValues } from "@/schemas/ecommerce"; // ✅ Import proper shipping type
+import { getCurrencyCode } from "@/lib/utils";
 
-// Load Stripe outside of component to avoid recreating it on each render
+// Load Stripe outside the component to avoid recreating on every render
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface PaymentFormProps {
   amount: number;
-  shippingDetails: any;
+  shippingDetails: ShippingFormValues;
   items: CartItem[];
   onSuccess: (orderId: string) => void;
 }
@@ -32,40 +35,40 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
-      return;
-    }
+    if (!stripe || !elements) return;
 
     setProcessing(true);
     setError(null);
 
     try {
-      // Create payment intent on the server
       const { clientSecret } = await createPaymentIntent({
-        amount: Math.round(amount * 100), // Convert to cents
+        amount: Math.round(amount * 100), // ✅ Correct: Convert pounds to cents
         shipping: shippingDetails
       });
 
-      // Confirm the payment with Stripe.js
       const cardElement = elements.getElement(CardElement);
 
       if (!clientSecret) {
         throw new Error("Missing client secret from payment intent");
       }
 
+      if (!cardElement) {
+        throw new Error("Card element not found");
+      }
+
       const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: cardElement,
+          card: cardElement as StripeCardElement, // ✅ Tell TypeScript it's safe
           billing_details: {
-            name: shippingDetails.fullName,
-            email: shippingDetails.email,
-            phone: shippingDetails.phone,
+            name: shippingDetails.fullName ?? "",
+            email: shippingDetails.email ?? "",
+            phone: shippingDetails.phone ?? "",
             address: {
-              line1: shippingDetails.address,
-              city: shippingDetails.city,
-              state: shippingDetails.state,
-              postal_code: shippingDetails.zipCode,
-              country: shippingDetails.country
+              line1: shippingDetails.address ?? "",
+              city: shippingDetails.city ?? "",
+              state: shippingDetails.state ?? "",
+              postal_code: shippingDetails.zipCode ?? "",
+              country: shippingDetails.country ?? ""
             }
           }
         }
@@ -74,7 +77,6 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
       if (paymentError) {
         setError(paymentError.message || "An error occurred with your payment");
       } else if (paymentIntent.status === "succeeded") {
-        // Payment successful - create order directly here
         const orderItems = items.map(item => ({
           productId: item.id,
           name: item.product.name,
@@ -89,11 +91,11 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
           customerName: shippingDetails.fullName,
           items: orderItems,
           shippingAddress: {
-            address: shippingDetails.address,
-            city: shippingDetails.city,
-            state: shippingDetails.state,
-            zipCode: shippingDetails.zipCode,
-            country: shippingDetails.country
+            address: shippingDetails.address ?? "",
+            city: shippingDetails.city ?? "",
+            state: shippingDetails.state ?? "",
+            zipCode: shippingDetails.zipCode ?? "",
+            country: shippingDetails.country ?? ""
           },
           status: "processing"
         });
@@ -104,8 +106,9 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
           throw new Error("Failed to create order");
         }
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(errorMessage);
     } finally {
       setProcessing(false);
     }
@@ -143,7 +146,7 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
           ? "Processing..."
           : `Pay ${new Intl.NumberFormat("en-US", {
               style: "currency",
-              currency: "USD"
+              currency: getCurrencyCode(shippingDetails.country)
             }).format(amount)}`}
       </Button>
     </form>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchUserOrdersClient } from "@/actions/client/orders";
+import { fetchUserOrdersClient } from "@/actions/client/fetch-user-orders-client";
 import type { Order } from "@/types/order";
 
 import { Loader } from "lucide-react";

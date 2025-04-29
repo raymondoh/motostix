@@ -110,6 +110,9 @@ export async function getUserOrders(userId: string) {
 // /**
 //  * Fetches all orders for admin dashboard
 //  */
+/**
+ * Fetches all orders (Admin use)
+ */
 export async function getAllOrders() {
   try {
     const snapshot = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
@@ -119,6 +122,51 @@ export async function getAllOrders() {
     return orders;
   } catch (error) {
     console.error("Error fetching all orders:", error);
-    throw new Error("Failed to fetch orders");
+
+    logger({
+      type: "error",
+      message: "Failed to fetch all orders",
+      metadata: { error },
+      context: "orders"
+    });
+
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error while fetching all orders";
+
+    throw new Error(message);
+  }
+}
+
+/**
+ * Fetches a single order by ID (Admin use)
+ */
+export async function getOrderById(id: string) {
+  try {
+    const doc = await adminDb.collection("orders").doc(id).get();
+
+    if (!doc.exists) {
+      return null;
+    }
+
+    return mapDocToOrder(doc);
+  } catch (error) {
+    console.error("Error fetching order by ID:", error);
+    logger({
+      type: "error",
+      message: "Failed to fetch order by ID",
+      metadata: { error, id },
+      context: "orders"
+    });
+
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error while fetching order";
+
+    throw new Error(message);
   }
 }

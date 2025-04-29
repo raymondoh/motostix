@@ -1,14 +1,19 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { CartItemCard } from "./cart-item-card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getCurrencyCode } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import Link from "next/link";
+import type { ShippingFormValues } from "@/schemas/ecommerce";
 
-export function CartSidebar() {
+interface Props {
+  shippingDetails?: ShippingFormValues;
+}
+
+export function CartSidebar({ shippingDetails }: Props) {
   const { isOpen, closeCart, items, subtotal, itemCount, clearCart } = useCart();
 
   return (
@@ -45,7 +50,12 @@ export function CartSidebar() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Subtotal</span>
-                  <span className="text-sm font-medium">{formatCurrency(subtotal)}</span>
+                  <span className="text-sm font-medium flex items-center gap-1">
+                    {formatCurrency(subtotal)}
+                    <span className="text-xs text-muted-foreground">
+                      ({getCurrencyCode(shippingDetails?.country ?? "US")})
+                    </span>
+                  </span>
                 </div>
                 <div className="text-xs text-muted-foreground">Shipping and taxes calculated at checkout</div>
               </div>
@@ -65,5 +75,3 @@ export function CartSidebar() {
     </Sheet>
   );
 }
-
-import { ShoppingCart } from "lucide-react";

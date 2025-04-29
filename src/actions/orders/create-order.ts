@@ -2,7 +2,7 @@
 
 "use server";
 
-import { createOrder } from "@/firebase/admin/orders"; // ✅ Server-side Firestore write
+import { createOrder } from "@/firebase/actions"; // ✅ Server-side Firestore write
 import type { OrderData } from "@/firebase/admin/orders"; // ✅ Keep types consistent
 
 // Action response type

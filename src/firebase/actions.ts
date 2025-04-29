@@ -134,6 +134,9 @@ export async function getFeaturedProducts(...args: Parameters<typeof adminProduc
 export async function createOrder(...args: Parameters<typeof adminOrders.createOrder>) {
   return adminOrders.createOrder(...args);
 }
+export async function getAllOrders(...args: Parameters<typeof adminOrders.getAllOrders>) {
+  return adminOrders.getAllOrders(...args);
+}
 // ================= Hero Slides =================
 
 export async function getHeroSlidesFromFirestore(...args: Parameters<typeof adminProducts.getHeroSlidesFromFirestore>) {

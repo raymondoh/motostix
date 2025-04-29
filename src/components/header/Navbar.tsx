@@ -103,32 +103,14 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link href="/" className="flex items-center mr-6">
               <Logo className="h-9 w-9" />
-              <span className="ml-3 text-xl font-bold">Firestarter</span>
+              <span className="ml-3 text-xl font-bold">MotoStix</span>
             </Link>
 
             <NavLinks isMobile={false} />
           </div>
         )}
       </div>
-      {/* <div className="flex items-center space-x-2 md:space-x-6">
-        <ModeToggle />
-        {!isMobile && status !== "loading" && !session?.user ? (
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="secondary" size="lg">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="default" size="lg">
-                Sign up
-              </Button>
-            </Link>
-          </div>
-        ) : isMobile || session?.user ? (
-          <UserMenu isMobile={isMobile} />
-        ) : null}
-      </div> */}
+
       <div className="flex items-center space-x-2 md:space-x-6">
         {/* Add CartIcon here */}
         <CartIcon />
