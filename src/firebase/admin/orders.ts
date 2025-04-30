@@ -170,3 +170,32 @@ export async function getOrderById(id: string) {
     throw new Error(message);
   }
 }
+/**
+ * Update a single order by ID (Admin use)
+ */
+export async function updateOrderStatus(orderId: string, status: Order["status"]) {
+  try {
+    await adminDb.collection("orders").doc(orderId).update({
+      status,
+      updatedAt: serverTimestamp()
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    logger({
+      type: "error",
+      message: "Failed to update order status",
+      context: "orders",
+      metadata: { orderId, error }
+    });
+
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error while updating order status";
+
+    return { success: false, error: message };
+  }
+}

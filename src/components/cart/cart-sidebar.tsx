@@ -4,10 +4,11 @@ import { X, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { CartItemCard } from "./cart-item-card";
-import { formatCurrency, getCurrencyCode } from "@/lib/utils";
+//import { formatCurrency, getCurrencyCode } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import Link from "next/link";
 import type { ShippingFormValues } from "@/schemas/ecommerce";
+import { formatPriceWithCode } from "@/lib/utils";
 
 interface Props {
   shippingDetails?: ShippingFormValues;
@@ -50,11 +51,8 @@ export function CartSidebar({ shippingDetails }: Props) {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Subtotal</span>
-                  <span className="text-sm font-medium flex items-center gap-1">
-                    {formatCurrency(subtotal)}
-                    <span className="text-xs text-muted-foreground">
-                      ({getCurrencyCode(shippingDetails?.country ?? "US")})
-                    </span>
+                  <span className="text-sm font-medium">
+                    {formatPriceWithCode(subtotal, shippingDetails?.country ?? "GB")}
                   </span>
                 </div>
                 <div className="text-xs text-muted-foreground">Shipping and taxes calculated at checkout</div>

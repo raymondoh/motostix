@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { formatPriceWithCode } from "@/lib/utils";
 
 export default async function ProductsPage() {
   const result = await getAllProducts();
@@ -31,7 +32,7 @@ export default async function ProductsPage() {
                 </div>
                 <CardContent className="p-4">
                   <h2 className="font-semibold text-lg">{product.name}</h2>
-                  <p className="text-muted-foreground mt-1">${product.price.toFixed(2)}</p>
+                  <p className="text-muted-foreground mt-1">{formatPriceWithCode(product.price, "GB")}</p>
                 </CardContent>
               </Link>
               <CardFooter className="p-4">

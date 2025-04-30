@@ -21,3 +21,13 @@ export function getCurrencyCode(country: string): string {
       return "USD";
   }
 }
+
+/**
+ * Formats a number into a localized currency string based on country.
+ */
+export function formatPriceWithCode(amount: number, country: string = "GB") {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: getCurrencyCode(country)
+  }).format(amount / 100); // divide if using cents
+}

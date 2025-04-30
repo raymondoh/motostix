@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import type { Product } from "@/types/product";
+import { formatPriceWithCode } from "@/lib/utils";
 
 type GetProductColumnsProps = {
   onEdit: (id: string) => void;
@@ -43,18 +44,28 @@ export function getProductColumns({ onEdit, onDelete }: GetProductColumnsProps):
       header: () => <div className="text-xs text-muted-foreground font-medium">Name</div>,
       cell: ({ row }) => <div className="font-medium whitespace-nowrap">{row.getValue("name")}</div>
     },
+    // {
+    //   accessorKey: "price",
+    //   header: () => <div className="text-xs text-muted-foreground font-medium text-center">Price</div>,
+    //   cell: ({ row }) => {
+    //     const price = Number.parseFloat(row.getValue("price"));
+    //     const formatted = new Intl.NumberFormat("en-US", {
+    //       style: "currency",
+    //       currency: "USD"
+    //     }).format(price);
+    //     return <div className="text-center whitespace-nowrap">{formatted}</div>;
+    //   }
+    // },
     {
       accessorKey: "price",
       header: () => <div className="text-xs text-muted-foreground font-medium text-center">Price</div>,
       cell: ({ row }) => {
-        const price = Number.parseFloat(row.getValue("price"));
-        const formatted = new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD"
-        }).format(price);
+        const price = Number(row.getValue("price"));
+        const formatted = formatPriceWithCode(price, "GB");
         return <div className="text-center whitespace-nowrap">{formatted}</div>;
       }
     },
+
     {
       accessorKey: "inStock",
       header: () => <div className="text-xs text-muted-foreground font-medium text-center">Status</div>,

@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/product";
+import { formatPriceWithCode } from "@/lib/utils";
 
 export interface ProductCarouselProps {
   /**
@@ -187,9 +188,7 @@ export function ProductCarousel({
 
                       <CardContent className="p-4">
                         <h3 className="text-lg font-semibold line-clamp-1">{product.name}</h3>
-                        <p className="text-xl font-bold mt-2">
-                          {typeof product.price === "number" ? formatPrice(product.price) : product.price}
-                        </p>
+                        <p className="text-xl font-bold mt-2">{formatPriceWithCode(product.price, "GB")}</p>
                         {product.description && (
                           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
                         )}

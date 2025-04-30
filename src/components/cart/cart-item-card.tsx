@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart, type CartItem } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatPriceWithCode, formatCurrency } from "@/lib/utils";
 
 interface CartItemCardProps {
   item: CartItem;
@@ -32,7 +32,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
             <h3 className="font-medium line-clamp-1">{product.name}</h3>
             <p className="text-sm text-muted-foreground line-clamp-1">{product.category}</p>
           </div>
-          <div className="text-sm font-medium">{formatCurrency(product.price)}</div>
+          <div className="text-sm font-medium">{formatPriceWithCode(product.price, "GB")}</div>
         </div>
 
         <div className="mt-auto flex items-center justify-between">

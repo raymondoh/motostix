@@ -1,23 +1,3 @@
-// "use client";
-
-// import { useState } from "react";
-// import { OrdersDataTable } from "./OrdersDataTable";
-// import { getAdminOrderColumns } from "./admin-order-columns";
-// import type { Order } from "@/types/order";
-
-// interface AdminOrdersClientProps {
-//   orders: Order[];
-// }
-
-// export function AdminOrdersClient({ orders }: AdminOrdersClientProps) {
-//   const [data, setData] = useState<Order[]>(orders);
-
-//   const handleRefresh = async () => {
-//     // TODO: Optional later — add a refresh action
-//   };
-
-//   return <OrdersDataTable data={data} columns={getAdminOrderColumns()} onRefresh={handleRefresh} />;
-// }
 "use client";
 
 import { useState, useTransition } from "react";

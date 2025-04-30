@@ -29,3 +29,4 @@ export type Order = {
 
 // ✅ Type used when **creating** a new order (before Firestore writes it)
 export type OrderData = z.infer<typeof orderSchema>;
+export type OrderStatus = Order["status"];

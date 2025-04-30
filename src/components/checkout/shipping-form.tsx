@@ -72,7 +72,6 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             )}
           />
         </div>
-
         <FormField
           control={form.control}
           name="phone"
@@ -86,7 +85,6 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="address"
@@ -100,7 +98,6 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             </FormItem>
           )}
         />
-
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField
             control={form.control}
@@ -120,34 +117,16 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>State</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value ?? ""}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="AL">Alabama</SelectItem>
-                    <SelectItem value="AK">Alaska</SelectItem>
-                    <SelectItem value="AZ">Arizona</SelectItem>
-                    <SelectItem value="CA">California</SelectItem>
-                    <SelectItem value="CO">Colorado</SelectItem>
-                    <SelectItem value="FL">Florida</SelectItem>
-                    <SelectItem value="GA">Georgia</SelectItem>
-                    <SelectItem value="HI">Hawaii</SelectItem>
-                    <SelectItem value="NY">New York</SelectItem>
-                    <SelectItem value="TX">Texas</SelectItem>
-                    <SelectItem value="WA">Washington</SelectItem>
-                    {/* Add more states as needed */}
-                  </SelectContent>
-                </Select>
+                <FormLabel>County / Region</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. Greater London" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </div>
-
+        </div>{" "}
+        {/* ✅ This closing div was missing */}
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField
             control={form.control}
@@ -187,7 +166,6 @@ export function ShippingForm({ onSubmit }: ShippingFormProps) {
             )}
           />
         </div>
-
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Processing..." : "Continue to Payment"}
         </Button>

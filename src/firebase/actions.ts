@@ -137,6 +137,18 @@ export async function createOrder(...args: Parameters<typeof adminOrders.createO
 export async function getAllOrders(...args: Parameters<typeof adminOrders.getAllOrders>) {
   return adminOrders.getAllOrders(...args);
 }
+
+export async function updateOrderStatus(...args: Parameters<typeof adminOrders.updateOrderStatus>) {
+  return adminOrders.updateOrderStatus(...args);
+}
+export async function getOrderById(...args: Parameters<typeof adminOrders.getOrderById>) {
+  return adminOrders.getOrderById(...args);
+}
+
+export async function getUserOrders(...args: Parameters<typeof adminOrders.getUserOrders>) {
+  return adminOrders.getUserOrders(...args);
+}
+
 // ================= Hero Slides =================
 
 export async function getHeroSlidesFromFirestore(...args: Parameters<typeof adminProducts.getHeroSlidesFromFirestore>) {

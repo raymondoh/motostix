@@ -3,7 +3,7 @@
 "use server";
 
 import { auth } from "@/auth"; // To get session
-import { getUserOrders } from "@/firebase/admin/orders";
+import { getUserOrders } from "@/firebase/actions";
 import type { OrderData } from "@/types/order";
 
 /**

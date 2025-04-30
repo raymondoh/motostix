@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ProductActions } from "@/components/products/ProductActions";
-import { formatCurrency } from "@/lib/utils";
+import { formatPriceWithCode } from "@/lib/utils";
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -63,7 +63,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
           {/* Price */}
           <div>
-            <p className="text-2xl font-semibold">{formatCurrency(product.price)}</p>
+            <p className="text-2xl font-semibold">{formatPriceWithCode(product.price, "GB")}</p>
           </div>
 
           {/* In Stock Status */}

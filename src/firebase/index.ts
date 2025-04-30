@@ -38,5 +38,8 @@ export {
 
   // orders
   createOrder,
-  getAllOrders
+  getAllOrders,
+  getOrderById,
+  getUserOrders,
+  updateOrderStatus
 } from "./actions";
