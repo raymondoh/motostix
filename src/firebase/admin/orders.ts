@@ -11,6 +11,7 @@ import { isFirebaseError, firebaseError } from "@/utils/firebase-error"; // ✅ 
 import { orderSchema } from "@/schemas/order"; // ✅ Validation schema
 import type { Order, OrderData } from "@/types/order"; // ✅ Type definitions
 import { logger } from "@/utils/logger";
+//import type { User } from "@/types/user";
 
 // ================= Types =================
 export type { OrderData }; // ✅ Explicitly export OrderData here for Actions or elsewhere
@@ -44,22 +45,33 @@ function mapDocToOrder(doc: FirebaseFirestore.DocumentSnapshot): Order {
 /**
  * Creates a new order in Firestore
  */
+
 export async function createOrder(orderData: OrderData) {
   try {
-    // Validate incoming data
+    // ✅ Validate incoming data
     const validatedData = orderSchema.parse(orderData);
 
-    // Get current user session
+    // ✅ Get current user session
     const session = await auth();
     if (!session?.user?.id) {
       return { success: false, error: "Unauthorized. Please sign in." };
     }
 
-    // Create the order document
+    // ✅ Calculate total amount
+    if (!validatedData.items || validatedData.items.length === 0) {
+      return { success: false, error: "No items provided in order." };
+    }
+
+    const amount = validatedData.items.reduce((total, item) => {
+      return total + item.price * item.quantity;
+    }, 0);
+
+    // ✅ Create the order document in Firestore
     const orderRef = await adminDb.collection("orders").add({
       ...validatedData,
       userId: session.user.id,
       status: validatedData.status || "processing",
+      amount, // 💸 Include total amount
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -70,7 +82,13 @@ export async function createOrder(orderData: OrderData) {
     };
   } catch (error) {
     console.error("Error creating order:", error);
-    logger({ type: "error", message: "Failed to create order", metadata: { error }, context: "orders" });
+
+    logger({
+      type: "error",
+      message: "Failed to create order",
+      metadata: { error },
+      context: "orders"
+    });
 
     const message = isFirebaseError(error)
       ? firebaseError(error)
@@ -178,6 +196,13 @@ export async function updateOrderStatus(orderId: string, status: Order["status"]
     await adminDb.collection("orders").doc(orderId).update({
       status,
       updatedAt: serverTimestamp()
+    });
+
+    logger({
+      type: "order:status",
+      message: `Order status updated to ${status}`,
+      context: "orders",
+      metadata: { orderId, status }
     });
 
     return { success: true };

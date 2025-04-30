@@ -9,6 +9,7 @@ import bcryptjs from "bcryptjs";
 import { logActivity } from "@/firebase/admin/activity";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { getUserImage } from "@/utils/get-user-image";
+import type { User } from "@/types/user";
 
 // ================= Firebase User Management =================
 
@@ -188,9 +189,43 @@ export async function deleteUser(uid: string) {
 /**
  * Get a Firebase user by UID
  */
-export async function getUser(uid: string) {
+export async function getUser(uid: string): Promise<{ success: true; data: User } | { success: false; error: string }> {
   try {
-    const user = await adminAuth.getUser(uid);
+    // Get auth user
+    const userRecord = await adminAuth.getUser(uid);
+
+    // Get Firestore user doc
+    const userDoc = await adminDb.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData) {
+      return { success: false, error: "User profile not found in Firestore." };
+    }
+
+    // Merge auth + Firestore data into your custom User type
+    const user: User = {
+      id: uid,
+      email: userRecord.email,
+      name: userRecord.displayName || userData.name || "",
+      image: userData.image || userData.picture || userRecord.photoURL || null,
+      emailVerified: userRecord.emailVerified,
+      role: userData.role || "user",
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt,
+      lastLoginAt: userData.lastLoginAt,
+      // Add optional fields if needed
+      phone: userData.phone || undefined,
+      bio: userData.bio || undefined,
+      location: userData.location || undefined,
+      website: userData.website || undefined,
+      provider: userData.provider || undefined,
+      hasPassword: userData.hasPassword || false,
+      has2FA: userData.has2FA || false,
+      passwordHash: userData.passwordHash || undefined,
+      status: userData.status || "active",
+      permissions: userData.permissions || []
+    };
+
     return { success: true, data: user };
   } catch (error) {
     const message = isFirebaseError(error)

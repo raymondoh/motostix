@@ -27,7 +27,7 @@ export function AdminOrderDetailCard({ order }: AdminOrderDetailCardProps) {
 
         <div className="flex justify-between">
           <span className="font-medium text-muted-foreground">Total:</span>
-          <span>{formatPriceWithCode(order.amount / 100, "GB")}</span>
+          <span>{formatPriceWithCode(order.amount, "GB")}</span>
         </div>
 
         <div className="flex justify-between">

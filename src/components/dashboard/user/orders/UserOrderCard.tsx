@@ -25,8 +25,8 @@ export function UserOrderCard({ order }: UserOrderCardProps) {
         </div>
 
         <div className="flex justify-between text-sm">
-          <span>Total:</span>
-          <span>{formatPriceWithCode(order.amount / 100, "GB")}</span>
+          <span>Total Paid:</span>
+          <span>{formatPriceWithCode(order.amount, "GB")}</span>
         </div>
 
         <div>

@@ -84,6 +84,7 @@ interface CheckoutSummaryProps {
   shipping: number;
   total: number;
   shippingDetails?: ShippingFormValues; // ✅ Add optional shippingDetails prop
+  userId?: string;
 }
 
 export function CheckoutSummary({ items, subtotal, tax, shipping, total, shippingDetails }: CheckoutSummaryProps) {
