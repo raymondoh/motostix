@@ -4,6 +4,8 @@
 
 import { formatDate } from "@/utils/date";
 import { formatPriceWithCode } from "@/lib/utils";
+import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
+
 import type { Order } from "@/types/order";
 import type { ColumnDef } from "@tanstack/react-table";
 import { updateOrderStatusAction } from "@/actions/orders/update-order-status";
@@ -30,14 +32,19 @@ export function getAdminOrderColumns(): ColumnDef<Order>[] {
       cell: ({ row }) => <div className="truncate max-w-[180px]">{row.original.customerEmail}</div>
     },
     {
-      accessorKey: "amount",
-      header: "Amount",
+      id: "total",
+      header: "Total",
       cell: ({ row }) => {
-        const order = row.original;
-        return <div className="font-medium">{formatPriceWithCode(order.amount, "GB")}</div>;
+        const rawAmount = row.original?.amount;
+        const amount = typeof rawAmount === "number" ? rawAmount : 0;
+
+        const tax = parseFloat((amount * TAX_RATE).toFixed(2));
+        const shipping = amount > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
+        const total = amount + tax + shipping;
+
+        return <span>{formatPriceWithCode(total, "GB")}</span>;
       }
     },
-
     {
       accessorKey: "status",
       header: "Status",

@@ -29,5 +29,5 @@ export function formatPriceWithCode(amount: number, country: string = "GB") {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: getCurrencyCode(country)
-  }).format(amount / 100); // divide if using cents
+  }).format(amount); // divide if using cents
 }

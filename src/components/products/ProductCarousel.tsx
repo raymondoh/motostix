@@ -118,13 +118,6 @@ export function ProductCarousel({
     }
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
-  };
-
   return (
     <div className={cn("py-4", className)}>
       <div className="px-4">

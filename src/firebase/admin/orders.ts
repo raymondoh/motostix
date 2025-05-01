@@ -12,6 +12,7 @@ import { orderSchema } from "@/schemas/order"; // ✅ Validation schema
 import type { Order, OrderData } from "@/types/order"; // ✅ Type definitions
 import { logger } from "@/utils/logger";
 //import type { User } from "@/types/user";
+import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 
 // ================= Types =================
 export type { OrderData }; // ✅ Explicitly export OrderData here for Actions or elsewhere
@@ -45,7 +46,6 @@ function mapDocToOrder(doc: FirebaseFirestore.DocumentSnapshot): Order {
 /**
  * Creates a new order in Firestore
  */
-
 export async function createOrder(orderData: OrderData) {
   try {
     // ✅ Validate incoming data
@@ -62,16 +62,23 @@ export async function createOrder(orderData: OrderData) {
       return { success: false, error: "No items provided in order." };
     }
 
-    const amount = validatedData.items.reduce((total, item) => {
+    const subtotal = validatedData.items.reduce((total, item) => {
       return total + item.price * item.quantity;
     }, 0);
+
+    const tax = subtotal * TAX_RATE;
+    const shipping = subtotal > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
+    const total = subtotal + tax + shipping;
 
     // ✅ Create the order document in Firestore
     const orderRef = await adminDb.collection("orders").add({
       ...validatedData,
       userId: session.user.id,
       status: validatedData.status || "processing",
-      amount, // 💸 Include total amount
+      amount: subtotal, // 💸 Base amount (subtotal)
+      tax,
+      shipping,
+      total, // ✅ Final total saved separately
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });

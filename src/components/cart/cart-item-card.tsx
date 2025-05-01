@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart, type CartItem } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
-import { formatPriceWithCode, formatCurrency } from "@/lib/utils";
+import { formatPriceWithCode } from "@/lib/utils";
 
 interface CartItemCardProps {
   item: CartItem;

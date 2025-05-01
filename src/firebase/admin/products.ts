@@ -10,7 +10,7 @@ import type {
   HeroSlide
 } from "@/types/product";
 import { serializeProduct, serializeProductArray } from "@/utils/serializeProduct";
-import { productSchema } from "@/schemas/product";
+import { productSchema, updateProductSchema } from "@/schemas/product";
 
 // Helper to map Firestore data to full Product type
 function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
@@ -103,13 +103,16 @@ type SafeUpdateProductInput = Omit<UpdateProductInput, "id" | "createdAt">;
 
 export async function updateProduct(id: string, updatedData: SafeUpdateProductInput) {
   try {
-    const parsed = productSchema.partial().omit({ id: true, createdAt: true }).safeParse(updatedData);
+    const parsed = updateProductSchema.safeParse(updatedData);
+
     if (!parsed.success) {
       console.error("❌ Invalid updated product data:", parsed.error.flatten());
       return { success: false as const, error: "Invalid product update data" };
     }
 
     const docRef = adminDb.collection("products").doc(id);
+    console.log("Parsed update data:", parsed.data);
+
     await docRef.update({ ...parsed.data, updatedAt: Timestamp.now() });
 
     const updatedDoc = await docRef.get();
