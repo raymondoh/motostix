@@ -55,7 +55,8 @@ export function getAdminOrderColumns(): ColumnDef<Order>[] {
             defaultValue={order.status}
             onValueChange={async newStatus => {
               try {
-                await updateOrderStatusAction(order.id, newStatus);
+                await updateOrderStatusAction(order.id, newStatus as Order["status"]);
+
                 toast.success("Status updated");
               } catch (error) {
                 toast.error("Failed to update status");

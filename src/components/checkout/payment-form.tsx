@@ -42,8 +42,11 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
 
     try {
       const { clientSecret } = await createPaymentIntent({
-        amount: Math.round(amount * 100), // ✅ Correct: Convert pounds to cents
-        shipping: shippingDetails
+        amount: Math.round(amount * 100), // Convert pounds to cents
+        shipping: {
+          ...shippingDetails,
+          state: shippingDetails.state ?? "" // ✅ fix: ensure `state` is not undefined
+        }
       });
 
       const cardElement = elements.getElement(CardElement);
@@ -100,7 +103,7 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
           status: "processing"
         });
 
-        if (orderResult.success) {
+        if (orderResult.success && orderResult.orderId) {
           onSuccess(orderResult.orderId);
         } else {
           throw new Error("Failed to create order");
