@@ -1,1 +1,2 @@
-export * from "./ecommerce";
+// In src/schemas/ecommerce/index.ts
+export * from "./stripe";

@@ -4,3 +4,5 @@ export const SHIPPING_CONFIG = {
   flatRate: 5,
   freeShippingThreshold: 50
 };
+
+export const DEFAULT_CURRENCY = "gbp";

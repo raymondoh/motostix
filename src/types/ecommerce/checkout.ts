@@ -1,3 +1,4 @@
+//src/types/ecommerce/checkout.ts
 // =============================
 // 📄 types/ecommerce/checkout.ts
 // =============================

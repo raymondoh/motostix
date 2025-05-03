@@ -25,6 +25,17 @@ export type Order = {
   createdAt?: Date; // ✅ Now correct — will match mapped Date
   updatedAt?: Date;
 };
+
+// src/types/order.ts
+
+export type StripeOrderInput = {
+  paymentIntentId: string;
+  amount: number;
+  customerEmail: string;
+  customerName: string;
+  // You can add `shipping?: ShippingDetails`, `items?: OrderItem[]`, etc. later
+};
+
 // ================== Order Types ==================
 
 // ✅ Type used when **creating** a new order (before Firestore writes it)

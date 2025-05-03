@@ -18,7 +18,13 @@ export function CartItemCard({ item }: CartItemCardProps) {
     <div className="flex gap-4 py-2">
       <div className="relative h-20 w-20 overflow-hidden rounded-md bg-muted">
         {product.image ? (
-          <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
+          <Image
+            src={product.image || "/placeholder.svg"}
+            alt={product.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Adjust these based on your design
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-secondary">
             <span className="text-sm text-muted-foreground">No image</span>

@@ -12,7 +12,8 @@ export type LogLevel =
   | `admin:${string}`
   | `deletion:${string}`
   | `data-privacy:${string}`
-  | `order:${string}`;
+  | `order:${string}`
+  | `stripe:${string}`;
 
 export interface LogEntry<T extends Record<string, unknown> = Record<string, unknown>> {
   type: LogLevel;

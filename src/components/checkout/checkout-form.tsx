@@ -1,4 +1,5 @@
-// src/components/checkout/checkout-form.tsx
+// // src/components/checkout/checkout-form.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,7 +10,7 @@ import { ShippingForm } from "./shipping-form";
 import { PaymentForm } from "./payment-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import type { ShippingFormValues } from "@/schemas/ecommerce/ecommerce";
+import type { ShippingFormValues } from "@/schemas/ecommerce/stripe";
 import { formatPriceWithCode } from "@/lib/utils";
 
 interface CheckoutFormProps {
@@ -21,7 +22,7 @@ type CheckoutStep = "shipping" | "payment" | "confirmation";
 
 export function CheckoutForm({ userId, user }: CheckoutFormProps) {
   const [step, setStep] = useState<CheckoutStep>("shipping");
-  const [shippingDetails, setShippingDetails] = useState<ShippingFormValues | null>(null);
+  const [shippingDetails, setShippingDetails] = useState<ShippingFormValues | undefined>(undefined); // Use `undefined` instead of `null`
   const [orderId, setOrderId] = useState<string | null>(null);
   const { items, subtotal, clearCart } = useCart();
   const router = useRouter();
@@ -67,9 +68,10 @@ export function CheckoutForm({ userId, user }: CheckoutFormProps) {
             </div>
             <PaymentForm
               amount={total}
-              shippingDetails={shippingDetails}
+              shippingDetails={shippingDetails} // Pass `undefined` if `shippingDetails` is not available
               items={items}
               onSuccess={id => {
+                setOrderId(id); // Set orderId after successful order creation
                 clearCart();
                 router.push(`/checkout/success?orderId=${id}`);
               }}
@@ -77,11 +79,11 @@ export function CheckoutForm({ userId, user }: CheckoutFormProps) {
           </div>
         )}
 
-        {step === "confirmation" && (
+        {step === "confirmation" && orderId && (
           <div className="rounded-lg border border-green-200 bg-green-50 p-6 text-center dark:border-green-900 dark:bg-green-950">
             <h2 className="mb-4 text-2xl font-semibold text-green-700 dark:text-green-300">🎉 Order Confirmed!</h2>
             <p className="mb-2 text-green-600 dark:text-green-400">Thank you for your purchase.</p>
-            {orderId && <p className="mb-2 text-green-600 dark:text-green-400 font-medium">Order ID: {orderId}</p>}
+            <p className="mb-2 text-green-600 dark:text-green-400 font-medium">Order ID: {orderId}</p>
             <p className="mb-2 text-green-600 dark:text-green-400 font-medium">
               Total Paid: {formatPriceWithCode(total, "GB")}
             </p>
@@ -104,6 +106,7 @@ export function CheckoutForm({ userId, user }: CheckoutFormProps) {
           tax={tax}
           shipping={shipping}
           total={total}
+          shippingDetails={shippingDetails} // Pass `undefined` or `ShippingFormValues` to CheckoutSummary
           userId={userId}
         />
       </div>

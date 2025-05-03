@@ -28,6 +28,7 @@ export default async function ProductsPage() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 300px"
+                    priority
                   />
                 </div>
                 <CardContent className="p-4">

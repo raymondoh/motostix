@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { Check, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Product } from "@/types/product";
 
 interface ProductActionsProps {
-  product: any; // Replace with your product type
+  product: Product; // Replace with your product type
 }
 
 export function ProductActions({ product }: ProductActionsProps) {
