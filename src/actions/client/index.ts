@@ -1,4 +1,4 @@
 export * from "./fetch-activity";
-export * from "./products";
+export * from "./fetch-all-products";
 export * from "./update-password";
 export * from "./users";

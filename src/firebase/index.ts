@@ -29,6 +29,7 @@ export {
 
   // Products
   getAllProducts,
+  getFilteredProducts,
   addProduct,
   getProductById,
   updateProduct,

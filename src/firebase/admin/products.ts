@@ -1,3 +1,8 @@
+// ===============================
+// 📂 src/firebase/admin/products.ts
+// ===============================
+
+// ================= Imports =================
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb, adminStorage } from "@/firebase/admin/firebase-admin-init";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
@@ -23,8 +28,9 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
     dimensions: data?.dimensions || "",
     material: data?.material || "",
     color: data?.color || "",
-    stickySide: data?.stickySide || undefined, // "Front" | "Back" | undefined
+    stickySide: data?.stickySide || undefined,
     category: data.category || "",
+    subcategory: data.subcategory || "", // ✅ NEW
     image: data?.image || "/placeholder.svg",
     price: data?.price,
     inStock: data?.inStock ?? true,
@@ -39,7 +45,18 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
 // ===================
 // GET ALL PRODUCTS
 // ===================
-export async function getAllProducts() {
+export async function getAllProducts(filters?: {
+  category?: string;
+  subcategory?: string;
+  material?: string;
+  priceRange?: string;
+  isFeatured?: boolean;
+  stickySide?: string;
+}) {
+  if (filters) {
+    return await getFilteredProducts(filters);
+  }
+
   try {
     const snapshot = await adminDb.collection("products").orderBy("createdAt", "desc").get();
     const products = snapshot.docs.map(mapDocToProduct);
@@ -48,6 +65,59 @@ export async function getAllProducts() {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : (error as Error)?.message || "Unknown error fetching products";
+    return { success: false as const, error: message };
+  }
+}
+
+// ===================
+// GET PRODUCTS WITH FILTERING
+// ===================
+export async function getFilteredProducts(filters: {
+  category?: string;
+  subcategory?: string;
+  material?: string;
+  priceRange?: string;
+  isFeatured?: boolean;
+  stickySide?: string;
+}) {
+  try {
+    let query = adminDb.collection("products").orderBy("createdAt", "desc");
+
+    if (filters.category) {
+      query = query.where("category", "==", filters.category);
+    }
+
+    if (filters.subcategory) {
+      query = query.where("subcategory", "==", filters.subcategory);
+    }
+
+    if (filters.material) {
+      query = query.where("material", "==", filters.material);
+    }
+
+    if (filters.priceRange) {
+      const priceRange = filters.priceRange.split("-");
+      if (priceRange.length === 2) {
+        query = query.where("price", ">=", parseFloat(priceRange[0])).where("price", "<=", parseFloat(priceRange[1]));
+      }
+    }
+
+    if (filters.isFeatured !== undefined) {
+      query = query.where("isFeatured", "==", filters.isFeatured);
+    }
+
+    if (filters.stickySide) {
+      query = query.where("stickySide", "==", filters.stickySide);
+    }
+
+    const snapshot = await query.get();
+    const products = snapshot.docs.map(mapDocToProduct);
+
+    return { success: true as const, data: serializeProductArray(products) };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : (error as Error)?.message || "Unknown error fetching filtered products";
     return { success: false as const, error: message };
   }
 }

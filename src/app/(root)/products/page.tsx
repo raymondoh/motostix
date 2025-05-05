@@ -1,50 +1,57 @@
-// src/app/products/page.tsx
 import { getAllProducts } from "@/actions/products/get-all-products";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import { formatPriceWithCode } from "@/lib/utils";
+import { extractCategoriesFromProducts } from "@/utils/product-utils";
+import { ProductsHeader } from "@/components/products/ProductsHeader";
+import { CategoryCardsWrapper } from "@/components/products/CategoryCardsWrapper";
+import { ProductsFiltersWrapper } from "@/components/products/ProductsFiltersWrapper";
+import { ProductsGrid } from "@/components/products/ProductsGrid";
 
-export default async function ProductsPage() {
-  const result = await getAllProducts();
-  const products = result.success ? result.data : [];
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Products | MotoStix",
+  description: "Browse our collection of premium motorcycle decals and stickers"
+};
+
+interface ProductsPageProps {
+  searchParams: Promise<{ category?: string }> | { category?: string };
+}
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  // Await the searchParams object before accessing its properties
+  const params = await searchParams;
+
+  // Now safely access the category property
+  const selectedCategory = params?.category || "all";
+
+  // Fetch products
+  const productsResult = await getAllProducts();
+  const products = productsResult.success ? productsResult.data : [];
+
+  // Extract categories from products - now directly returns CategoryData[]
+  const categories = extractCategoriesFromProducts(products);
+
+  // Filter products based on selected category
+  const filteredProducts =
+    selectedCategory && selectedCategory !== "all"
+      ? products.filter(product => product.category?.toLowerCase().replace(/\s+/g, "-") === selectedCategory)
+      : products;
 
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-8">Our Stickers</h1>
-
-      {products.length === 0 ? (
-        <p className="text-muted-foreground">No products available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {products.map(product => (
-            <Card key={product.id} className="flex flex-col overflow-hidden">
-              <Link href={`/products/${product.id}`} className="flex-1">
-                <div className="relative w-full h-48">
-                  <Image
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 300px"
-                    priority
-                  />
-                </div>
-                <CardContent className="p-4">
-                  <h2 className="font-semibold text-lg">{product.name}</h2>
-                  <p className="text-muted-foreground mt-1">{formatPriceWithCode(product.price, "GB")}</p>
-                </CardContent>
-              </Link>
-              <CardFooter className="p-4">
-                <Button asChild className="w-full">
-                  <Link href={`/products/${product.id}`}>View Details</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+    <>
+      <main className="min-h-screen">
+        <div className="container py-8 md:py-12">
+          <ProductsHeader />
+          <CategoryCardsWrapper categories={categories} selectedCategory={selectedCategory} />
+          <div className="mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+            <aside className="hidden lg:block">
+              <ProductsFiltersWrapper selectedCategory={selectedCategory} />
+            </aside>
+            <div>
+              <ProductsGrid products={filteredProducts} />
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+      </main>
+    </>
   );
 }

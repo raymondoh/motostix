@@ -109,6 +109,9 @@ export async function sendResetPasswordEmail(...args: Parameters<typeof adminAut
 export async function getAllProducts(...args: Parameters<typeof adminProducts.getAllProducts>) {
   return adminProducts.getAllProducts(...args);
 }
+export async function getFilteredProducts(...args: Parameters<typeof adminProducts.getFilteredProducts>) {
+  return adminProducts.getFilteredProducts(...args);
+}
 
 export async function addProduct(...args: Parameters<typeof adminProducts.addProduct>) {
   return adminProducts.addProduct(...args);

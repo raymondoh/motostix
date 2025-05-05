@@ -12,7 +12,12 @@ import {
 import { HeaderIconButton } from "./header-icon-button";
 
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
+  // Add a console log to debug
+  React.useEffect(() => {
+    console.log("Current theme:", theme);
+  }, [theme]);
 
   return (
     <DropdownMenu>

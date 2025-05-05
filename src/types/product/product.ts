@@ -12,6 +12,7 @@ export interface Product {
   stickySide?: "Front" | "Back"; // ✨ NEW
   image: string;
   category?: string;
+  subcategory?: string; // ✅ NEW
   price: number;
   inStock: boolean;
   badge?: string;
@@ -32,6 +33,7 @@ export interface SerializedProduct {
   stickySide?: "Front" | "Back"; // ✨ NEW
   image: string;
   category?: string;
+  subcategory?: string; // ✅ NEW
   price: number;
   inStock: boolean;
   badge?: string;
@@ -85,3 +87,48 @@ export interface HeroSlide {
   cta?: string;
   ctaHref?: string;
 }
+/**
+ * Category type representing a group of products with the same category
+ */
+export interface Category {
+  /**
+   * Unique identifier for the category (slug format)
+   */
+  id: string;
+
+  /**
+   * Display name of the category
+   */
+  name: string;
+
+  /**
+   * Number of products in this category
+   */
+  count: number;
+
+  /**
+   * Optional image URL for the category (typically from a representative product)
+   */
+  image?: string;
+}
+
+/**
+ * Success response when fetching categories
+ */
+export interface GetCategoriesSuccess {
+  success: true;
+  data: Category[];
+}
+
+/**
+ * Error response when fetching categories fails
+ */
+export interface GetCategoriesError {
+  success: false;
+  error: string;
+}
+
+/**
+ * Union type for category fetch results
+ */
+export type GetCategoriesResult = GetCategoriesSuccess | GetCategoriesError;

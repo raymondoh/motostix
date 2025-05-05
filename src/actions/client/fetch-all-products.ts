@@ -1,12 +1,22 @@
 // src/actions/client/products.ts
 import type { GetAllProductsResult } from "@/types/product/result";
+import type { ProductFilterOptions } from "@/types/product/filter";
 
 /**
- * Client-side action to fetch all products
+ * Client-side action to fetch filtered products
  */
-export async function fetchAllProductsClient(): Promise<GetAllProductsResult> {
+export async function fetchAllProductsClient(filters?: ProductFilterOptions): Promise<GetAllProductsResult> {
   try {
-    const res = await fetch("/api/products");
+    const query = filters
+      ? "?" +
+        new URLSearchParams(
+          Object.entries(filters)
+            .filter(([_, value]) => value !== undefined && value !== "")
+            .map(([key, value]) => [key, String(value)])
+        ).toString()
+      : "";
+
+    const res = await fetch(`/api/products${query}`);
 
     if (!res.ok) {
       console.error("fetchAllProductsClient error:", res.statusText);

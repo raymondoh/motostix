@@ -11,17 +11,16 @@ export const productSchema = z.object({
   color: z.string().min(2, "Color must be at least 2 characters").trim().optional(),
   stickySide: z.enum(["Front", "Back"]).optional(),
   category: z.string().optional(),
+  subcategory: z.string().optional(), // ✅ Added here
   image: z.string().url("Must be a valid image URL"),
   price: z.preprocess(
     val => (typeof val === "string" ? parseFloat(val) : val),
     z.number().positive("Price must be a positive number")
   ),
   inStock: z.boolean(),
-
   badge: z.string().optional(),
   isFeatured: z.boolean().optional(),
   isHero: z.boolean().optional(),
-
   createdAt: z.date().optional(),
   updatedAt: z.date().optional()
 });
@@ -33,7 +32,7 @@ export const createProductSchema = productSchema
     createdAt: true,
     updatedAt: true
   })
-  .strict(); // ✅ No unknown fields allowed
+  .strict();
 
 // Schema for updating an existing product (partial fields allowed)
 export const updateProductSchema = productSchema
@@ -43,7 +42,7 @@ export const updateProductSchema = productSchema
     updatedAt: true
   })
   .partial()
-  .strict(); // ✅ Also strict here
+  .strict();
 
 // TypeScript types generated from schemas
 export type CreateProductInput = z.infer<typeof createProductSchema>;

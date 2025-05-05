@@ -3,7 +3,8 @@
 
 import { getAllProducts as getAllProductsFromDB } from "@/firebase/actions";
 import type { GetAllProductsResult } from "@/types/product/result";
+import type { ProductFilterOptions } from "@/types/product/filter";
 
-export async function getAllProducts(): Promise<GetAllProductsResult> {
-  return await getAllProductsFromDB();
+export async function getAllProducts(filters?: ProductFilterOptions): Promise<GetAllProductsResult> {
+  return await getAllProductsFromDB(filters);
 }

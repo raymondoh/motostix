@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { Navbar } from "@/components/header/Navbar";
 import { usePathname } from "next/navigation";
+import { Logo } from "./Logo";
 
 export function Header() {
   const pathname = usePathname();
@@ -23,10 +23,13 @@ export function Header() {
 
   if (showMinimalHeader) {
     return (
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-white dark:bg-background">
         <div className="container px-4 py-4 mx-auto flex items-center justify-center">
-          <Link href="/">
-            <Image src="/fire.svg" alt="Logo" width={50} height={32} priority />
+          <Link href="/" className="flex items-center">
+            <Logo className="h-9 w-9" />
+            <span className="ml-3 text-2xl font-bold tracking-tight">
+              MOTO<span className="text-accent">STIX</span>
+            </span>
           </Link>
         </div>
       </header>
@@ -34,11 +37,10 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-white dark:bg-background">
       <div className="container px-4 mx-auto">
         <Navbar />
       </div>
-      {/* global styles */}
     </header>
   );
 }

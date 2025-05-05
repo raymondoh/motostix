@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/header/ModeToggle";
-import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus } from "lucide-react";
+import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus, User } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSession, signOut } from "next-auth/react";
 import { generalNavItems, adminNavItems, type NavItem } from "@/lib/navigation";
@@ -52,16 +51,18 @@ const NavLinks = ({ setOpen, isMobile }: { setOpen?: (open: boolean) => void; is
     <Link
       key={item.href}
       href={item.href}
-      className={`flex items-center ${
-        pathname === item.href ? "text-primary" : "text-muted-foreground"
-      } p-2 hover:bg-accent rounded-md`}
+      className={`text-sm font-bold uppercase tracking-wide transition-colors ${
+        pathname === item.href
+          ? "text-foreground border-b-2 border-accent pb-1"
+          : "text-muted-foreground hover:text-primary"
+      } ${isMobile ? "p-2 hover:bg-accent/10 rounded-md" : ""}`}
       onClick={() => setOpen?.(false)}>
       <span>{item.title}</span>
     </Link>
   );
 
   return (
-    <div className={`flex ${isMobile ? "flex-col space-y-4" : "space-x-4"}`}>{generalNavItems.map(renderNavItem)}</div>
+    <div className={`flex ${isMobile ? "flex-col space-y-4" : "space-x-6"}`}>{generalNavItems.map(renderNavItem)}</div>
   );
 };
 
@@ -97,13 +98,18 @@ export const Navbar = () => {
             </Sheet>
             <Link href="/" className="flex items-center ml-2 mr-0">
               <Logo className="h-8 w-8" />
+              <span className="ml-2 text-xl font-bold tracking-tight">
+                MOTO<span className="text-accent">STIX</span>
+              </span>
             </Link>
           </div>
         ) : (
           <div className="flex items-center">
-            <Link href="/" className="flex items-center mr-6">
+            <Link href="/" className="flex items-center mr-10">
               <Logo className="h-9 w-9" />
-              <span className="ml-3 text-xl font-bold">MotoStix</span>
+              <span className="ml-3 text-2xl font-bold tracking-tight">
+                MOTO<span className="text-accent">STIX</span>
+              </span>
             </Link>
 
             <NavLinks isMobile={false} />
@@ -111,26 +117,10 @@ export const Navbar = () => {
         )}
       </div>
 
-      <div className="flex items-center space-x-2 md:space-x-6">
-        {/* Add CartIcon here */}
+      <div className="flex items-center space-x-3">
         <CartIcon />
         <ModeToggle />
-        {!isMobile && status !== "loading" && !session?.user ? (
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="secondary" size="lg">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="default" size="lg">
-                Sign up
-              </Button>
-            </Link>
-          </div>
-        ) : isMobile || session?.user ? (
-          <UserMenu isMobile={isMobile} />
-        ) : null}
+        <UserMenu isMobile={isMobile} />
       </div>
     </nav>
   );
@@ -246,32 +236,38 @@ const UserMenu = ({ isMobile }: { isMobile?: boolean }) => {
   };
 
   const user = session?.user;
+  const isLoggedIn = !!user;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <HeaderIconButton>
-          <UserAvatar src={user?.image} name={user?.name} email={user?.email} className="h-8 w-8" />
+        <HeaderIconButton className=" hover:bg-background/70">
+          {isLoggedIn ? (
+            <UserAvatar src={user?.image} name={user?.name} email={user?.email} className="h-8 w-8" />
+          ) : (
+            <User className="h-5 w-5 text-black dark:text-white" />
+          )}
         </HeaderIconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel className="flex items-center gap-3 p-4">
-          <div className="flex flex-col">
-            <span className="font-medium text-base">{session?.user?.name || session?.user?.email || "Guest"}</span>
-            {session?.user?.email && session?.user?.name && (
-              <span className="text-xs text-muted-foreground truncate max-w-[180px]">{session.user.email}</span>
-            )}
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
         {status === "loading" ? (
           <DropdownMenuItem disabled>
             <Skeleton className="h-4 w-full" />
           </DropdownMenuItem>
-        ) : session?.user ? (
+        ) : isLoggedIn ? (
           <>
+            <DropdownMenuLabel className="flex items-center gap-3 p-4">
+              <UserAvatar src={user?.image} name={user?.name} email={user?.email} className="h-10 w-10" />
+              <div className="flex flex-col">
+                <span className="font-medium text-base">{user?.name || user?.email}</span>
+                {user?.email && user?.name && (
+                  <span className="text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</span>
+                )}
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {session.user.role === "admin" ? (
+              {user.role === "admin" ? (
                 adminNavItems.map(item => (
                   <DropdownMenuItem key={item.href} onClick={() => handleNavigation(item.href)} className="py-3">
                     <item.icon className="mr-3 h-5 w-5" />
@@ -293,22 +289,22 @@ const UserMenu = ({ isMobile }: { isMobile?: boolean }) => {
           </>
         ) : (
           <>
-            {isMobile && (
-              <>
-                <Link href="/login" passHref>
-                  <DropdownMenuItem className="py-3">
-                    <LogIn className="mr-3 h-5 w-5" />
-                    <span className="text-base">Log in</span>
-                  </DropdownMenuItem>
-                </Link>
-                <Link href="/register" passHref>
-                  <DropdownMenuItem className="py-3 font-medium">
-                    <UserPlus className="mr-3 h-5 w-5" />
-                    <span className="text-base">Sign up</span>
-                  </DropdownMenuItem>
-                </Link>
-              </>
-            )}
+            <DropdownMenuLabel className="p-4">
+              <span className="font-medium text-base">Account</span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <Link href="/login" passHref>
+              <DropdownMenuItem className="py-3">
+                <LogIn className="mr-3 h-5 w-5 text-primary" />
+                <span className="text-base">Log in</span>
+              </DropdownMenuItem>
+            </Link>
+            <Link href="/register" passHref>
+              <DropdownMenuItem className="py-3 font-medium">
+                <UserPlus className="mr-3 h-5 w-5 text-accent" />
+                <span className="text-base">Sign up</span>
+              </DropdownMenuItem>
+            </Link>
           </>
         )}
       </DropdownMenuContent>

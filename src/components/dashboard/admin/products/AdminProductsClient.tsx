@@ -11,7 +11,7 @@ import { getProductColumns } from "./products-columns";
 import { deleteProduct } from "@/actions/products";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { Product } from "@/types/product";
-import { fetchAllProductsClient } from "@/actions/client/products";
+import { fetchAllProductsClient } from "@/actions/client/fetch-all-products";
 
 import {
   AlertDialog,
