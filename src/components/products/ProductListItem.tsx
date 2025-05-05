@@ -2,44 +2,35 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatPriceWithCode } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
-interface ProductCardProps {
+interface ProductListItemProps {
   product: Product;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductListItem({ product }: ProductListItemProps) {
   // Calculate a rating based on product id for demo purposes
-  // In a real app, you'd have actual ratings from reviews
   const demoRating = Math.floor((Number.parseInt(product.id.slice(-2), 16) % 5) + 1);
   const demoReviewCount = Math.floor((Number.parseInt(product.id.slice(-4), 16) % 100) + 5);
 
   return (
-    <Card className="overflow-hidden border-border/40 hover:border-primary/20 transition-colors group h-full flex flex-col bg-gradient-to-b from-background to-secondary/5">
-      <div className="relative">
+    <div className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg hover:border-primary/20 transition-colors group bg-gradient-to-r from-background to-secondary/5">
+      {/* Product Image */}
+      <div className="relative w-full sm:w-48 h-48 flex-shrink-0">
         <Link href={`/products/${product.id}`} className="block">
-          <div className="relative aspect-square overflow-hidden bg-secondary/5">
+          <div className="relative h-full overflow-hidden bg-secondary/5 rounded-md">
             <Image
               src={product.image || "/placeholder.svg"}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 300px"
+              sizes="(max-width: 768px) 100vw, 192px"
               priority
             />
           </div>
         </Link>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background">
-          <Heart className="h-4 w-4" />
-          <span className="sr-only">Add to wishlist</span>
-        </Button>
 
         {product.badge && (
           <Badge
@@ -55,7 +46,8 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
 
-      <CardContent className="p-4 flex-1 flex flex-col">
+      {/* Product Details */}
+      <div className="flex-1 flex flex-col">
         <div className="mb-1">
           {product.category && (
             <Link href={`/products?category=${product.category.toLowerCase().replace(/\s+/g, "-")}`}>
@@ -67,10 +59,10 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <Link href={`/products/${product.id}`} className="block group-hover:text-primary transition-colors">
-          <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
+          <h3 className="text-lg font-medium">{product.name}</h3>
         </Link>
 
-        <div className="flex items-center mt-1 mb-3">
+        <div className="flex items-center mt-1 mb-2">
           <div className="flex items-center">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} className={`h-3 w-3 ${i < demoRating ? "text-accent fill-accent" : "text-muted/20"}`} />
@@ -79,16 +71,25 @@ export function ProductCard({ product }: ProductCardProps) {
           <span className="text-xs text-muted-foreground ml-1">({demoReviewCount})</span>
         </div>
 
-        <div className="mt-auto pt-2">
-          <div className="flex items-center justify-between">
-            <span className="font-bold">{formatPriceWithCode(product.price, "GB")}</span>
-            <Button size="sm" className="h-8 px-3">
+        {/* Description preview */}
+        {product.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{product.description}</p>
+        )}
+
+        <div className="mt-auto pt-2 flex items-center justify-between">
+          <span className="font-bold text-lg">{formatPriceWithCode(product.price, "GB")}</span>
+          <div className="flex space-x-2">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Heart className="h-4 w-4" />
+              <span className="sr-only">Add to wishlist</span>
+            </Button>
+            <Button size="sm">
               <ShoppingCart className="h-3.5 w-3.5 mr-1" />
-              Add
+              Add to Cart
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

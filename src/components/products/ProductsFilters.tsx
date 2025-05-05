@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { X } from "lucide-react";
 import { categories, subcategories } from "@/config/categories";
 import type { Category, CategoryData } from "@/config/categories";
+import { cn } from "@/lib/utils";
 
 interface ProductsFiltersProps {
   onClose?: () => void;
@@ -81,9 +82,9 @@ export function ProductsFilters({
         )}
       </div>
 
-      <Accordion type="multiple" defaultValue={["category", "price", "material"]}>
-        <AccordionItem value="category">
-          <AccordionTrigger>
+      <Accordion type="multiple" defaultValue={["category", "price", "material"]} className="space-y-2">
+        <AccordionItem value="category" className="border-b-0">
+          <AccordionTrigger className={cn("no-underline hover:no-underline py-2", "text-sm font-medium")}>
             {selectedCategory && selectedCategory !== "all"
               ? `${getCategoryDisplayName(selectedCategory)} Subcategories`
               : "Categories"}
@@ -155,8 +156,10 @@ export function ProductsFilters({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="price">
-          <AccordionTrigger>Price Range</AccordionTrigger>
+        <AccordionItem value="price" className="border-b-0">
+          <AccordionTrigger className={cn("no-underline hover:no-underline py-2", "text-sm font-medium")}>
+            Price Range
+          </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-4">
               <Slider defaultValue={[0, 100]} max={100} step={1} value={priceRange} onValueChange={setPriceRange} />
@@ -169,8 +172,10 @@ export function ProductsFilters({
         </AccordionItem>
 
         {/* Rest of the accordion items remain the same */}
-        <AccordionItem value="material">
-          <AccordionTrigger>Material</AccordionTrigger>
+        <AccordionItem value="material" className="border-b-0">
+          <AccordionTrigger className={cn("no-underline hover:no-underline py-2", "text-sm font-medium")}>
+            Material
+          </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2">
               {["Vinyl", "Reflective", "Matte", "Glossy", "Waterproof"].map(material => (
@@ -187,8 +192,10 @@ export function ProductsFilters({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="color">
-          <AccordionTrigger>Color</AccordionTrigger>
+        <AccordionItem value="color" className="border-b-0">
+          <AccordionTrigger className={cn("no-underline hover:no-underline py-2", "text-sm font-medium")}>
+            Color
+          </AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-wrap gap-2">
               {[
@@ -209,8 +216,10 @@ export function ProductsFilters({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="stickySide">
-          <AccordionTrigger>Sticky Side</AccordionTrigger>
+        <AccordionItem value="stickySide" className="border-b-0">
+          <AccordionTrigger className={cn("no-underline hover:no-underline py-2", "text-sm font-medium")}>
+            Sticky Side
+          </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2">
               {["Front", "Back"].map(side => (

@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
-import { siteConfig } from "./src/styles/site-config";
-// Import the plugin using ES module syntax or use the approach that worked for you
+// Import the plugin using ES module syntax
 import tailwindcssAnimate from "tailwindcss-animate";
 // Or if you prefer: const tailwindcssAnimate = eval('require')("tailwindcss-animate")
 
@@ -120,13 +119,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)"
       },
       fontFamily: {
-        sans: [siteConfig.theme.fonts.primary, "sans-serif"],
-        heading: [siteConfig.theme.fonts.secondary, "sans-serif"]
+        sans: ["Inter", "sans-serif"],
+        heading: ["Space Grotesk", "sans-serif"]
       },
-      spacing: siteConfig.theme.spacing,
-      maxWidth: siteConfig.theme.layout.maxWidth,
-      // borderRadius: siteConfig.theme.borderRadius,
-      boxShadow: siteConfig.theme.shadows,
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -140,9 +135,34 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out"
+      },
+      // Add standard spacing values
+      spacing: {
+        xs: "0.25rem", // 4px
+        sm: "0.5rem", // 8px
+        md: "1rem", // 16px
+        lg: "1.5rem", // 24px
+        xl: "2rem", // 32px
+        xxl: "3rem" // 48px
+      },
+      // Add standard max-width values
+      maxWidth: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        xxl: "1536px"
+      },
+      // Add standard box-shadow values
+      boxShadow: {
+        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        DEFAULT: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
       }
     }
   },
   plugins: [tailwindcssAnimate]
 };
+
 export default config;

@@ -10,10 +10,7 @@ import {
   Activity,
   Users,
   Shield,
-  //BarChart,
   Receipt,
-
-  //Key,
   ShoppingBag
 } from "lucide-react";
 

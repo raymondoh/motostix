@@ -187,6 +187,12 @@ body {
   }
 }
 
+/* Fix for sidebar transparency */
+[data-sidebar="sidebar"] {
+  background-color: hsl(var(--sidebar-background)) !important;
+  backdrop-filter: none !important;
+}
+
 /* Your existing desktop sidebar styling */
 [data-collapsible="icon"] [data-sidebar="menu-button"] {
   width: 100% !important;
