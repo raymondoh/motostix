@@ -17,18 +17,21 @@ export function ProductListItem({ product }: ProductListItemProps) {
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg hover:border-primary/20 transition-colors group bg-gradient-to-r from-background to-secondary/5">
-      {/* Product Image */}
+      {/* Product Image - Fixed dimensions with proper positioning */}
       <div className="relative w-full sm:w-48 h-48 flex-shrink-0">
-        <Link href={`/products/${product.id}`} className="block">
-          <div className="relative h-full overflow-hidden bg-secondary/5 rounded-md">
-            <Image
-              src={product.image || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 192px"
-              priority
-            />
+        <Link href={`/products/${product.id}`} className="block h-full">
+          <div className="relative h-full w-full overflow-hidden bg-secondary/5 rounded-md">
+            {/* Using position relative with width and height 100% for the image container */}
+            <div className="relative w-full h-full">
+              <Image
+                src={product.image || "/placeholder.svg"}
+                alt={product.name}
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 192px"
+                fill
+                priority
+              />
+            </div>
           </div>
         </Link>
 

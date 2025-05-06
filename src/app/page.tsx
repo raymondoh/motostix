@@ -3,7 +3,6 @@ import { getAllProducts } from "@/firebase/actions";
 import { ProductCarousel } from "@/components/products/ProductCarousel";
 import { HeroBanner } from "@/components/hero/HeroBanner";
 import { siteConfig } from "@/config/siteConfig";
-import { Footer } from "@/components/footer/footer";
 import { FeaturedCategories } from "@/components/sections/FeaturedCategories";
 import { TestimonialSection } from "@/components/sections/TestimonialSection";
 import { PromoSection } from "@/components/sections/PromoSection";
