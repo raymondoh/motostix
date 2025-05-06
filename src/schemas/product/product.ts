@@ -9,6 +9,8 @@ export const productSchema = z.object({
   dimensions: z.string().min(2, "Dimensions must be at least 2 characters").trim().optional(),
   material: z.string().min(2, "Material must be at least 2 characters").trim().optional(),
   color: z.string().min(2, "Color must be at least 2 characters").trim().optional(),
+  baseColor: z.string().optional(),
+  colorDisplayName: z.string().optional(),
   stickySide: z.enum(["Front", "Back"]).optional(),
   category: z.string().optional(),
   subcategory: z.string().optional(), // ✅ Added here

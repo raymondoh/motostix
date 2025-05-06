@@ -5,6 +5,7 @@
 // ================= Imports =================
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb, adminStorage } from "@/firebase/admin/firebase-admin-init";
+import { DocumentData } from "firebase-admin/firestore";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import type {
   //GetProductByIdFromFirestoreResult,
@@ -28,6 +29,8 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
     dimensions: data?.dimensions || "",
     material: data?.material || "",
     color: data?.color || "",
+    baseColor: data?.baseColor || "",
+    colorDisplayName: data?.colorDisplayName || "",
     stickySide: data?.stickySide || undefined,
     category: data.category || "",
     subcategory: data.subcategory || "", // ✅ NEW
@@ -287,6 +290,57 @@ export async function getHeroSlidesFromFirestore() {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : (error as Error)?.message || "Unknown error fetching hero slides";
+    return { success: false as const, error: message };
+  }
+}
+
+// ===================
+// GET RELATED PRODUCTS
+// ===================
+interface GetRelatedProductsParams {
+  productId: string;
+  category?: string;
+  limit?: number;
+}
+
+export async function getRelatedProducts({ productId, category, limit = 4 }: GetRelatedProductsParams) {
+  try {
+    // Start with a collection reference
+    let query = adminDb.collection("products") as FirebaseFirestore.Query<DocumentData>;
+
+    // If category is provided, apply the where clause
+    if (category) {
+      query = query.where("category", "==", category);
+    }
+
+    // Apply ordering and limit
+    const snapshot = await query
+      .orderBy("createdAt", "desc") // Ensure 'createdAt' is indexed
+      .limit(limit + 1) // Fetch one more than the limit to remove the current product
+      .get();
+
+    const related = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() } as Product))
+      .filter(product => product.id !== productId) // Filter out the current product
+      .slice(0, limit); // Ensure we only return up to the specified limit after filtering
+    // If no products found in the same category, try without category filter
+    if (related.length === 0 && category) {
+      const fallbackQuery = adminDb.collection("products").orderBy("createdAt", "desc").limit(limit).get();
+
+      const fallbackSnapshot = await fallbackQuery;
+      const fallbackProducts = fallbackSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Product))
+        .filter(product => product.id !== productId)
+        .slice(0, limit);
+
+      return { success: true as const, products: serializeProductArray(fallbackProducts) };
+    }
+
+    return { success: true as const, products: serializeProductArray(related) };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : (error as Error)?.message || "Unknown error fetching related products";
     return { success: false as const, error: message };
   }
 }

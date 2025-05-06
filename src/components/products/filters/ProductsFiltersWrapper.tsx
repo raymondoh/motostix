@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { ProductsFilters } from "./ProductsFilters";
+import { ProductFilters } from "./ProductFilters";
 import { useEffect, useState } from "react";
 import type { CategoryData } from "@/config/categories";
 
@@ -32,7 +32,7 @@ export function ProductsFiltersWrapper({
   };
 
   return (
-    <ProductsFilters
+    <ProductFilters
       selectedCategory={selectedCategory}
       onCategoryChange={handleCategoryChange}
       categoriesData={categoriesData}

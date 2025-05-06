@@ -132,6 +132,9 @@ export async function deleteProduct(...args: Parameters<typeof adminProducts.del
 export async function getFeaturedProducts(...args: Parameters<typeof adminProducts.getFeaturedProducts>) {
   return adminProducts.getFeaturedProducts(...args);
 }
+export async function getRelatedProducts(...args: Parameters<typeof adminProducts.getRelatedProducts>) {
+  return adminProducts.getRelatedProducts(...args);
+}
 
 // ================= Admin Auth Orders =================
 export async function createOrder(...args: Parameters<typeof adminOrders.createOrder>) {

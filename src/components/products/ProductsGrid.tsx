@@ -6,15 +6,14 @@ import { ProductListItem } from "@/components/products/ProductListItem";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { LayoutToggle } from "@/components/products/LayoutToggle";
-import type { Product } from "@/types/product";
+import { useProducts } from "./ProductsProvider";
+import { MobileFiltersButton } from "@/components/products/MobileFiltersButton";
 
-interface ProductsGridProps {
-  products: Product[];
-}
-
-export function ProductsGrid({ products }: ProductsGridProps) {
+export function ProductsGrid() {
+  const { filteredProducts } = useProducts();
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [visibleProducts, setVisibleProducts] = useState(12);
+  const [sortOrder, setSortOrder] = useState<string>("featured");
 
   const handleLayoutChange = useCallback((newLayout: "grid" | "list") => {
     setLayout(newLayout);
@@ -24,25 +23,55 @@ export function ProductsGrid({ products }: ProductsGridProps) {
     setVisibleProducts(prev => prev + 12);
   };
 
-  const displayedProducts = products.slice(0, visibleProducts);
-  const hasMoreProducts = visibleProducts < products.length;
+  // Sort products based on selected sort order
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortOrder) {
+      case "price-asc":
+        return a.price - b.price;
+      case "price-desc":
+        return b.price - a.price;
+      case "newest":
+        // Handle different types of createdAt (Date, string, or undefined)
+        if (a.createdAt instanceof Date && b.createdAt instanceof Date) {
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        } else if (typeof a.createdAt === "string" && typeof b.createdAt === "string") {
+          // If createdAt is a string (ISO date format), compare them directly
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        } else {
+          // Fallback to string comparison for IDs if they're not numbers
+          return String(b.id).localeCompare(String(a.id));
+        }
+      default:
+        // Default to featured or any other sorting logic
+        return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
+    }
+  });
+
+  const displayedProducts = sortedProducts.slice(0, visibleProducts);
+  const hasMoreProducts = visibleProducts < sortedProducts.length;
 
   return (
     <div>
-      {products.length === 0 ? (
+      {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-medium mb-2">No products found</h3>
           <p className="text-muted-foreground">Try adjusting your filters or search criteria.</p>
         </div>
       ) : (
         <>
+          {/* Mobile filters button - only visible on mobile */}
+          <div className="mb-4 lg:hidden">
+            <MobileFiltersButton />
+          </div>
+
+          {/* Product count and sorting options */}
           <div className="flex justify-between items-center mb-6">
-            <p className="text-sm text-muted-foreground">{products.length} products</p>
+            <p className="text-sm text-muted-foreground">{filteredProducts.length} products</p>
             <div className="flex items-center space-x-3">
               <LayoutToggle onLayoutChange={handleLayoutChange} />
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-muted-foreground hidden sm:inline">Sort by:</span>
-                <Select defaultValue="featured">
+                <Select value={sortOrder} onValueChange={setSortOrder}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -79,7 +108,7 @@ export function ProductsGrid({ products }: ProductsGridProps) {
                 Load More Products
               </Button>
               <p className="text-xs text-muted-foreground mt-2">
-                Showing {displayedProducts.length} of {products.length} products
+                Showing {displayedProducts.length} of {filteredProducts.length} products
               </p>
             </div>
           )}

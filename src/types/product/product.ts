@@ -9,6 +9,8 @@ export interface Product {
   dimensions?: string;
   material?: string;
   color?: string;
+  baseColor?: string;
+  colorDisplayName?: string;
   stickySide?: "Front" | "Back"; // ✨ NEW
   image: string;
   category?: string;
@@ -30,6 +32,8 @@ export interface SerializedProduct {
   dimensions?: string;
   material?: string;
   color?: string;
+  baseColor?: string;
+  colorDisplayName?: string;
   stickySide?: "Front" | "Back"; // ✨ NEW
   image: string;
   category?: string;
