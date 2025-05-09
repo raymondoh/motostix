@@ -6,8 +6,8 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="w-full max-w-md space-y-6">{children}</div>
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-12">
+        <div className="w-full max-w-md space-y-8">{children}</div>
       </div>
     </ThemeProvider>
   );

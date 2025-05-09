@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { VerificationSuccessForm } from "@/components";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
 export const metadata: Metadata = {
   title: "Verify Success",
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function VerifySuccessPage() {
-  return <VerificationSuccessForm />;
+  return (
+    <>
+      <AuthHeader title="You're verified!" subtitle="Your account has been successfully verified" />
+      <VerificationSuccessForm />
+    </>
+  );
 }

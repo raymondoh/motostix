@@ -146,42 +146,47 @@ export function VerifyEmailForm() {
     );
   }
 
+  // ✅ Verified, show email sent message
   return (
-    <div className="container flex items-center justify-center min-h-screen py-12">
-      <Card className="max-w-md w-full">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-center mb-4">
-            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-              <Mail className="h-10 w-10 text-primary" />
-            </div>
+    <div className="w-full max-w-md px-4 sm:px-6 mx-auto">
+      <div className="relative py-8 sm:py-10">
+        <div className="flex justify-center mb-6">
+          <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <Mail className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-center">Check your email</CardTitle>
-          <CardDescription className="text-center">
-            We&apos;ve sent you a verification email. Please check your inbox and spam folder.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 text-center">
+        </div>
+
+        <div className="text-center space-y-2 mb-6">
+          <h1 className="text-3xl font-semibold tracking-tight">Check your email</h1>
+          <p className="text-muted-foreground">
+            We've sent you a verification email. Please check your inbox and spam folder.
+          </p>
+        </div>
+
+        <div className="text-center space-y-4 text-base">
           <p>
             Click the verification link in the email to activate your account. If you don&apos;t see the email, check
             your spam folder.
           </p>
           <p className="text-sm text-muted-foreground">The verification link will expire in 24 hours.</p>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <Button asChild className="w-full">
+        </div>
+
+        <div className="mt-10 space-y-4 text-center">
+          <Button asChild className="w-full h-12 text-base font-semibold">
             <Link href="/login">
               Continue to login
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
-          <p className="text-xs text-center text-muted-foreground">
+
+          <p className="text-sm text-muted-foreground">
             Didn&apos;t receive an email?{" "}
             <Link href="/verify-email" className="underline underline-offset-4 hover:text-primary">
               Try resending it
             </Link>
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -198,17 +203,17 @@ function CenteredCard({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="container flex items-center justify-center min-h-screen py-12">
-      <Card className="max-w-md w-full">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-center mb-4">
-            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">{icon}</div>
-          </div>
-          <CardTitle className="text-2xl text-center">{title}</CardTitle>
-          <CardDescription className="text-center">{description}</CardDescription>
-        </CardHeader>
-        {footer && <CardFooter className="flex justify-center">{footer}</CardFooter>}
-      </Card>
+    <div className="w-full max-w-md px-4 sm:px-6 mx-auto">
+      <div className="flex flex-col items-center text-center py-12 sm:py-16 space-y-6">
+        <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">{icon}</div>
+
+        <div className="space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+          <p className="text-muted-foreground">{description}</p>
+        </div>
+
+        {footer && <div className="pt-4">{footer}</div>}
+      </div>
     </div>
   );
 }

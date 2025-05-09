@@ -1,5 +1,5 @@
 // src/components/products/detail/RelatedProducts.tsx
-import { Separator } from "@/components/ui/separator";
+//import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products/ProductCard";
 import type { Product } from "@/types/product";
 

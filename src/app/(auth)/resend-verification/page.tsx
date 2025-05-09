@@ -1,12 +1,16 @@
 import { ResendVerificationForm } from "@/components";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "Resend Verification",
-  description: "Resend Verification Page"
+  description: "Resend verification email"
 };
 
-export default function ResetPasswordPage() {
-  return <ResendVerificationForm />;
+export default function ResendVerificationPage() {
+  return (
+    <>
+      <AuthHeader title="Verify your email" subtitle="Didn’t receive an email? Enter your address again below." />
+      <ResendVerificationForm />
+    </>
+  );
 }

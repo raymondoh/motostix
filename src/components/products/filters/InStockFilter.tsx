@@ -11,7 +11,7 @@ interface InStockFilterProps {
 export function InStockFilter({ checked, onToggle }: InStockFilterProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium mb-3">Availability</h3>
+      {/* <h3 className="text-sm font-medium mb-3"></h3> */}
       <div className="flex items-center justify-between space-x-2">
         <Label htmlFor="in-stock-filter" className="text-sm">
           Show in-stock items only

@@ -13,7 +13,7 @@ export function StickySideFilter({ sides, selectedSides, onToggle }: StickySideF
   if (!sides || sides.length === 0) {
     return (
       <div className="space-y-4">
-        <h3 className="text-sm font-medium mb-3">Sticky Side</h3>
+        {/* <h3 className="text-sm font-medium mb-3">Sticky Side</h3> */}
         <p className="text-sm text-muted-foreground">No options available</p>
       </div>
     );
@@ -21,7 +21,7 @@ export function StickySideFilter({ sides, selectedSides, onToggle }: StickySideF
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium mb-3">Sticky Side</h3>
+      {/* <h3 className="text-sm font-medium mb-3">Sticky Side</h3> */}
       <div className="space-y-2">
         {sides.map(side => (
           <div key={side} className="flex items-center space-x-2">

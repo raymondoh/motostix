@@ -1,3 +1,4 @@
+//src/components/category-carousel/CategoryCardsWrapper.tsx
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";

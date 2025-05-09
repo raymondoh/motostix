@@ -1,13 +1,18 @@
-//src/(auth)/login.tsx
-import { LoginForm } from "@/components";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { LoginRedirect } from "@/components/auth/LoginRedirect";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "Login",
   description: "Login to your account"
 };
 
 export default function LoginPage() {
-  return <LoginForm />;
+  return (
+    <>
+      <LoginRedirect />
+      <AuthHeader title="Welcome back" subtitle="Sign in to your account to continue" />
+      <LoginForm />
+    </>
+  );
 }

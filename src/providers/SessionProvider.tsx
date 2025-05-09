@@ -3,7 +3,8 @@
 //import { useEffect } from "react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-//import { UserProvider } from "@/contexts/UserContext";
+import { DashboardThemeProvider } from "@/providers/DashboardThemeProvider";
+
 import { Toaster } from "@/components/ui/sonner";
 
 interface ProvidersProps {

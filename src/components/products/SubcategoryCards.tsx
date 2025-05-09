@@ -1,9 +1,16 @@
 "use client";
 
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { useState, useEffect } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi
+} from "@/components/ui/carousel";
 import type { Category } from "@/config/categories";
 import { subcategories, categories } from "@/config/categories";
-import { useEffect } from "react";
 
 interface SubcategoryCardsProps {
   parentCategory: string;
@@ -12,6 +19,31 @@ interface SubcategoryCardsProps {
 }
 
 export function SubcategoryCards({ parentCategory, selectedSubcategory, onSubcategorySelect }: SubcategoryCardsProps) {
+  const [api, setApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  // Update the scroll buttons state when the carousel changes
+  useEffect(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    };
+
+    api.on("select", onSelect);
+    api.on("resize", onSelect);
+
+    // Initialize
+    onSelect();
+
+    return () => {
+      api.off("select", onSelect);
+      api.off("resize", onSelect);
+    };
+  }, [api]);
+
   // Add debugging to see what's happening
   useEffect(() => {
     console.log("SubcategoryCards - parentCategory:", parentCategory);
@@ -75,8 +107,8 @@ export function SubcategoryCards({ parentCategory, selectedSubcategory, onSubcat
   }
 
   return (
-    <div className="w-full mt-4">
-      <Carousel className="w-full">
+    <div className="w-full mt-4 relative group">
+      <Carousel setApi={setApi} className="w-full">
         <CarouselContent className="-ml-2">
           {/* Subcategories - No "All" card */}
           {availableSubcategories.map(subcategory => {
@@ -111,6 +143,22 @@ export function SubcategoryCards({ parentCategory, selectedSubcategory, onSubcat
             );
           })}
         </CarouselContent>
+
+        {/* Navigation buttons with improved styling */}
+        {canScrollPrev && (
+          <CarouselPrevious
+            className="absolute left-0 -translate-x-1/2 bg-background/80 backdrop-blur-sm shadow-md border-neutral-200 
+                      opacity-0 group-hover:opacity-100 transition-opacity
+                      disabled:opacity-0 disabled:pointer-events-none"
+          />
+        )}
+        {canScrollNext && (
+          <CarouselNext
+            className="absolute right-0 translate-x-1/2 bg-background/80 backdrop-blur-sm shadow-md border-neutral-200 
+                      opacity-0 group-hover:opacity-100 transition-opacity
+                      disabled:opacity-0 disabled:pointer-events-none"
+          />
+        )}
       </Carousel>
     </div>
   );

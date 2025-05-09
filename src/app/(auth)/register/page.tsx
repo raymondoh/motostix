@@ -1,11 +1,16 @@
-import type { Metadata } from "next";
-import { RegisterForm } from "@/components";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Register",
-  description: "Register for an account"
+  description: "Create a new account"
 };
 
 export default function RegisterPage() {
-  return <RegisterForm />;
+  return (
+    <>
+      <AuthHeader title="Create an account" subtitle="Sign up to get started with MotoStix" />
+      <RegisterForm />
+    </>
+  );
 }

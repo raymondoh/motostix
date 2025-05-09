@@ -38,7 +38,7 @@ export function PriceRangeFilter({ minPrice, maxPrice, priceRange, onPriceChange
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-medium mb-3">Price Range</h3>
+        {/* <h3 className="text-sm font-medium mb-3">Price Range</h3> */}
         <Slider
           min={priceRange[0]}
           max={priceRange[1]}

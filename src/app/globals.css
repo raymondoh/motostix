@@ -108,14 +108,14 @@
     --chart-5: 340 75% 55%;
 
     /* Sidebar colors for dark mode */
-    --sidebar-background: 240 5.9% 10%; /* Dark sidebar for dark mode */
-    --sidebar-foreground: 240 4.8% 95.9%; /* Light text for sidebar in dark mode */
-    --sidebar-primary: 48 100% 50%; /* #FFCE00 - Yellow (changed from green) */
-    --sidebar-primary-foreground: 0 0% 0%; /* Black text on yellow */
-    --sidebar-accent: 48 100% 50%; /* #FFCE00 - Yellow */
-    --sidebar-accent-foreground: 0 0% 0%; /* Black text on yellow */
-    --sidebar-border: 240 3.7% 15.9%; /* Dark border for sidebar in dark mode */
-    --sidebar-ring: 48 100% 50%; /* #FFCE00 - Yellow (changed from green) */
+    --sidebar-background: 240 5.9% 10%; /* Default shadcn dark sidebar background */
+    --sidebar-foreground: 240 4.8% 95.9%; /* Default shadcn dark sidebar text */
+    --sidebar-primary: 0 0% 98%; /* Default shadcn dark sidebar primary */
+    --sidebar-primary-foreground: 240 5.9% 10%; /* Default shadcn dark sidebar primary text */
+    --sidebar-accent: 240 3.7% 15.9%; /* Default shadcn dark sidebar accent */
+    --sidebar-accent-foreground: 240 4.8% 95.9%; /* Default shadcn dark sidebar accent text */
+    --sidebar-border: 240 3.7% 15.9%; /* Default shadcn dark sidebar border */
+    --sidebar-ring: 217.2 91.2% 59.8%; /* Default shadcn dark sidebar ring */
 
     /* Keep existing toast styling */
     --toaster-font-size: 1.25rem;
@@ -123,6 +123,92 @@
     --toaster-width: 420px;
     --toaster-border-radius: 12px;
     --toaster-icon-size: 28px;
+  }
+
+  /* Dashboard specific theme - Clerk-inspired */
+  .dashboard-theme {
+    /* Background colors */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 222 47% 11%; /* Dark text */
+
+    /* Card colors */
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 222 47% 11%; /* Dark text */
+
+    /* Primary colors - blue instead of green/yellow */
+    --primary: 215 100% 50%; /* Blue */
+    --primary-foreground: 0 0% 100%; /* White text */
+
+    /* Secondary colors */
+    --secondary: 210 20% 98%; /* Very light gray */
+    --secondary-foreground: 215 25% 27%; /* Dark blue-gray */
+
+    /* Muted colors */
+    --muted: 210 20% 96%; /* Light gray background */
+    --muted-foreground: 215 16% 47%; /* Medium gray text */
+
+    /* Accent colors */
+    --accent: 215 100% 98%; /* Very light blue */
+    --accent-foreground: 215 100% 50%; /* Blue */
+
+    /* Border colors */
+    --border: 214 32% 91%; /* Light gray border */
+    --input: 214 32% 91%; /* Light gray input */
+
+    /* Ring color */
+    --ring: 215 100% 50%; /* Blue ring */
+
+    /* Sidebar colors for dashboard - using default shadcn light sidebar colors */
+    --sidebar-background: 0 0% 100%; /* Default shadcn light sidebar background */
+    --sidebar-foreground: 240 5.3% 26.1%; /* Default shadcn light sidebar text */
+    --sidebar-primary: 240 5.9% 10%; /* Default shadcn light sidebar primary */
+    --sidebar-primary-foreground: 0 0% 98%; /* Default shadcn light sidebar primary text */
+    --sidebar-accent: 240 4.8% 95.9%; /* Default shadcn light sidebar accent */
+    --sidebar-accent-foreground: 240 5.9% 10%; /* Default shadcn light sidebar accent text */
+    --sidebar-border: 220 13% 91%; /* Default shadcn light sidebar border */
+    --sidebar-ring: 217.2 91.2% 59.8%; /* Default shadcn light sidebar ring */
+  }
+
+  /* Dashboard dark theme */
+  .dashboard-theme[data-theme="dark"] {
+    /* Background colors */
+    --background: 220 10% 10%; /* Slightly blue-tinted dark background - same as main site */
+    --foreground: 210 40% 98%; /* Light text */
+
+    /* Card colors */
+    --card: 0 0% 16%; /* Default shadcn dark cards */
+    --card-foreground: 0 0% 98%; /* Default shadcn dark card text */
+
+    /* Primary colors - using default shadcn dark primary */
+    --primary: 240 5.9% 10%; /* Default shadcn dark primary */
+    --primary-foreground: 0 0% 98%; /* Default shadcn dark primary text */
+
+    /* Secondary colors - using default shadcn dark secondary */
+    --secondary: 240 3.7% 15.9%; /* Default shadcn dark secondary */
+    --secondary-foreground: 0 0% 98%; /* Default shadcn dark secondary text */
+
+    /* Muted colors - using default shadcn dark muted */
+    --muted: 240 3.7% 15.9%; /* Default shadcn dark muted */
+    --muted-foreground: 240 5% 64.9%; /* Default shadcn dark muted text */
+
+    /* Accent colors - using default shadcn dark accent */
+    --accent: 240 3.7% 15.9%; /* Default shadcn dark accent */
+    --accent-foreground: 0 0% 98%; /* Default shadcn dark accent text */
+
+    /* Border colors - using default shadcn dark border with increased visibility */
+    --border: 240 3.7% 25%; /* Increased visibility for dark borders */
+    --input: 240 3.7% 25%; /* Increased visibility for dark inputs */
+    --ring: 240 4.9% 83.9%; /* Default shadcn dark ring */
+
+    /* Sidebar colors for dashboard dark mode - using default shadcn dark sidebar colors */
+    --sidebar-background: 240 5.9% 10%; /* Default shadcn dark sidebar background */
+    --sidebar-foreground: 240 4.8% 95.9%; /* Default shadcn dark sidebar text */
+    --sidebar-primary: 0 0% 98%; /* Default shadcn dark sidebar primary */
+    --sidebar-primary-foreground: 240 5.9% 10%; /* Default shadcn dark sidebar primary text */
+    --sidebar-accent: 240 3.7% 15.9%; /* Default shadcn dark sidebar accent */
+    --sidebar-accent-foreground: 240 4.8% 95.9%; /* Default shadcn dark sidebar accent text */
+    --sidebar-border: 240 3.7% 25%; /* Increased visibility for dark sidebar borders */
+    --sidebar-ring: 217.2 91.2% 59.8%; /* Default shadcn dark sidebar ring */
   }
 }
 
@@ -172,6 +258,11 @@ body {
     radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.01) 2%, transparent 0%);
   background-size: 100px 100px;
   background-position: 0 0, 50px 50px;
+}
+
+/* Remove pattern background in dashboard */
+.dashboard-theme body {
+  background-image: none;
 }
 
 /* Add this to ensure your main app header has a higher z-index */
@@ -376,4 +467,82 @@ body {
   .logo-highlight {
     @apply text-accent font-bold;
   }
+}
+
+/* Dashboard specific component overrides */
+.dashboard-theme .border,
+.dashboard-theme .border-b,
+.dashboard-theme .border-t,
+.dashboard-theme .border-l,
+.dashboard-theme .border-r {
+  --tw-border-opacity: 0.2;
+}
+
+/* Dashboard table styles */
+.dashboard-theme table {
+  --tw-border-opacity: 0.15;
+}
+
+.dashboard-theme table th {
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Dashboard card styles */
+.dashboard-theme .card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-theme[data-theme="dark"] .card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Dashboard sidebar styles - compatible with shadcn sidebar */
+.dashboard-theme [data-sidebar="sidebar"] {
+  background-color: hsl(var(--sidebar-background));
+  border-right: 1px solid hsl(var(--sidebar-border));
+}
+
+.dashboard-theme [data-sidebar="menu-button"][data-active="true"] {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+}
+
+.dashboard-theme [data-sidebar="menu-button"]:hover:not([data-active="true"]) {
+  background-color: hsl(var(--muted));
+}
+
+/* Dashboard button styles */
+.dashboard-theme .btn,
+.dashboard-theme .button,
+.dashboard-theme button[class*="Button"],
+.dashboard-theme a[class*="Button"] {
+  border-radius: 0.375rem;
+}
+
+/* Dashboard form styles */
+.dashboard-theme input,
+.dashboard-theme select,
+.dashboard-theme textarea {
+  border-color: hsl(var(--input));
+}
+
+.dashboard-theme input:focus,
+.dashboard-theme select:focus,
+.dashboard-theme textarea:focus {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 1px hsl(var(--ring) / 0.2);
+}
+
+/* Dashboard utility classes */
+.dashboard-theme .accent-border {
+  @apply border-primary/30;
+}
+
+.dashboard-theme .accent-bg {
+  @apply bg-primary/10 text-foreground;
+}
+
+.dashboard-theme .accent-text {
+  @apply text-primary;
 }

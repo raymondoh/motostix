@@ -1,12 +1,16 @@
 import { ResetPasswordForm } from "@/components";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "Reset Password",
-  description: "Reset Password Page"
+  description: "Reset your password"
 };
 
 export default function ResetPasswordPage() {
-  return <ResetPasswordForm />;
+  return (
+    <>
+      <AuthHeader title="Reset your password" subtitle="Enter your new password below" />
+      <ResetPasswordForm />
+    </>
+  );
 }

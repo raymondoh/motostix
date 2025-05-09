@@ -1,11 +1,16 @@
-import type { Metadata } from "next";
 import { VerifyEmailForm } from "@/components";
+import { AuthHeader } from "@/components/auth/AuthHeader";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Verify Email",
   description: "Verify your account"
 };
 
 export default function VerifyEmailPage() {
-  return <VerifyEmailForm />;
+  return (
+    <>
+      <AuthHeader title="Verify your email" subtitle="Please check your inbox and enter the code below" />
+      <VerifyEmailForm />
+    </>
+  );
 }

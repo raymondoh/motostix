@@ -1,53 +1,26 @@
-// "use client";
-
-// import { Button } from "@/components/ui/button";
-// import { Separator } from "@/components/ui/separator";
-// import { PriceRangeFilterWrapper } from "./PriceRangeFilterWrapper";
-// import { InStockFilterWrapper } from "./InStockFilterWrapper";
-// import { MaterialFilterWrapper } from "./MaterialFilterWrapper";
-// import { ColorFilterWrapper } from "./ColorFilterWrapper";
-// import { StickySideFilterWrapper } from "./StickySideFilterWrapper";
-// import { useProducts } from "../ProductsProvider";
-
-// export function ProductFilters() {
-//   const { resetFilters, hasActiveFilters } = useProducts();
-
-//   return (
-//     <div className="space-y-6">
-//       <div>
-//         <h2 className="text-lg font-semibold mb-4">Filters</h2>
-//         <div className="space-y-6">
-//           <PriceRangeFilterWrapper />
-//           <Separator />
-//           <InStockFilterWrapper />
-//           <Separator />
-//           <MaterialFilterWrapper />
-//           <Separator />
-//           <ColorFilterWrapper />
-//           <Separator />
-//           <StickySideFilterWrapper />
-//         </div>
-//       </div>
-
-//       {hasActiveFilters && (
-//         <Button variant="outline" size="sm" onClick={resetFilters} className="w-full">
-//           Reset All Filters
-//         </Button>
-//       )}
-//     </div>
-//   );
-// }
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PriceRangeFilterWrapper } from "./PriceRangeFilterWrapper";
 import { InStockFilterWrapper } from "./InStockFilterWrapper";
 import { MaterialFilterWrapper } from "./MaterialFilterWrapper";
 import { ColorFilterWrapper } from "./ColorFilterWrapper";
 import { StickySideFilterWrapper } from "./StickySideFilterWrapper";
+import { CategoryFilter } from "./CategoryFilter";
 import { useProducts } from "../ProductsProvider";
-import type { CategoryData } from "@/config/categories";
+import { AnimatedFilterSection } from "./AnimatedFilterSection";
+
+// Define the CategoryData interface
+export interface CategoryData {
+  id: string;
+  name: string;
+  count: number;
+  subcategories?: Array<{
+    id: string;
+    name: string;
+    count: number;
+  }>;
+}
 
 // Define the props interface for ProductFilters
 interface ProductFiltersProps {
@@ -56,36 +29,53 @@ interface ProductFiltersProps {
   categoriesData?: CategoryData[];
 }
 
-export function ProductFilters({
-  // We're accepting these props for type safety, but not using them in this component
-  selectedCategory,
-  onCategoryChange,
-  categoriesData
-}: ProductFiltersProps) {
-  const { resetFilters, hasActiveFilters } = useProducts();
+export function ProductFilters({ selectedCategory, onCategoryChange, categoriesData = [] }: ProductFiltersProps) {
+  const { hasActiveFilters } = useProducts();
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold mb-4">Filters</h2>
         <div className="space-y-6">
-          <PriceRangeFilterWrapper />
+          {/* Only render CategoryFilter if we have the required props */}
+          {selectedCategory !== undefined && onCategoryChange && categoriesData.length > 0 && (
+            <>
+              <AnimatedFilterSection title="Categories" defaultOpen={true}>
+                <CategoryFilter
+                  categories={categoriesData}
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={onCategoryChange}
+                />
+              </AnimatedFilterSection>
+              <Separator />
+            </>
+          )}
+
+          <AnimatedFilterSection title="Price Range" defaultOpen={true}>
+            <PriceRangeFilterWrapper />
+          </AnimatedFilterSection>
           <Separator />
-          <InStockFilterWrapper />
+
+          <AnimatedFilterSection title="Availability" defaultOpen={true}>
+            <InStockFilterWrapper />
+          </AnimatedFilterSection>
           <Separator />
-          <MaterialFilterWrapper />
+
+          <AnimatedFilterSection title="Material" defaultOpen={true}>
+            <MaterialFilterWrapper />
+          </AnimatedFilterSection>
           <Separator />
-          <ColorFilterWrapper />
+
+          <AnimatedFilterSection title="Color" defaultOpen={true}>
+            <ColorFilterWrapper />
+          </AnimatedFilterSection>
           <Separator />
-          <StickySideFilterWrapper />
+
+          <AnimatedFilterSection title="Sticky Side" defaultOpen={true}>
+            <StickySideFilterWrapper />
+          </AnimatedFilterSection>
         </div>
       </div>
-
-      {hasActiveFilters && (
-        <Button variant="outline" size="sm" onClick={resetFilters} className="w-full">
-          Reset All Filters
-        </Button>
-      )}
     </div>
   );
 }

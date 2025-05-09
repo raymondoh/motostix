@@ -11,10 +11,10 @@ interface ProductDialogProps {
 export function ProductDialog({ open, onOpenChange, onSuccess }: ProductDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Product</DialogTitle>
-          <DialogDescription>Fill in the details to add a new product to your catalog.</DialogDescription>
+          <DialogTitle></DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="mt-4">
           <AddProductForm onSuccess={onSuccess} />

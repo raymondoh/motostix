@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal } from "lucide-react";
-import { ProductFilters } from "./filters/ProductFilters";
+import { ProductFilters } from "@/components/products/filters/ProductFilters";
 import { useProducts } from "./ProductsProvider";
+import { ActiveFilterBadges } from "./filters/ActiveFilterBadges";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function MobileFiltersButton() {
   const [open, setOpen] = useState(false);
@@ -14,10 +16,19 @@ export function MobileFiltersButton() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full flex items-center justify-center">
+        <Button variant="outline" size="sm" className="w-full flex items-center justify-center relative">
           <SlidersHorizontal className="h-4 w-4 mr-2" />
           Filters
-          {hasActiveFilters && <span className="ml-1 rounded-full bg-primary w-2 h-2 block" />}
+          <AnimatePresence>
+            {hasActiveFilters && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                className="ml-1 rounded-full bg-primary w-2 h-2 block"
+              />
+            )}
+          </AnimatePresence>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
@@ -41,6 +52,8 @@ export function MobileFiltersButton() {
               </Button>
             )}
           </div>
+
+          <ActiveFilterBadges />
           <ProductFilters />
         </div>
       </SheetContent>

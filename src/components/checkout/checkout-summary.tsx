@@ -24,9 +24,9 @@ export function CheckoutSummary({ items, subtotal, tax, shipping, total, shippin
 
   return (
     <div className="rounded-lg border p-6">
-      <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
+      <h2 className="mb-4 text-xl font-semibold tracking-tight">Order Summary</h2>
 
-      <div className="max-h-80 overflow-auto">
+      <div className="max-h-80 overflow-auto pr-1">
         {items.map(item => (
           <div key={item.id} className="mb-4 flex items-start gap-3">
             <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
@@ -36,8 +36,8 @@ export function CheckoutSummary({ items, subtotal, tax, shipping, total, shippin
                   alt={item.product.name}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Define sizes for responsive image loading
-                  priority // Prioritize this image since it's part of the above-the-fold content
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-secondary">
@@ -45,8 +45,8 @@ export function CheckoutSummary({ items, subtotal, tax, shipping, total, shippin
                 </div>
               )}
             </div>
-            <div className="flex-1">
-              <h3 className="font-medium line-clamp-1">{item.product.name}</h3>
+            <div className="flex-1 space-y-1">
+              <h3 className="text-sm font-medium line-clamp-1">{item.product.name}</h3>
               <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
               <p className="text-sm font-medium">
                 {formatPriceWithCode(item.product.price * item.quantity, countryCode)}
@@ -58,21 +58,21 @@ export function CheckoutSummary({ items, subtotal, tax, shipping, total, shippin
 
       <Separator className="my-4" />
 
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
           <span>Subtotal</span>
           <span>{formatPriceWithCode(subtotal, countryCode)}</span>
         </div>
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between">
           <span>Tax</span>
           <span>{formatPriceWithCode(tax, countryCode)}</span>
         </div>
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between">
           <span>Shipping</span>
           <span>{shipping === 0 ? "Free" : formatPriceWithCode(shipping, countryCode)}</span>
         </div>
         <Separator className="my-2" />
-        <div className="flex justify-between font-medium">
+        <div className="flex justify-between font-semibold text-base">
           <span>Total</span>
           <span>{formatPriceWithCode(total, countryCode)}</span>
         </div>

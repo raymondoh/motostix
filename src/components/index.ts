@@ -1,5 +1,5 @@
 export { Header } from "./header/Header";
-export { Footer } from "./footer/Footer";
+export { FooterWrapper } from "./footer/FooterWrapper";
 export { Navbar } from "./header/Navbar";
 export { ModeToggle } from "./header/ModeToggle";
 export { HeroCarousel } from "./hero-carousel";

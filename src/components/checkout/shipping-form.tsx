@@ -46,16 +46,16 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <div className="grid gap-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel className="text-base font-semibold uppercase tracking-wide">Full Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. John Smith" {...field} />
+                  <Input placeholder="e.g. John Smith" {...field} className="h-14 text-lg px-4" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -67,9 +67,9 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-base font-semibold uppercase tracking-wide">Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="e.g. john@example.com" {...field} />
+                  <Input type="email" placeholder="e.g. john@example.com" {...field} className="h-14 text-lg px-4" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,9 +82,9 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel className="text-base font-semibold uppercase tracking-wide">Phone Number</FormLabel>
               <FormControl>
-                <Input type="tel" placeholder="e.g. +44 7123 456789" {...field} />
+                <Input type="tel" placeholder="e.g. +44 7123 456789" {...field} className="h-14 text-lg px-4" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,24 +96,24 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Address</FormLabel>
+              <FormLabel className="text-base font-semibold uppercase tracking-wide">Address</FormLabel>
               <FormControl>
-                <Textarea placeholder="e.g. 221B Baker Street, Flat 2A" {...field} />
+                <Textarea placeholder="e.g. 221B Baker Street, Flat 2A" {...field} className="text-lg px-4 py-3" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City</FormLabel>
+                <FormLabel className="text-base font-semibold uppercase tracking-wide">City</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. London" {...field} />
+                  <Input placeholder="e.g. London" {...field} className="h-14 text-lg px-4" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -125,9 +125,9 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>County / Region</FormLabel>
+                <FormLabel className="text-base font-semibold uppercase tracking-wide">County / Region</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Greater London" {...field} />
+                  <Input placeholder="e.g. Greater London" {...field} className="h-14 text-lg px-4" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -135,15 +135,15 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="zipCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Postcode</FormLabel>
+                <FormLabel className="text-base font-semibold uppercase tracking-wide">Postcode</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. SW1A 1AA" {...field} />
+                  <Input placeholder="e.g. SW1A 1AA" {...field} className="h-14 text-lg px-4" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -155,10 +155,10 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
             name="country"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Country</FormLabel>
+                <FormLabel className="text-base font-semibold uppercase tracking-wide">Country</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-14 text-lg px-4">
                       <SelectValue placeholder="Select a country" />
                     </SelectTrigger>
                   </FormControl>
@@ -176,7 +176,7 @@ export function ShippingForm({ onSubmit, defaultValues }: ShippingFormProps) {
           />
         </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="w-full h-14 text-lg font-bold tracking-wide uppercase" disabled={isSubmitting}>
           {isSubmitting ? "Processing..." : "Continue to Payment"}
         </Button>
       </form>

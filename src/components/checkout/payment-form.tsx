@@ -54,79 +54,6 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
       quantity: item.quantity
     }));
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!stripe || !elements) return;
-
-  //   setProcessing(true);
-  //   setError(null);
-
-  //   try {
-  //     // Ensure that the amount is rounded to the nearest integer (pence)
-  //     const amountInPence = Math.round(amount * 100);
-
-  //     // Create payment intent
-  //     const result = await createPaymentIntent({
-  //       amount: amountInPence,
-  //       shipping: { ...shippingDetails, state: shippingDetails.state ?? "" },
-  //       return_url: `${window.location.origin}/checkout/success` // Stripe will redirect here after success
-  //     });
-
-  //     if (!("clientSecret" in result)) {
-  //       throw new Error(result.error || "Failed to create payment intent");
-  //     }
-
-  //     // Get the card element
-  //     const cardElement = elements.getElement(CardElement);
-  //     if (!cardElement) throw new Error("Card element not found");
-
-  //     // Confirm the payment with Stripe
-  //     const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(result.clientSecret, {
-  //       payment_method: {
-  //         card: cardElement as StripeCardElement,
-  //         billing_details: getBillingAddress()
-  //       }
-  //     });
-
-  //     // If payment failed, show an error
-  //     if (paymentError) {
-  //       setError(paymentError.message || "Payment failed");
-  //       return;
-  //     }
-
-  //     // If payment was successful, proceed to create the order
-  //     if (paymentIntent.status === "succeeded") {
-  //       const orderResult = await createOrderAction({
-  //         paymentIntentId: paymentIntent.id,
-  //         amount,
-  //         customerEmail: shippingDetails.email,
-  //         customerName: shippingDetails.fullName,
-  //         items: mapCartItemsToOrderItems(),
-  //         shippingAddress: {
-  //           address: shippingDetails.address,
-  //           city: shippingDetails.city,
-  //           state: shippingDetails.state ?? "",
-  //           zipCode: shippingDetails.zipCode,
-  //           country: shippingDetails.country
-  //         },
-  //         status: "processing"
-  //       });
-
-  //       if (orderResult.success && orderResult.orderId) {
-  //         // Trigger page redirect after order is successfully created
-  //         onSuccess(orderResult.orderId);
-  //         router.push(`/checkout/success?orderId=${orderResult.orderId}`);
-  //       } else {
-  //         throw new Error(orderResult.error || "Failed to create order");
-  //       }
-  //     }
-  //   } catch (err: unknown) {
-  //     const errorMessage = err instanceof Error ? err.message : "Unexpected error";
-  //     setError(errorMessage);
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
@@ -204,13 +131,14 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="rounded-md border p-4">
+      <div className="rounded-md border border-gray-300 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-primary">
         <CardElement
           options={{
             style: {
               base: {
                 fontSize: "16px",
                 color: "#424770",
+                fontFamily: "inherit",
                 "::placeholder": { color: "#aab7c4" }
               },
               invalid: { color: "#9e2146" }
@@ -225,7 +153,10 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
         </Alert>
       )}
 
-      <Button type="submit" className="w-full" disabled={!stripe || processing}>
+      <Button
+        type="submit"
+        className="w-full h-14 text-lg font-bold tracking-wide uppercase"
+        disabled={!stripe || processing}>
         {processing
           ? "Processing..."
           : `Pay ${new Intl.NumberFormat("en-US", {

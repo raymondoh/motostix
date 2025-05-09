@@ -65,92 +65,95 @@ export function ForgotPasswordForm() {
 
   if (isSubmitted) {
     return (
-      <div className="container flex items-center justify-center min-h-screen py-12">
-        <Card className="max-w-md w-full">
-          <CardHeader className="space-y-1">
-            <div className="flex justify-center mb-4">
-              <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-                <Mail className="h-10 w-10 text-primary" />
-              </div>
+      <div className="w-full max-w-md px-4 sm:px-6 mx-auto">
+        <div className="relative py-8 sm:py-10 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <Mail className="h-10 w-10 text-primary" />
             </div>
-            <CardTitle className="text-2xl text-center">Check your email</CardTitle>
-            <CardDescription className="text-center">
-              We&apos;ve sent you a password reset link. Please check your inbox and spam folder.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 text-center">
+          </div>
+
+          <div className="space-y-2 mb-6">
+            <h1 className="text-3xl font-semibold tracking-tight">Check your email</h1>
+            <p className="text-muted-foreground">
+              We've sent you a password reset link. Please check your inbox and spam folder.
+            </p>
+          </div>
+
+          <div className="space-y-4 text-base">
             <p>
               Click the reset link in the email to set a new password. If you don&apos;t see the email, check your spam
               folder.
             </p>
             <p className="text-sm text-muted-foreground">The reset link will expire in 1 hour.</p>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button asChild className="w-full">
+          </div>
+
+          <div className="mt-10 space-y-4">
+            <Button asChild className="w-full h-12 text-base font-semibold">
               <Link href="/login">
                 Return to login
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <p className="text-xs text-center text-muted-foreground">
-              Didn&apos;t receive an email? Check your spam folder or{" "}
+
+            <p className="text-sm text-muted-foreground">
+              Didn&apos;t receive an email?{" "}
               <Button
                 variant="link"
-                className="p-0 h-auto"
+                className="p-0 h-auto text-sm"
                 onClick={() => {
                   resetForm();
                   setIsSubmitted(false);
                 }}>
-                try again
+                Try again
               </Button>
             </p>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen py-12">
-      <Card className="max-w-md w-full">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Forgot Password</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email address and we&apos;ll send you a link to reset your password.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <SubmitButton isLoading={isLoading} loadingText="Sending..." className="w-full" variant="default">
-              Send Reset Link
-            </SubmitButton>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <div className="text-sm text-muted-foreground">
-            Remember your password?{" "}
-            <Button variant="link" className="p-0 h-auto" asChild>
-              <Link href="/login">Back to login</Link>
-            </Button>
+    <div className="w-full max-w-md px-4 sm:px-6 mx-auto">
+      <div className="relative py-8 sm:py-10">
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-base font-semibold uppercase tracking-wide">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              className="h-14 text-lg px-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary"
+            />
           </div>
-        </CardFooter>
-      </Card>
+
+          <SubmitButton
+            isLoading={isLoading}
+            loadingText="Sending..."
+            className="w-full h-14 text-lg font-bold tracking-wide uppercase">
+            Send Reset Link
+          </SubmitButton>
+        </form>
+
+        <div className="pt-10 text-sm text-center text-muted-foreground">
+          Remember your password?{" "}
+          <Link href="/login" className="font-medium text-primary hover:underline">
+            Back to login
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

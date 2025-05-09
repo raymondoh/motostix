@@ -42,7 +42,7 @@ export function ColorFilter({ colors, selectedColors, onToggle }: ColorFilterPro
   if (!colors || colors.length === 0) {
     return (
       <div className="space-y-4">
-        <h3 className="text-sm font-medium mb-3">Color</h3>
+        {/* <h3 className="text-sm font-medium mb-3">Colorssss</h3> */}
         <p className="text-sm text-muted-foreground">No colors available</p>
       </div>
     );
@@ -56,7 +56,7 @@ export function ColorFilter({ colors, selectedColors, onToggle }: ColorFilterPro
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium mb-3">Color</h3>
+      {/* <h3 className="text-sm font-medium mb-3">Color</h3> */}
       <div className="flex flex-wrap gap-2">
         {colors.map(color => {
           const isSelected = selectedColors.includes(color);

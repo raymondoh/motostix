@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { StripeIcon } from "../shared/StripeIcon";
 
 export function Footer() {
   return (
@@ -36,7 +37,7 @@ export function Footer() {
                 <span className="sr-only">Twitter</span>
               </Link>
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Youtube className="h-5 w-5" />
+                <StripeIcon className="h-5 w-5" />
                 <span className="sr-only">YouTube</span>
               </Link>
             </div>
