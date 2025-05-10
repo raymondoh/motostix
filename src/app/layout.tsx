@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Header, FooterWrapper } from "@/components";
 import { Providers } from "@/providers/SessionProvider";
 import { CartProvider } from "@/contexts/CartContext";
+import { LikesProvider } from "@/contexts/LikesContext";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
 
 import "./globals.css";
@@ -29,11 +30,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <CartProvider>
-            <Header />
-            <div className="flex flex-col min-h-screen">
-              <div className="flex-1">{children}</div>
-              <FooterWrapper />
-            </div>
+            <LikesProvider>
+              <Header />
+              <div className="flex flex-col min-h-screen">
+                <div className="flex-1">{children}</div>
+                <FooterWrapper />
+              </div>
+            </LikesProvider>
             <CartSidebar />
           </CartProvider>
         </Providers>

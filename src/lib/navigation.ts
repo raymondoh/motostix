@@ -11,7 +11,8 @@ import {
   Users,
   Shield,
   Receipt,
-  ShoppingBag
+  ShoppingBag,
+  HeartIcon
 } from "lucide-react";
 
 export type NavItem = {
@@ -62,6 +63,11 @@ export const userNavItems: NavItem[] = [
     title: "Orders",
     href: "/user/orders",
     icon: Receipt
+  },
+  {
+    title: "Likes",
+    href: "/user/likes",
+    icon: HeartIcon
   },
   {
     title: "Profile",

@@ -1,15 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatPriceWithCode } from "@/lib/utils";
 import { ProductCardButton } from "@/components/products/ProductCardButton";
 import type { Product } from "@/types/product";
+import { ProductLikeButton } from "./ProductLikeButton";
 
 interface ProductCardProps {
   product: Product;
+  liked?: boolean;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -35,13 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </Link>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background">
-          <Heart className="h-4 w-4" />
-          <span className="sr-only">Add to wishlist</span>
-        </Button>
+        <ProductLikeButton product={product} />
 
         {product.badge && (
           <Badge
@@ -69,21 +64,19 @@ export function ProductCard({ product }: ProductCardProps) {
               </Link>
             )}
           </div>
-
           <Link href={`/products/${product.id}`} className="block group-hover:text-primary transition-colors">
             {/* Made title smaller by using text-sm */}
             <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
           </Link>
-
-          <div className="flex items-center mt-1 mb-2">
+          `{" "}
+          {/* <div className="flex items-center mt-1 mb-2">
             <div className="flex items-center">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className={`h-3 w-3 ${i < demoRating ? "text-accent fill-accent" : "text-muted/20"}`} />
               ))}
             </div>
             <span className="text-xs text-muted-foreground ml-1">({demoReviewCount})</span>
-          </div>
-
+          </div>` */}
           <div className="mt-auto pt-1">
             <div className="flex items-center justify-between">
               <span className="font-bold">{formatPriceWithCode(product.price, "GB")}</span>

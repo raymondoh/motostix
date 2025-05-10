@@ -10,3 +10,8 @@ export type DeleteProductResult = { success: true } | { success: false; error: s
 
 // Used when fetching related products
 export type GetRelatedProductsResult = { success: true; products: Product[] } | { success: false; error: string };
+
+export type GetUserLikedProductsResult = { success: true; products: Product[] } | { success: false; error: string };
+
+export type UnlikeProductResult = { success: true } | { success: false; error: string };
+export type LikeProductResult = { success: true } | { success: false; error: string };

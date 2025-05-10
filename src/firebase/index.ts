@@ -37,6 +37,9 @@ export {
   getFeaturedProducts,
   getHeroSlidesFromFirestore,
   getRelatedProducts,
+  likeProduct,
+  unlikeProduct,
+  getUserLikedProducts,
 
   // orders
   createOrder,

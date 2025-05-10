@@ -40,6 +40,8 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
     badge: data?.badge || "",
     isFeatured: data?.isFeatured ?? false,
     isHero: data?.isHero ?? false,
+    isLiked: data?.isLiked ?? false,
+    //likesCount: data?.likesCount || 0,
     createdAt: data?.createdAt,
     updatedAt: data?.updatedAt
   };
@@ -54,6 +56,7 @@ export async function getAllProducts(filters?: {
   material?: string;
   priceRange?: string;
   isFeatured?: boolean;
+  isLiked?: boolean;
   stickySide?: string;
 }) {
   if (filters) {
@@ -81,6 +84,7 @@ export async function getFilteredProducts(filters: {
   material?: string;
   priceRange?: string;
   isFeatured?: boolean;
+  isLiked?: boolean;
   stickySide?: string;
 }) {
   try {
@@ -341,6 +345,69 @@ export async function getRelatedProducts({ productId, category, limit = 4 }: Get
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : (error as Error)?.message || "Unknown error fetching related products";
+    return { success: false as const, error: message };
+  }
+}
+// ===================
+// LIKE A PRODUCT
+// ===================
+export async function likeProduct(userId: string, productId: string) {
+  try {
+    const now = Timestamp.now();
+    const likeRef = adminDb.collection("users").doc(userId).collection("likes").doc(productId);
+
+    await likeRef.set({
+      productId,
+      createdAt: now
+    });
+
+    return { success: true as const };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : (error as Error)?.message || "Unknown error liking product";
+    console.error("Error liking product:", message);
+    return { success: false as const, error: message };
+  }
+}
+
+// ===================
+// UNLIKE A PRODUCT
+// ===================
+export async function unlikeProduct(userId: string, productId: string) {
+  try {
+    const likeRef = adminDb.collection("users").doc(userId).collection("likes").doc(productId);
+    await likeRef.delete();
+    return { success: true as const };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : (error as Error)?.message || "Unknown error unliking product";
+    console.error("Error unliking product:", message);
+    return { success: false as const, error: message };
+  }
+}
+
+// ===================
+// GET LIKED PRODUCTS
+// ===================
+export async function getUserLikedProducts(userId: string) {
+  try {
+    const snapshot = await adminDb.collection("users").doc(userId).collection("likes").get();
+    const likedProductIds = snapshot.docs.map(doc => doc.id);
+
+    if (likedProductIds.length === 0) return { success: true as const, data: [] };
+
+    const productDocs = await Promise.all(likedProductIds.map(id => adminDb.collection("products").doc(id).get()));
+
+    const products = productDocs.filter(doc => doc.exists).map(doc => mapDocToProduct(doc));
+
+    return { success: true as const, data: serializeProductArray(products) };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : (error as Error)?.message || "Unknown error fetching liked products";
+    console.error("Error fetching liked products:", message);
     return { success: false as const, error: message };
   }
 }

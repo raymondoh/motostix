@@ -20,6 +20,7 @@ export interface Product {
   badge?: string;
   isFeatured?: boolean;
   isHero?: boolean;
+  isLiked?: boolean;
   createdAt: Timestamp | string;
   updatedAt?: Timestamp | string;
 }
@@ -43,6 +44,7 @@ export interface SerializedProduct {
   badge?: string;
   isFeatured?: boolean;
   isHero?: boolean;
+  isLiked?: boolean;
   createdAt: string; // Always a string after serialization
   updatedAt?: string;
 }
