@@ -5,25 +5,25 @@ import { Card, CardContent } from "@/components/ui/card";
 const categories = [
   {
     name: "Sport Bike Decals",
-    image: "/placeholder.svg?key=8mn36",
+    image: "/bike.jpg",
     slug: "/category/sport-bike",
     count: 42
   },
   {
     name: "Cruiser Graphics",
-    image: "/placeholder.svg?key=gjbvm",
+    image: "/car.jpg",
     slug: "/category/cruiser",
     count: 38
   },
   {
     name: "Off-Road Stickers",
-    image: "/placeholder.svg?key=3h9dg",
+    image: "/bike.jpg",
     slug: "/category/off-road",
     count: 56
   },
   {
     name: "Custom Designs",
-    image: "/placeholder.svg?key=8tv72",
+    image: "/car.jpg",
     slug: "/category/custom",
     count: 24
   }

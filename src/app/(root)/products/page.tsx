@@ -2,7 +2,7 @@ import { getAllProducts } from "@/actions/products/get-all-products";
 import { extractCategoriesFromProducts } from "@/utils/product-utils";
 import { ProductsHeader } from "@/components/products/ProductsHeader";
 import { CategoryCardsWrapper } from "@/components/products/category-carousel/CategoryCardsWrapper";
-import { SubcategoryCardsWrapper } from "@/components/products/SubcategoryCardsWrapper";
+import { SubcategoryCardsWrapper } from "@/components/products/subcategory-carousel/SubcategoryCardsWrapper";
 import { ProductsGrid } from "@/components/products/ProductsGrid";
 import { ProductsProvider } from "@/components/products/ProductsProvider";
 import { ProductFilters } from "@/components/products/filters/ProductFilters";

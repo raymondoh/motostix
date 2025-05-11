@@ -67,8 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <Link href={`/products/${product.id}`} className="block group-hover:text-primary transition-colors">
             {/* Made title smaller by using text-sm */}
             <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
-          </Link>
-          `{" "}
+          </Link>{" "}
           {/* <div className="flex items-center mt-1 mb-2">
             <div className="flex items-center">
               {Array.from({ length: 5 }).map((_, i) => (

@@ -10,35 +10,35 @@
 
 @layer base {
   :root {
-    /* Light Mode Theme Colors */
-    --background: 0 0% 98%; /* Slightly off-white background for light mode (was 0 0% 100%) */
-    --foreground: 0 0% 3.9%; /* Dark text for light mode */
+    /* Light Mode Theme Colors - Monochromatic */
+    --background: 0 0% 98%; /* Slightly off-white background */
+    --foreground: 0 0% 10%; /* Dark gray text */
 
-    --primary: 142 76% 36%; /* #1DB954 - Green */
-    --primary-foreground: 0 0% 100%; /* White text on green */
+    --primary: 0 0% 20%; /* Dark gray primary */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
 
-    --secondary: 0 0% 29%; /* #4A4A4A - Dark Gray */
-    --secondary-foreground: 0 0% 100%; /* White text on dark gray */
+    --secondary: 0 0% 90%; /* Light gray secondary */
+    --secondary-foreground: 0 0% 20%; /* Dark gray text on secondary */
 
-    /* Yellow as accent color */
-    --accent: 48 100% 50%; /* #FFCE00 - Yellow */
-    --accent-foreground: 0 0% 0%; /* Black text on yellow */
+    /* Accent color - slightly darker than primary for contrast */
+    --accent: 0 0% 15%; /* Darker gray accent */
+    --accent-foreground: 0 0% 100%; /* White text on accent */
 
-    --muted: 0 0% 96.1%; /* Light gray for light mode */
-    --muted-foreground: 0 0% 45.1%; /* Medium gray text for light mode */
+    --muted: 0 0% 96%; /* Light gray muted */
+    --muted-foreground: 0 0% 45%; /* Medium gray text */
 
-    --card: 0 0% 100%; /* White cards for light mode */
-    --card-foreground: 0 0% 3.9%; /* Dark text on cards for light mode */
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 0 0% 10%; /* Dark text on cards */
 
-    --popover: 0 0% 100%; /* White popovers for light mode */
-    --popover-foreground: 0 0% 3.9%; /* Dark text on popovers for light mode */
+    --popover: 0 0% 100%; /* White popovers */
+    --popover-foreground: 0 0% 10%; /* Dark text on popovers */
 
-    --destructive: 0 84.2% 60.2%; /* Keep original */
+    --destructive: 0 84% 60%; /* Keep original */
     --destructive-foreground: 0 0% 98%; /* Keep original */
 
-    --border: 0 0% 89.8%; /* Light border for light mode */
-    --input: 0 0% 89.8%; /* Light input border for light mode */
-    --ring: 142 76% 36%; /* #1DB954 - Green */
+    --border: 0 0% 90%; /* Light border */
+    --input: 0 0% 90%; /* Light input border */
+    --ring: 0 0% 20%; /* Dark ring */
 
     /* Keep existing chart colors */
     --chart-1: 12 76% 61%;
@@ -47,15 +47,15 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Sidebar colors for light mode */
-    --sidebar-background: 0 0% 100%; /* White sidebar for light mode */
-    --sidebar-foreground: 240 5.3% 26.1%; /* Dark text for sidebar in light mode */
-    --sidebar-primary: 142 76% 36%; /* #1DB954 - Green */
-    --sidebar-primary-foreground: 0 0% 100%; /* White text on green */
-    --sidebar-accent: 48 100% 50%; /* #FFCE00 - Yellow */
-    --sidebar-accent-foreground: 0 0% 0%; /* Black text on yellow */
-    --sidebar-border: 220 13% 91%; /* Light border for sidebar in light mode */
-    --sidebar-ring: 142 76% 36%; /* #1DB954 - Green */
+    /* Sidebar colors for light mode - monochromatic */
+    --sidebar-background: 0 0% 100%; /* White sidebar */
+    --sidebar-foreground: 0 0% 20%; /* Dark text for sidebar */
+    --sidebar-primary: 0 0% 20%; /* Dark gray primary */
+    --sidebar-primary-foreground: 0 0% 100%; /* White text on primary */
+    --sidebar-accent: 0 0% 95%; /* Very light gray accent */
+    --sidebar-accent-foreground: 0 0% 20%; /* Dark text on accent */
+    --sidebar-border: 0 0% 90%; /* Light border */
+    --sidebar-ring: 0 0% 20%; /* Dark ring */
 
     /* Keep existing toast styling */
     --toaster-font-size: 1.25rem !important;
@@ -71,19 +71,19 @@
   /* Dark theme variables */
   .dark {
     /* Dark Mode Theme Colors */
-    --background: 220 10% 10%; /* Slightly blue-tinted dark background (was 0 0% 12%) */
+    --background: 220 10% 10%; /* Slightly blue-tinted dark background */
     --foreground: 0 0% 98%; /* Light text for dark mode */
 
-    --card: 0 0% 16%; /* #2A2A2A - Dark cards */
-    --card-foreground: 0 0% 98%; /* Light text on cards for dark mode */
+    --card: 0 0% 16%; /* Dark cards */
+    --card-foreground: 0 0% 98%; /* Light text on cards */
 
-    --popover: 0 0% 16%; /* #2A2A2A - Dark popovers */
-    --popover-foreground: 0 0% 98%; /* Light text on popovers for dark mode */
+    --popover: 0 0% 16%; /* Dark popovers */
+    --popover-foreground: 0 0% 98%; /* Light text on popovers */
 
-    --primary: 48 100% 50%; /* #FFCE00 - Yellow (changed from green) */
+    --primary: 48 100% 50%; /* #FFCE00 - Yellow (keeping this for contrast) */
     --primary-foreground: 0 0% 0%; /* Black text on yellow */
 
-    --secondary: 0 0% 29%; /* #4A4A4A - Dark Gray */
+    --secondary: 0 0% 29%; /* Dark Gray */
     --secondary-foreground: 0 0% 100%; /* White text on dark gray */
 
     /* Yellow as accent color */
@@ -98,7 +98,7 @@
 
     --border: 0 0% 14.9%; /* Dark border for dark mode */
     --input: 0 0% 14.9%; /* Dark input border for dark mode */
-    --ring: 48 100% 50%; /* #FFCE00 - Yellow (changed from green) */
+    --ring: 48 100% 50%; /* #FFCE00 - Yellow */
 
     /* Keep existing chart colors */
     --chart-1: 220 70% 50%;
@@ -125,90 +125,90 @@
     --toaster-icon-size: 28px;
   }
 
-  /* Dashboard specific theme - Clerk-inspired */
+  /* Dashboard specific theme - Monochromatic */
   .dashboard-theme {
     /* Background colors */
     --background: 0 0% 100%; /* Pure white */
-    --foreground: 222 47% 11%; /* Dark text */
+    --foreground: 0 0% 15%; /* Dark gray text */
 
     /* Card colors */
     --card: 0 0% 100%; /* White cards */
-    --card-foreground: 222 47% 11%; /* Dark text */
+    --card-foreground: 0 0% 15%; /* Dark gray text */
 
-    /* Primary colors - blue instead of green/yellow */
-    --primary: 215 100% 50%; /* Blue */
+    /* Primary colors - dark gray */
+    --primary: 0 0% 20%; /* Dark gray */
     --primary-foreground: 0 0% 100%; /* White text */
 
     /* Secondary colors */
-    --secondary: 210 20% 98%; /* Very light gray */
-    --secondary-foreground: 215 25% 27%; /* Dark blue-gray */
+    --secondary: 0 0% 95%; /* Very light gray */
+    --secondary-foreground: 0 0% 20%; /* Dark gray text */
 
     /* Muted colors */
-    --muted: 210 20% 96%; /* Light gray background */
-    --muted-foreground: 215 16% 47%; /* Medium gray text */
+    --muted: 0 0% 96%; /* Light gray background */
+    --muted-foreground: 0 0% 45%; /* Medium gray text */
 
     /* Accent colors */
-    --accent: 215 100% 98%; /* Very light blue */
-    --accent-foreground: 215 100% 50%; /* Blue */
+    --accent: 0 0% 90%; /* Light gray */
+    --accent-foreground: 0 0% 20%; /* Dark gray */
 
     /* Border colors */
-    --border: 214 32% 91%; /* Light gray border */
-    --input: 214 32% 91%; /* Light gray input */
+    --border: 0 0% 90%; /* Light gray border */
+    --input: 0 0% 90%; /* Light gray input */
 
     /* Ring color */
-    --ring: 215 100% 50%; /* Blue ring */
+    --ring: 0 0% 20%; /* Dark gray ring */
 
-    /* Sidebar colors for dashboard - using default shadcn light sidebar colors */
-    --sidebar-background: 0 0% 100%; /* Default shadcn light sidebar background */
-    --sidebar-foreground: 240 5.3% 26.1%; /* Default shadcn light sidebar text */
-    --sidebar-primary: 240 5.9% 10%; /* Default shadcn light sidebar primary */
-    --sidebar-primary-foreground: 0 0% 98%; /* Default shadcn light sidebar primary text */
-    --sidebar-accent: 240 4.8% 95.9%; /* Default shadcn light sidebar accent */
-    --sidebar-accent-foreground: 240 5.9% 10%; /* Default shadcn light sidebar accent text */
-    --sidebar-border: 220 13% 91%; /* Default shadcn light sidebar border */
-    --sidebar-ring: 217.2 91.2% 59.8%; /* Default shadcn light sidebar ring */
+    /* Sidebar colors for dashboard - monochromatic */
+    --sidebar-background: 0 0% 100%; /* White sidebar */
+    --sidebar-foreground: 0 0% 20%; /* Dark text */
+    --sidebar-primary: 0 0% 20%; /* Dark gray */
+    --sidebar-primary-foreground: 0 0% 100%; /* White text */
+    --sidebar-accent: 0 0% 95%; /* Very light gray */
+    --sidebar-accent-foreground: 0 0% 20%; /* Dark text */
+    --sidebar-border: 0 0% 90%; /* Light gray border */
+    --sidebar-ring: 0 0% 20%; /* Dark gray ring */
   }
 
-  /* Dashboard dark theme */
+  /* Dashboard dark theme - Monochromatic */
   .dashboard-theme[data-theme="dark"] {
     /* Background colors */
-    --background: 220 10% 10%; /* Slightly blue-tinted dark background - same as main site */
-    --foreground: 210 40% 98%; /* Light text */
+    --background: 0 0% 10%; /* Dark gray background */
+    --foreground: 0 0% 90%; /* Light gray text */
 
     /* Card colors */
-    --card: 0 0% 16%; /* Default shadcn dark cards */
-    --card-foreground: 0 0% 98%; /* Default shadcn dark card text */
+    --card: 0 0% 15%; /* Slightly lighter gray cards */
+    --card-foreground: 0 0% 90%; /* Light gray text */
 
-    /* Primary colors - using default shadcn dark primary */
-    --primary: 240 5.9% 10%; /* Default shadcn dark primary */
-    --primary-foreground: 0 0% 98%; /* Default shadcn dark primary text */
+    /* Primary colors */
+    --primary: 0 0% 80%; /* Light gray primary */
+    --primary-foreground: 0 0% 10%; /* Dark gray text */
 
-    /* Secondary colors - using default shadcn dark secondary */
-    --secondary: 240 3.7% 15.9%; /* Default shadcn dark secondary */
-    --secondary-foreground: 0 0% 98%; /* Default shadcn dark secondary text */
+    /* Secondary colors */
+    --secondary: 0 0% 20%; /* Dark gray secondary */
+    --secondary-foreground: 0 0% 90%; /* Light gray text */
 
-    /* Muted colors - using default shadcn dark muted */
-    --muted: 240 3.7% 15.9%; /* Default shadcn dark muted */
-    --muted-foreground: 240 5% 64.9%; /* Default shadcn dark muted text */
+    /* Muted colors */
+    --muted: 0 0% 20%; /* Dark gray muted */
+    --muted-foreground: 0 0% 70%; /* Medium-light gray text */
 
-    /* Accent colors - using default shadcn dark accent */
-    --accent: 240 3.7% 15.9%; /* Default shadcn dark accent */
-    --accent-foreground: 0 0% 98%; /* Default shadcn dark accent text */
+    /* Accent colors */
+    --accent: 0 0% 25%; /* Dark gray accent */
+    --accent-foreground: 0 0% 90%; /* Light gray text */
 
-    /* Border colors - using default shadcn dark border with increased visibility */
-    --border: 240 3.7% 25%; /* Increased visibility for dark borders */
-    --input: 240 3.7% 25%; /* Increased visibility for dark inputs */
-    --ring: 240 4.9% 83.9%; /* Default shadcn dark ring */
+    /* Border colors */
+    --border: 0 0% 25%; /* Dark gray border */
+    --input: 0 0% 25%; /* Dark gray input */
+    --ring: 0 0% 80%; /* Light gray ring */
 
-    /* Sidebar colors for dashboard dark mode - using default shadcn dark sidebar colors */
-    --sidebar-background: 240 5.9% 10%; /* Default shadcn dark sidebar background */
-    --sidebar-foreground: 240 4.8% 95.9%; /* Default shadcn dark sidebar text */
-    --sidebar-primary: 0 0% 98%; /* Default shadcn dark sidebar primary */
-    --sidebar-primary-foreground: 240 5.9% 10%; /* Default shadcn dark sidebar primary text */
-    --sidebar-accent: 240 3.7% 15.9%; /* Default shadcn dark sidebar accent */
-    --sidebar-accent-foreground: 240 4.8% 95.9%; /* Default shadcn dark sidebar accent text */
-    --sidebar-border: 240 3.7% 25%; /* Increased visibility for dark sidebar borders */
-    --sidebar-ring: 217.2 91.2% 59.8%; /* Default shadcn dark sidebar ring */
+    /* Sidebar colors for dashboard dark mode - monochromatic */
+    --sidebar-background: 0 0% 12%; /* Very dark gray sidebar */
+    --sidebar-foreground: 0 0% 90%; /* Light gray text */
+    --sidebar-primary: 0 0% 80%; /* Light gray primary */
+    --sidebar-primary-foreground: 0 0% 10%; /* Dark gray text */
+    --sidebar-accent: 0 0% 20%; /* Dark gray accent */
+    --sidebar-accent-foreground: 0 0% 90%; /* Light gray text */
+    --sidebar-border: 0 0% 25%; /* Dark gray border */
+    --sidebar-ring: 0 0% 80%; /* Light gray ring */
   }
 }
 
@@ -463,9 +463,9 @@ body {
     @apply text-accent;
   }
 
-  /* Yellow highlight for the STIX part of the logo */
+  /* Highlight for the STIX part of the logo - now using primary instead of accent for monochromatic theme */
   .logo-highlight {
-    @apply text-accent font-bold;
+    @apply text-primary font-bold;
   }
 }
 

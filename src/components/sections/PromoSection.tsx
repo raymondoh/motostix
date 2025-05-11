@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 export function PromoSection() {
   return (
     <section className="py-12 bg-secondary/5 border-y border-border/40">
-      <div className="container">
+      <div className="max-w-8xl mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-xl">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Limited Time Offer</h2>
