@@ -1,4 +1,4 @@
-"use client";
+// "use client"
 
 import type React from "react";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { loadStripe, type StripeCardElement } from "@stripe/stripe-js";
 
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CreditCard } from "lucide-react";
 
 import { createPaymentIntent } from "@/actions/ecommerce/create-payment-intent";
 import { createOrderAction } from "@/actions/orders/create-order";
@@ -21,7 +22,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 interface PaymentFormProps {
   amount: number;
-  shippingDetails: ShippingFormValues; // Updated to use ShippingFormValues
+  shippingDetails: ShippingFormValues;
   items: CartItem[];
   onSuccess: (orderId: string) => void;
 }
@@ -40,7 +41,7 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
     address: {
       line1: shippingDetails.address,
       city: shippingDetails.city,
-      state: shippingDetails.state ?? "", // state is now required by ShippingFormValues
+      state: shippingDetails.state ?? "",
       postal_code: shippingDetails.zipCode,
       country: shippingDetails.country
     }
@@ -131,32 +132,41 @@ function PaymentFormContent({ amount, shippingDetails, items, onSuccess }: Payme
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="rounded-md border border-gray-300 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-primary">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: "16px",
-                color: "#424770",
-                fontFamily: "inherit",
-                "::placeholder": { color: "#aab7c4" }
-              },
-              invalid: { color: "#9e2146" }
-            }
-          }}
-        />
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <CreditCard className="h-5 w-5 text-muted-foreground" />
+          <h3 className="text-base font-medium">Card Details</h3>
+        </div>
+
+        <div className="rounded-lg border border-input bg-background px-4 py-4 shadow-sm focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: "16px",
+                  color: "#424770",
+                  fontFamily: "inherit",
+                  "::placeholder": { color: "#aab7c4" }
+                },
+                invalid: { color: "#9e2146" }
+              }
+            }}
+          />
+        </div>
+
+        <p className="text-sm text-muted-foreground">
+          Your card information is securely processed. We don't store your card details.
+        </p>
       </div>
 
       {error && (
         <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <Button
-        type="submit"
-        className="w-full h-14 text-lg font-bold tracking-wide uppercase"
-        disabled={!stripe || processing}>
+      <Button type="submit" className="w-full h-14 text-lg font-bold" disabled={!stripe || processing}>
         {processing
           ? "Processing..."
           : `Pay ${new Intl.NumberFormat("en-US", {

@@ -30,8 +30,8 @@ const testimonials = [
 
 export function TestimonialSection() {
   return (
-    <section className="py-16 bg-background">
-      <div className="container">
+    <section className="py-16 w-full bg-secondary/5">
+      <div className="container mx-auto px-4">
         <div className="flex flex-col items-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">What Our Customers Say</h2>
           <div className="w-12 h-0.5 bg-primary mb-6"></div>
@@ -42,7 +42,9 @@ export function TestimonialSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map(testimonial => (
-            <Card key={testimonial.id} className="border border-border hover:border-primary/20 transition-colors">
+            <Card
+              key={testimonial.id}
+              className="border border-border hover:border-primary/20 transition-colors hover:shadow-sm h-full">
               <CardContent className="pt-6">
                 <div className="flex mb-4">
                   {Array(5)
@@ -50,7 +52,7 @@ export function TestimonialSection() {
                     .map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-5 w-5 ${i < testimonial.rating ? "text-accent" : "text-muted/20"}`}
+                        className={`h-5 w-5 ${i < testimonial.rating ? "text-primary" : "text-muted/20"}`}
                         fill={i < testimonial.rating ? "currentColor" : "none"}
                       />
                     ))}

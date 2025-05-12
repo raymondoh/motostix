@@ -6,7 +6,6 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ProductJsonLd } from "@/components/products/ProductJsonLd";
 import { ProductGallery, ProductInfo, ProductTabs, RelatedProducts } from "@/components/products/page-detail";
-import { Separator } from "@/components/ui/separator";
 import type { Metadata, ResolvingMetadata } from "next";
 
 // ---------- Metadata ----------
@@ -71,54 +70,78 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
   });
 
   return (
-    <div className="container py-8">
+    <main className="min-h-screen">
       {/* Structured Data */}
       <ProductJsonLd product={product} url={productUrl} />
 
-      {/* Breadcrumb + Back */}
-      <div className="mb-8">
-        <div className="text-sm text-muted-foreground mb-2">
-          <Link href="/" className="hover:text-foreground">
-            Home
-          </Link>{" "}
-          /{" "}
-          <Link href="/products" className="hover:text-foreground">
-            Products
-          </Link>
-          {product.category && (
-            <>
-              {" / "}
-              <Link
-                href={`/products?category=${product.category.toLowerCase().replace(/\s+/g, "-")}`}
-                className="hover:text-foreground">
-                {product.category}
+      {/* Product Detail Section */}
+      <section className="py-12 md:py-16 w-full bg-background">
+        <div className="container mx-auto px-4">
+          {/* Breadcrumb + Back */}
+          <div className="mb-8">
+            <div className="text-sm text-muted-foreground mb-3">
+              <Link href="/" className="hover:text-foreground">
+                Home
+              </Link>{" "}
+              /{" "}
+              <Link href="/products" className="hover:text-foreground">
+                Products
               </Link>
-            </>
-          )}
+              {product.category && (
+                <>
+                  {" / "}
+                  <Link
+                    href={`/products?category=${product.category.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="hover:text-foreground">
+                    {product.category}
+                  </Link>
+                </>
+              )}
+            </div>
+
+            <Button variant="outline" asChild className="rounded-full">
+              <Link href="/products">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Products
+              </Link>
+            </Button>
+          </div>
+
+          {/* Main Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+            <ProductGallery product={product} />
+            <ProductInfo product={product} />
+          </div>
         </div>
+      </section>
 
-        <Button variant="outline" asChild>
-          <Link href="/products">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Products
-          </Link>
-        </Button>
-      </div>
+      {/* Product Details Tabs Section */}
+      <section className="py-12 md:py-16 w-full bg-secondary/5 border-y border-border/40">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">Product Details</h2>
+            <div className="w-12 h-0.5 bg-primary mb-6"></div>
+          </div>
 
-      {/* Main Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <ProductGallery product={product} />
-        <ProductInfo product={product} />
-      </div>
+          <div className="max-w-4xl mx-auto">
+            <ProductTabs product={product} />
+          </div>
+        </div>
+      </section>
 
-      <ProductTabs product={product} />
-
+      {/* Related Products Section */}
       {relatedProductsResult.success && relatedProductsResult.products.length > 0 && (
-        <>
-          <Separator className="my-16" />
-          <RelatedProducts products={relatedProductsResult.products} />
-        </>
+        <section className="py-12 md:py-16 w-full bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col items-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">You May Also Like</h2>
+              <div className="w-12 h-0.5 bg-primary mb-6"></div>
+            </div>
+
+            <RelatedProducts products={relatedProductsResult.products} />
+          </div>
+        </section>
       )}
-    </div>
+    </main>
   );
 }

@@ -1,20 +1,64 @@
-// src/components/dashboard/DashboardHeader.tsx
-import type React from "react";
+// // src/components/dashboard/DashboardHeader.tsx
+// import type React from "react";
+
+// interface DashboardHeaderProps {
+//   heading: string;
+//   text?: string;
+//   children?: React.ReactNode;
+// }
+
+// export function DashboardHeader({ heading, text, children }: DashboardHeaderProps) {
+//   return (
+//     <div className="flex items-center justify-between px-2">
+//       <div className="grid gap-1">
+//         <h1 className="font-heading text-3xl md:text-4xl font-bold">{heading}</h1>
+//         {text && <p className="text-lg text-muted-foreground">{text}</p>}
+//       </div>
+//       {children}
+//     </div>
+//   );
+// }
+import React from "react";
+import { ChevronRight } from "lucide-react";
 
 interface DashboardHeaderProps {
-  heading: string;
-  text?: string;
-  children?: React.ReactNode;
+  title: string;
+  description?: string;
+  breadcrumbs?: Array<{
+    label: string;
+    href?: string;
+  }>;
 }
 
-export function DashboardHeader({ heading, text, children }: DashboardHeaderProps) {
+export function DashboardHeader({ title, description, breadcrumbs = [] }: DashboardHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-2">
-      <div className="grid gap-1">
-        <h1 className="font-heading text-3xl md:text-4xl font-bold">{heading}</h1>
-        {text && <p className="text-lg text-muted-foreground">{text}</p>}
+    <div className="mb-8">
+      {/* Breadcrumbs */}
+      {breadcrumbs.length > 0 && (
+        <nav className="flex items-center text-sm text-muted-foreground mb-2">
+          {breadcrumbs.map((crumb, index) => (
+            <React.Fragment key={index}>
+              {index > 0 && <ChevronRight className="h-4 w-4 mx-1" />}
+              {crumb.href ? (
+                <a href={crumb.href} className="hover:text-foreground transition-colors">
+                  {crumb.label}
+                </a>
+              ) : (
+                <span>{crumb.label}</span>
+              )}
+            </React.Fragment>
+          ))}
+        </nav>
+      )}
+
+      {/* Title with decorative line */}
+      <div className="relative">
+        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+        <div className="absolute -bottom-3 left-0 h-1 w-20 bg-primary rounded-full"></div>
       </div>
-      {children}
+
+      {/* Description */}
+      {description && <p className="mt-6 text-muted-foreground max-w-3xl">{description}</p>}
     </div>
   );
 }

@@ -1,9 +1,45 @@
-// src/components/checkout/CheckoutSuccess.tsx
+// // src/components/checkout/CheckoutSuccess.tsx
+// "use client";
+
+// import { useSearchParams, useRouter } from "next/navigation";
+// import { Button } from "@/components/ui/button";
+// import { CheckCircle } from "lucide-react";
+
+// export function CheckoutSuccess() {
+//   const searchParams = useSearchParams();
+//   const router = useRouter();
+//   const orderId = searchParams.get("orderId");
+
+//   return (
+//     <div className="w-full max-w-md px-4 sm:px-6 mx-auto">
+//       <div className="py-12 text-center space-y-8">
+//         <div className="flex justify-center">
+//           <CheckCircle className="w-16 h-16 text-green-500" />
+//         </div>
+
+//         <div className="space-y-2">
+//           <h1 className="text-3xl font-semibold text-green-700 dark:text-green-300">Thank you for your order!</h1>
+//           <p className="text-muted-foreground text-base">
+//             Your order{orderId ? ` (#${orderId.slice(0, 8).toUpperCase()})` : ""} has been placed successfully.
+//           </p>
+//         </div>
+
+//         <p className="text-sm text-muted-foreground">
+//           A confirmation email has been sent. You can also view your order in your dashboard.
+//         </p>
+
+//         <Button onClick={() => router.push("/user/orders")} className="w-full sm:w-auto">
+//           Go to My Orders
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// }
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ShoppingBag } from "lucide-react";
 
 export function CheckoutSuccess() {
   const searchParams = useSearchParams();
@@ -14,11 +50,13 @@ export function CheckoutSuccess() {
     <div className="w-full max-w-md px-4 sm:px-6 mx-auto">
       <div className="py-12 text-center space-y-8">
         <div className="flex justify-center">
-          <CheckCircle className="w-16 h-16 text-green-500" />
+          <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <CheckCircle className="h-10 w-10 text-primary" />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold text-green-700 dark:text-green-300">Thank you for your order!</h1>
+          <h1 className="text-3xl font-semibold">Thank you for your order!</h1>
           <p className="text-muted-foreground text-base">
             Your order{orderId ? ` (#${orderId.slice(0, 8).toUpperCase()})` : ""} has been placed successfully.
           </p>
@@ -28,9 +66,16 @@ export function CheckoutSuccess() {
           A confirmation email has been sent. You can also view your order in your dashboard.
         </p>
 
-        <Button onClick={() => router.push("/user/orders")} className="w-full sm:w-auto">
-          Go to My Orders
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button onClick={() => router.push("/user/orders")} className="h-12 px-6">
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            View My Orders
+          </Button>
+
+          <Button variant="outline" onClick={() => router.push("/products")} className="h-12 px-6">
+            Continue Shopping
+          </Button>
+        </div>
       </div>
     </div>
   );

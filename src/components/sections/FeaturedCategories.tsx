@@ -31,8 +31,8 @@ const categories = [
 
 export function FeaturedCategories() {
   return (
-    <section className="py-16 bg-secondary/5 border-y border-border/40">
-      <div className="container">
+    <section className="py-16 w-full bg-background">
+      <div className="container mx-auto px-4">
         <div className="flex flex-col items-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Shop By Category</h2>
           <div className="w-12 h-0.5 bg-primary mb-6"></div>
@@ -44,7 +44,7 @@ export function FeaturedCategories() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map(category => (
             <Link href={category.slug} key={category.slug}>
-              <Card className="overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary/20 group">
+              <Card className="overflow-hidden transition-all duration-300 hover:shadow-sm hover:border-primary/20 group h-full">
                 <div className="relative h-48 w-full overflow-hidden">
                   <Image
                     src={category.image || "/placeholder.svg"}

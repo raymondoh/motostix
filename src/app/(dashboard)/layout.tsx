@@ -1,6 +1,5 @@
-// src/app/(dashboard)/layout.tsx
 import type { ReactNode } from "react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -8,10 +7,12 @@ import { DashboardThemeProvider } from "@/providers/DashboardThemeProvider";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Dashboard Layout",
-  description: "Dashboard Layout"
+  title: "Dashboard | MotoStix",
+  description: "Manage your MotoStix account and orders"
 };
 
 // This layout uses auth() or headers(), so force dynamic rendering
@@ -41,15 +42,15 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
     const role = session.user?.role;
 
-    // // Role-based access control
+    // Role-based access control
     if (role === "admin" && isUserRoute) {
       console.warn("Admin trying to access user route — redirecting to /admin");
-      redirect("/admin"); // Corrected path without dashboard prefix
+      redirect("/admin");
     }
 
     if (role === "user" && isAdminRoute) {
       console.warn("User trying to access admin route — redirecting to /not-authorized");
-      redirect("/not-authorized"); // Consistent with our approach
+      redirect("/not-authorized");
     }
 
     // Role-based redirects
@@ -75,15 +76,31 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
             {/* Main content area */}
             <SidebarInset className="flex-1 flex flex-col w-full">
-              {/* Header with trigger button */}
-              <header className="flex h-16 items-center gap-2 border-b px-4 sticky top-0 bg-background z-10">
-                <SidebarTrigger className="-ml-1" />
-                {/* <h1 className="font-semibold">{role === "admin" ? "Dashboard Menu" : "Dashboard Menu"}</h1> */}
+              {/* Enhanced header with trigger button */}
+              <header className="flex h-16 items-center justify-between border-b px-6 sticky top-0 bg-background/95 backdrop-blur-sm z-10 shadow-sm">
+                <div className="flex items-center gap-4">
+                  <SidebarTrigger className="rounded-full hover:bg-muted p-2 transition-colors" />
+                  <h1 className="font-semibold text-lg hidden sm:block">
+                    {role === "admin" ? "Admin Dashboard" : "My Account"}
+                  </h1>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/"
+                    className="text-sm font-medium flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                    <ChevronLeft className="h-4 w-4" />
+                    <span>Back to Store</span>
+                  </Link>
+                </div>
               </header>
 
-              {/* Main content with centered container */}
-              <main className="flex-1 overflow-auto">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">{children}</div>
+              {/* Main content with enhanced styling */}
+              <main className="flex-1 overflow-auto bg-muted/30">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+                  {/* Content wrapper with subtle styling */}
+                  <div className="bg-background rounded-xl shadow-sm border p-6">{children}</div>
+                </div>
               </main>
             </SidebarInset>
           </div>
@@ -92,6 +109,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     );
   } catch (error) {
     console.error("Error in DashboardLayout:", error);
-    redirect("/not-authorized"); // Updated for consistency
+    redirect("/not-authorized");
   }
 }

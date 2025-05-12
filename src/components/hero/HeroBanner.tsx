@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 
@@ -57,13 +55,6 @@ export function HeroBanner({ className }: HeroBannerProps) {
             </button>
           </div>
         </div>
-
-        {/* Shop Now Button - Keeping your original button but moving it below search */}
-        {/* <div className="mt-8">
-          <Button asChild size="lg" variant="secondary" className="text-black font-bold">
-            <Link href="/products">Shop Now</Link>
-          </Button>
-        </div> */}
       </div>
 
       {/* Photo Credit */}

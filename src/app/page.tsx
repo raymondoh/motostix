@@ -6,7 +6,6 @@ import { siteConfig } from "@/config/siteConfig";
 import { FeaturedCategories } from "@/components/sections/FeaturedCategories";
 import { TestimonialSection } from "@/components/sections/TestimonialSection";
 import { PromoSection } from "@/components/sections/PromoSection";
-
 import StickerGridSections from "@/components/sections/StickerGridSections";
 
 export const metadata: Metadata = {
@@ -26,32 +25,23 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow">
+        {/* Hero Banner - Full width, outside of container */}
         <HeroBanner />
 
-        <div className="container py-10">
-          {/* <h2 className="text-4xl font-bold mb-6 text-center">Welcome to MotoStix!</h2>
-          <p className="text-muted-foreground text-center mb-12">
-            Your ultimate destination for premium motorcycle decals and stickers.
-          </p> */}
+        {/* Featured Categories - Light background */}
+        <FeaturedCategories />
 
-          <ProductCarousel
-            products={products}
-            title="Trending Stickers"
-            showTitle
-            //itemsPerView={{ sm: 0.5, md: 2, lg: 3, xl: 5 }}
-            className="mt-8"
-          />
-          <StickerGridSections />
+        {/* Trending Products - Subtle background */}
+        <ProductCarousel products={products} title="Trending Stickers" showTitle />
 
-          {/* Featured Categories Section */}
-          <FeaturedCategories />
+        {/* Sticker Grid Sections - Light background */}
+        <StickerGridSections />
 
-          {/* Promotional Banner */}
-          <PromoSection />
+        {/* Testimonials - Subtle background (uncomment if needed) */}
+        <TestimonialSection />
 
-          {/* Testimonials Section */}
-          {/* <TestimonialSection /> */}
-        </div>
+        {/* Promo Section - Light background */}
+        <PromoSection />
       </main>
     </div>
   );

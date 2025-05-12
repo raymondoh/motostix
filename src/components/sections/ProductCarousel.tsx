@@ -1,228 +1,3 @@
-// "use client";
-
-// import type React from "react";
-// import Image from "next/image";
-// import Link from "next/link";
-// import { ShoppingCart, Eye } from "lucide-react";
-// import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-// import { Button } from "@/components/ui/button";
-// import { Card, CardContent, CardFooter } from "@/components/ui/card";
-// import { Badge } from "@/components/ui/badge";
-// import { cn } from "@/lib/utils";
-// import type { Product } from "@/types/product";
-// import { formatPriceWithCode } from "@/lib/utils";
-
-// export interface ProductCarouselProps {
-//   /**
-//    * Array of products to display
-//    */
-//   products?: Product[];
-//   /**
-//    * Title for the carousel section
-//    */
-//   title?: string;
-//   /**
-//    * Whether to show the title
-//    * @default true
-//    */
-//   showTitle?: boolean;
-//   /**
-//    * Number of items to show per view on different breakpoints
-//    */
-//   itemsPerView?: {
-//     sm?: number;
-//     md?: number;
-//     lg?: number;
-//     xl?: number;
-//   };
-//   /**
-//    * Whether to loop the carousel
-//    * @default true
-//    */
-//   loop?: boolean;
-//   /**
-//    * Whether to show navigation arrows
-//    * @default true
-//    */
-//   showArrows?: boolean;
-//   /**
-//    * Custom class name for the container
-//    */
-//   className?: string;
-//   /**
-//    * Callback when a product is clicked
-//    */
-//   onProductClick?: (product: Product) => void;
-//   /**
-//    * Callback when add to cart button is clicked
-//    */
-//   onAddToCart?: (product: Product) => void;
-//   /**
-//    * Custom button text for the add to cart button
-//    * @default "Add to Cart"
-//    */
-//   addToCartText?: string;
-//   /**
-//    * Whether to show the quick view button
-//    * @default false
-//    */
-//   showQuickView?: boolean;
-// }
-
-// export function ProductCarousel({
-//   products = [],
-//   title = "Featured Products",
-//   showTitle = true,
-//   itemsPerView = { sm: 1, md: 2, lg: 3, xl: 4 },
-//   loop = true,
-//   showArrows = true,
-//   className,
-//   onProductClick,
-//   onAddToCart,
-//   addToCartText = "Add to Cart",
-//   showQuickView = false
-// }: ProductCarouselProps) {
-//   // Calculate the basis classes based on itemsPerView
-//   const getBasisClasses = () => {
-//     const classes = [];
-
-//     if (itemsPerView.sm) {
-//       classes.push(`basis-1/${itemsPerView.sm}`);
-//     }
-
-//     if (itemsPerView.md) {
-//       classes.push(`md:basis-1/${itemsPerView.md}`);
-//     }
-
-//     if (itemsPerView.lg) {
-//       classes.push(`lg:basis-1/${itemsPerView.lg}`);
-//     }
-
-//     if (itemsPerView.xl) {
-//       classes.push(`xl:basis-1/${itemsPerView.xl}`);
-//     }
-
-//     return classes.join(" ");
-//   };
-
-//   const handleProductClick = (product: Product) => {
-//     if (onProductClick) {
-//       onProductClick(product);
-//     }
-//   };
-
-//   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
-//     e.stopPropagation();
-//     if (onAddToCart) {
-//       onAddToCart(product);
-//     }
-//   };
-
-//   return (
-//     <div className={cn("py-4", className)}>
-//       <div className="px-4">
-//         {showTitle && title && <h2 className="text-2xl font-bold mb-6">{title}</h2>}
-
-//         <Carousel
-//           opts={{
-//             align: "start",
-//             loop
-//           }}
-//           className="w-full">
-//           <CarouselContent className="-ml-2 md:-ml-4">
-//             {products.length === 0 ? (
-//               <CarouselItem className="pl-2 md:pl-4 basis-full">
-//                 <Card className="h-[300px] flex items-center justify-center">
-//                   <p className="text-muted-foreground">No products available</p>
-//                 </Card>
-//               </CarouselItem>
-//             ) : (
-//               products.map(product => (
-//                 <CarouselItem key={product.id} className={cn("pl-2 md:pl-4", getBasisClasses())}>
-//                   <Link href={`/products/${product.id}`} key={product.id}>
-//                     <Card
-//                       className="h-full overflow-hidden cursor-pointer transition-all hover:shadow-md"
-//                       onClick={() => handleProductClick(product)}>
-//                       <div className="relative">
-//                         <div className="relative h-[200px] bg-muted">
-//                           <Image
-//                             src={product.image || "/placeholder.svg?height=200&width=200"}
-//                             alt={product.name}
-//                             fill
-//                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-//                             className="object-cover"
-//                           />
-//                         </div>
-
-//                         {/* Product badge if available */}
-//                         {product.badge && (
-//                           <Badge className="absolute top-2 right-2" variant="secondary">
-//                             {product.badge}
-//                           </Badge>
-//                         )}
-
-//                         {/* Quick view button */}
-//                         {showQuickView && (
-//                           <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-//                             <Button
-//                               variant="secondary"
-//                               size="sm"
-//                               className="gap-1"
-//                               onClick={e => {
-//                                 e.stopPropagation();
-//                                 handleProductClick(product);
-//                               }}>
-//                               <Eye className="h-4 w-4" />
-//                               Quick View
-//                             </Button>
-//                           </div>
-//                         )}
-//                       </div>
-
-//                       <CardContent className="p-4">
-//                         <h3 className="text-lg font-semibold line-clamp-1">{product.name}</h3>
-//                         <p className="text-xl font-bold mt-2">{formatPriceWithCode(product.price, "GB")}</p>
-//                         {product.description && (
-//                           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
-//                         )}
-//                       </CardContent>
-
-//                       <CardFooter className="p-4 pt-0">
-//                         <Button
-//                           className="w-full"
-//                           variant={product.inStock === false ? "outline" : "default"}
-//                           disabled={product.inStock === false}
-//                           onClick={e => handleAddToCart(e, product)}>
-//                           {product.inStock === false ? (
-//                             "Out of Stock"
-//                           ) : (
-//                             <>
-//                               <ShoppingCart className="mr-2 h-4 w-4" />
-//                               {addToCartText}
-//                             </>
-//                           )}
-//                         </Button>
-//                       </CardFooter>
-//                     </Card>
-//                   </Link>
-//                 </CarouselItem>
-//               ))
-//             )}
-//           </CarouselContent>
-
-//           {showArrows && products.length > 0 && (
-//             <>
-//               <CarouselPrevious className="-left-3 md:-left-5" />
-//               <CarouselNext className="-right-3 md:-right-5" />
-//             </>
-//           )}
-//         </Carousel>
-//       </div>
-//     </div>
-//   );
-// }
-//////////////////////////////
-
 "use client";
 
 import type React from "react";
@@ -321,123 +96,129 @@ export function ProductCarousel({
   };
 
   return (
-    <div className={cn("container mx-auto px-4 py-12 bg-secondary/5 rounded-xl shadow-md", className)}>
-      {showTitle && title && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold">{title}</h2>
-        </div>
-      )}
+    <div className={cn("py-16 w-full bg-secondary/5 border-y border-border/40", className)}>
+      <div className="container mx-auto px-4">
+        {showTitle && title && (
+          <div className="flex flex-col items-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">{title}</h2>
+            <div className="w-12 h-0.5 bg-primary mb-6"></div>
+            <p className="text-muted-foreground text-center max-w-2xl">
+              Discover our most popular designs loved by riders everywhere.
+            </p>
+          </div>
+        )}
 
-      <Carousel
-        opts={{
-          align: "start",
-          loop
-        }}
-        className="w-full">
-        <CarouselContent className="-ml-3 md:-ml-6">
-          {products.length === 0 ? (
-            <CarouselItem className="pl-3 md:pl-6 basis-full">
-              <div className="h-[300px] flex items-center justify-center rounded-lg border-2 border-gray-200 bg-white">
-                <p className="text-muted-foreground">No products available</p>
-              </div>
-            </CarouselItem>
-          ) : (
-            products.map(product => (
-              <CarouselItem
-                key={product.id}
-                className="pl-3 md:pl-6 w-[65%] md:w-[40%] lg:w-[30%] xl:w-[22%] flex-none">
-                <Link href={`/products/${product.id}`} key={product.id} className="block group h-full">
-                  <div
-                    className="relative overflow-hidden rounded-lg bg-white transition-all hover:shadow-md h-[250px] sm:h-[280px] md:h-[320px]"
-                    onClick={() => handleProductClick(product)}>
-                    {/* Using standard img tag with error handling */}
-                    <img
-                      src={product.image || "https://placehold.co/400x400/png"}
-                      alt={product.name}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={handleImageError}
-                    />
+        <Carousel
+          opts={{
+            align: "start",
+            loop
+          }}
+          className="w-full">
+          <CarouselContent className="-ml-3 md:-ml-6">
+            {products.length === 0 ? (
+              <CarouselItem className="pl-3 md:pl-6 basis-full">
+                <div className="h-[300px] flex items-center justify-center rounded-lg border-2 border-gray-200 bg-white">
+                  <p className="text-muted-foreground">No products available</p>
+                </div>
+              </CarouselItem>
+            ) : (
+              products.map(product => (
+                <CarouselItem
+                  key={product.id}
+                  className="pl-3 md:pl-6 w-[65%] md:w-[40%] lg:w-[30%] xl:w-[22%] flex-none">
+                  <Link href={`/products/${product.id}`} key={product.id} className="block group h-full">
+                    <div
+                      className="relative overflow-hidden rounded-lg bg-white transition-all hover:shadow-md h-[250px] sm:h-[280px] md:h-[320px]"
+                      onClick={() => handleProductClick(product)}>
+                      {/* Using standard img tag with error handling */}
+                      <img
+                        src={product.image || "https://placehold.co/400x400/png"}
+                        alt={product.name}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={handleImageError}
+                      />
 
-                    {/* Product badge if available */}
-                    {product.badge && (
-                      <Badge className="absolute top-2 right-2 z-10" variant="secondary">
-                        {product.badge}
-                      </Badge>
-                    )}
+                      {/* Product badge if available */}
+                      {product.badge && (
+                        <Badge className="absolute top-2 right-2 z-10" variant="secondary">
+                          {product.badge}
+                        </Badge>
+                      )}
 
-                    {/* 
+                      {/* 
                       Overlay with product details - only visible on hover on desktop
                       On mobile, we'll show a permanent footer with basic info
                     */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 md:block hidden">
-                      <h3 className="font-medium text-white text-lg">{product.name}</h3>
-                      <p className="text-base text-white/90 mt-1">{formatPriceWithCode(product.price, "GB")}</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 md:block hidden">
+                        <h3 className="font-medium text-white text-lg">{product.name}</h3>
+                        <p className="text-base text-white/90 mt-1">{formatPriceWithCode(product.price, "GB")}</p>
 
-                      {/* Quick view button - only shown on hover */}
-                      {showQuickView && (
-                        <Button
-                          variant="secondary"
-                          size="default"
-                          className="gap-1 mt-4 w-full"
-                          onClick={e => {
-                            e.preventDefault();
-                            handleProductClick(product);
-                          }}>
-                          <Eye className="h-4 w-4" />
-                          Quick View
-                        </Button>
-                      )}
+                        {/* Quick view button - only shown on hover */}
+                        {showQuickView && (
+                          <Button
+                            variant="secondary"
+                            size="default"
+                            className="gap-1 mt-4 w-full"
+                            onClick={e => {
+                              e.preventDefault();
+                              handleProductClick(product);
+                            }}>
+                            <Eye className="h-4 w-4" />
+                            Quick View
+                          </Button>
+                        )}
 
-                      {/* Add to cart button - only shown on hover */}
-                      {onAddToCart && (
-                        <Button
-                          className="w-full mt-2"
-                          variant="secondary"
-                          size="default"
-                          disabled={product.inStock === false}
-                          onClick={e => {
-                            e.preventDefault();
-                            handleAddToCart(e, product);
-                          }}>
-                          {product.inStock === false ? (
-                            "Out of Stock"
-                          ) : (
-                            <>
-                              <ShoppingCart className="mr-2 h-4 w-4" />
-                              {addToCartText}
-                            </>
-                          )}
-                        </Button>
-                      )}
+                        {/* Add to cart button - only shown on hover */}
+                        {onAddToCart && (
+                          <Button
+                            className="w-full mt-2"
+                            variant="secondary"
+                            size="default"
+                            disabled={product.inStock === false}
+                            onClick={e => {
+                              e.preventDefault();
+                              handleAddToCart(e, product);
+                            }}>
+                            {product.inStock === false ? (
+                              "Out of Stock"
+                            ) : (
+                              <>
+                                <ShoppingCart className="mr-2 h-4 w-4" />
+                                {addToCartText}
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Mobile footer - always visible on mobile */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 md:hidden">
+                        <h3 className="font-medium text-white text-base truncate">{product.name}</h3>
+                        <p className="text-sm text-white/90">{formatPriceWithCode(product.price, "GB")}</p>
+                      </div>
                     </div>
+                  </Link>
+                </CarouselItem>
+              ))
+            )}
+          </CarouselContent>
 
-                    {/* Mobile footer - always visible on mobile */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 md:hidden">
-                      <h3 className="font-medium text-white text-base truncate">{product.name}</h3>
-                      <p className="text-sm text-white/90">{formatPriceWithCode(product.price, "GB")}</p>
-                    </div>
-                  </div>
-                </Link>
-              </CarouselItem>
-            ))
+          {showArrows && products.length > 0 && (
+            <>
+              <CarouselPrevious className="-left-4 md:-left-6" />
+              <CarouselNext className="-right-4 md:-right-6" />
+            </>
           )}
-        </CarouselContent>
+        </Carousel>
 
-        {showArrows && products.length > 0 && (
-          <>
-            <CarouselPrevious className="-left-4 md:-left-6" />
-            <CarouselNext className="-right-4 md:-right-6" />
-          </>
-        )}
-      </Carousel>
-
-      {/* View All link - larger button */}
-      <div className="mt-12 text-center">
-        <Link
-          href={viewAllUrl}
-          className="inline-block rounded-full bg-black text-white dark:bg-white dark:text-black px-10 py-4 text-lg font-medium hover:bg-black/90 dark:hover:bg-white/90 transition-colors">
-          View All Stickers
-        </Link>
+        {/* View All link - larger button */}
+        <div className="mt-12 text-center">
+          <Link
+            href={viewAllUrl}
+            className="inline-block rounded-full bg-black text-white dark:bg-white dark:text-black px-10 py-4 text-lg font-medium hover:bg-black/90 dark:hover:bg-white/90 transition-colors">
+            View All Stickers
+          </Link>
+        </div>
       </div>
     </div>
   );
