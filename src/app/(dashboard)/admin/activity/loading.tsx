@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export default function AdminActivityLoading() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Admin Activity Log" text="View all user actions and system events." />
+      <DashboardHeader title="Admin Activity Log" description="View all user actions and system events." />
 
       <Separator className="mb-8" />
 

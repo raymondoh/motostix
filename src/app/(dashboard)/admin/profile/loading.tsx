@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function AdminProfileLoading() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Admin Profile" text="Manage your admin account settings and profile information" />
+      <DashboardHeader title="Admin Profile" description="Manage your admin account settings and profile information" />
       <Separator className="mb-8" />
 
       <div className="max-w-4xl">

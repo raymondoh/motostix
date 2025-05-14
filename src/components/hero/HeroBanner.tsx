@@ -48,7 +48,7 @@ export function HeroBanner({ className }: HeroBannerProps) {
             <input
               type="text"
               placeholder="Search for sticker designs..."
-              className="w-full py-4 px-4 text-black outline-none"
+              className="w-full py-4 px-4 text-black outline-none dark:bg-gray-100"
             />
             <button className="bg-gray-100 px-6 text-gray-700 transition hover:bg-gray-200">
               <Search size={20} />

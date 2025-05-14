@@ -28,9 +28,10 @@ interface DashboardHeaderProps {
     label: string;
     href?: string;
   }>;
+  children?: React.ReactNode;
 }
 
-export function DashboardHeader({ title, description, breadcrumbs = [] }: DashboardHeaderProps) {
+export function DashboardHeader({ title, description, breadcrumbs = [], children }: DashboardHeaderProps) {
   return (
     <div className="mb-8">
       {/* Breadcrumbs */}
@@ -51,14 +52,20 @@ export function DashboardHeader({ title, description, breadcrumbs = [] }: Dashbo
         </nav>
       )}
 
-      {/* Title with decorative line */}
-      <div className="relative">
-        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-        <div className="absolute -bottom-3 left-0 h-1 w-20 bg-primary rounded-full"></div>
-      </div>
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          {/* Title with decorative line */}
+          <div className="relative">
+            <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+            {/* <div className="absolute -bottom-3 left-0 h-1 w-20 bg-primary rounded-full"></div> */}
+          </div>
 
-      {/* Description */}
-      {description && <p className="mt-6 text-muted-foreground max-w-3xl">{description}</p>}
+          {/* Description */}
+          {description && <p className="mt-6 text-muted-foreground max-w-3xl">{description}</p>}
+        </div>
+
+        {children && <div className="flex items-center gap-2">{children}</div>}
+      </div>
     </div>
   );
 }

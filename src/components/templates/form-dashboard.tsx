@@ -32,7 +32,7 @@ export function FormDashboard({
 }: FormDashboardProps) {
   return (
     <DashboardShell>
-      <DashboardHeader heading={title} text={description} />
+      <DashboardHeader title={title} description={description} />
       <Separator className="my-6" />
       <Card className="max-w-2xl mx-auto">
         {(formTitle || formDescription) && (

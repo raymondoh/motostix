@@ -15,7 +15,7 @@ interface TableDashboardProps {
 export function TableDashboard({ title, description, headerAction, filterSection, children }: TableDashboardProps) {
   return (
     <DashboardShell>
-      <DashboardHeader heading={title} text={description}>
+      <DashboardHeader title={title} description={description}>
         {headerAction}
       </DashboardHeader>
       <Separator className="my-6" />

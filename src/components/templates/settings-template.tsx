@@ -18,7 +18,7 @@ interface SettingsTemplateProps {
 export function SettingsTemplate({ title, description, defaultTab, tabs }: SettingsTemplateProps) {
   return (
     <DashboardShell>
-      <DashboardHeader heading={title} text={description} />
+      <DashboardHeader title={title} description={description} />
       <Separator className="my-6" />
       <Tabs defaultValue={defaultTab || tabs[0].id} className="space-y-6">
         <TabsList>

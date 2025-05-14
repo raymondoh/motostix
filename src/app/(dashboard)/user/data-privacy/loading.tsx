@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function UserDataPrivacyLoading() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Data & Privacy" text="Manage your data, export it, or delete your account." />
+      <DashboardHeader title="Data & Privacy" description="Manage your data, export it, or delete your account." />
       <Separator className="mb-8" />
 
       <div className="grid gap-8 md:grid-cols-2">

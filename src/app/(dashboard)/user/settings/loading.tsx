@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 export default function UserSettingsLoading() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Settings" text="Manage your account settings and security preferences" />
+      <DashboardHeader title="Settings" description="Manage your account settings and security preferences" />
       <Separator className="mb-8" />
 
       <div className="w-full max-w-4xl overflow-hidden">

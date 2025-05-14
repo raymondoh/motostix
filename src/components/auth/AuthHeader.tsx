@@ -20,7 +20,7 @@ export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
 
       <div className="flex flex-col items-center text-center">
         <h1 className="text-3xl md:text-4xl font-bold">{title}</h1>
-        <div className="w-12 h-0.5 bg-primary my-4"></div>
+        {/* <div className="w-12 h-0.5 bg-primary my-4"></div> */}
         {subtitle && <p className="text-muted-foreground text-lg max-w-sm">{subtitle}</p>}
       </div>
     </div>

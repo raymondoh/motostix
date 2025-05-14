@@ -13,7 +13,7 @@ interface BasicDashboardProps {
 export function BasicDashboard({ title, description, headerAction, children }: BasicDashboardProps) {
   return (
     <DashboardShell>
-      <DashboardHeader heading={title} text={description}>
+      <DashboardHeader title={title} description={description}>
         {headerAction}
       </DashboardHeader>
       <Separator className="my-6" />

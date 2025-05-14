@@ -22,7 +22,8 @@
 // import { Logo } from "./Logo";
 // import { UserAvatar } from "../shared/UserAvatar";
 // import { HeaderIconButton } from "./header-icon-button";
-// import { CartIcon } from "@/components/cart/cart-icon";
+// import { cn } from "@/lib/utils";
+// import { CartIcon } from "@/components/cart/cart-icon"; // Import the correct CartIcon component
 
 // // Track if we've already checked the session
 // let hasCheckedSession = false;
@@ -62,18 +63,20 @@
 //     <Link
 //       key={item.href}
 //       href={item.href}
-//       className={`text-sm font-bold uppercase tracking-wide transition-colors ${
+//       className={cn(
+//         "text-sm font-bold uppercase tracking-wide transition-colors px-4 py-2 rounded-full",
 //         isActive(item.href)
-//           ? "text-foreground border-b-2 border-accent pb-1"
-//           : "text-muted-foreground hover:text-primary"
-//       } ${isMobile ? "p-2 hover:bg-accent/10 rounded-md" : ""}`}
+//           ? "bg-black text-white dark:bg-white dark:text-black"
+//           : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800",
+//         isMobile ? "w-full text-center" : ""
+//       )}
 //       onClick={() => setOpen?.(false)}>
 //       <span>{item.title}</span>
 //     </Link>
 //   );
 
 //   return (
-//     <div className={`flex ${isMobile ? "flex-col space-y-4" : "space-x-6"}`}>{generalNavItems.map(renderNavItem)}</div>
+//     <div className={`flex ${isMobile ? "flex-col space-y-4" : "space-x-2"}`}>{generalNavItems.map(renderNavItem)}</div>
 //   );
 // };
 
@@ -332,14 +335,13 @@
 //     </div>
 //   </nav>
 // );
-///////////////////
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/header/ModeToggle";
-import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus, User } from "lucide-react";
+import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus, User, Search } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSession, signOut } from "next-auth/react";
 import { generalNavItems, adminNavItems, type NavItem } from "@/lib/navigation";
@@ -358,7 +360,8 @@ import { Logo } from "./Logo";
 import { UserAvatar } from "../shared/UserAvatar";
 import { HeaderIconButton } from "./header-icon-button";
 import { cn } from "@/lib/utils";
-import { CartIcon } from "@/components/cart/cart-icon"; // Import the correct CartIcon component
+import { CartIcon } from "@/components/cart/cart-icon";
+import { useSearch } from "@/contexts/SearchContext";
 
 // Track if we've already checked the session
 let hasCheckedSession = false;
@@ -419,6 +422,20 @@ export const Navbar = () => {
   const { matches: isMobile, isLoading } = useMediaQuery("(max-width: 768px)");
   const [open, setOpen] = useState(false);
   const { data: session, status } = useSession();
+  const { openSearch } = useSearch();
+
+  // Add keyboard shortcut for search (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        openSearch();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openSearch]);
 
   if (isLoading) {
     return <NavbarSkeleton />;
@@ -441,6 +458,15 @@ export const Navbar = () => {
                   <SheetDescription></SheetDescription>
                 </SheetHeader>
                 <div className="py-4">
+                  {/* Add search button to mobile menu */}
+                  <HeaderIconButton 
+                    onClick={openSearch} 
+                    className="w-full flex justify-center items-center gap-2 mb-4"
+                    aria-label="Search"
+                  >
+                    <Search className="h-5 w-5" />
+                    <span>Search</span>
+                  </HeaderIconButton>
                   <NavLinks setOpen={setOpen} isMobile={true} />
                 </div>
               </SheetContent>
@@ -467,6 +493,10 @@ export const Navbar = () => {
       </div>
 
       <div className="flex items-center space-x-3">
+        {/* Add search button before cart icon */}
+        <HeaderIconButton onClick={openSearch} aria-label="Search">
+          <Search className="h-5 w-5" />
+        </HeaderIconButton>
         <CartIcon />
         <ModeToggle />
         <UserMenu isMobile={isMobile} />

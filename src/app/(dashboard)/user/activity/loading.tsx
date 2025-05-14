@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export default function UserActivityLoading() {
   return (
     <DashboardShell>
-      <DashboardHeader heading="Activity Log" text="View your recent account activity and security events." />
+      <DashboardHeader title="Activity Log" description="View your recent account activity and security events." />
       <Separator className="mb-8" />
 
       <div className="w-full overflow-hidden rounded-md border">

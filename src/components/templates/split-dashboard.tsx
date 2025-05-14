@@ -34,7 +34,7 @@ export function SplitDashboard({
 
   return (
     <DashboardShell>
-      <DashboardHeader heading={title} text={description}>
+      <DashboardHeader title={title} description={description}>
         {headerAction}
       </DashboardHeader>
       <Separator className="my-6" />
