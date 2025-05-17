@@ -1,3 +1,4 @@
+//src/(dashboard)/layoutCombedText.tsx
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";

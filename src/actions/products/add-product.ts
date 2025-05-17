@@ -1,4 +1,4 @@
-// //src/actions/products/add-product.ts
+// src/actions/products/add-product.ts
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -27,7 +27,13 @@ export async function addProduct(data: CreateProductInput): Promise<AddProductRe
     }
 
     // ✅ Step 2: Call Firebase function with validated data
-    const result = await addProductToDb(validated.data);
+    // Add default value for inStock if it's undefined
+    const productData = {
+      ...validated.data,
+      inStock: validated.data.inStock ?? true
+    };
+
+    const result = await addProductToDb(productData);
 
     if (result.success) {
       // ✅ Revalidate cache for products page

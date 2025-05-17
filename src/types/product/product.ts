@@ -1,50 +1,131 @@
 // types/product.ts
-import { Timestamp } from "firebase-admin/firestore"; // ✅ Correct import for client-side types
+import { Timestamp } from "firebase-admin/firestore"; // ✅ Correct import for server-side types
+import type {
+  Category as CategoryName,
+  DesignTheme,
+  ProductType,
+  Material,
+  Placement,
+  Brand,
+  Size,
+  ShippingClass,
+  Tag
+} from "@/config/categories";
 
 export interface Product {
   id: string;
+
+  // Basic Information
   name: string;
   description?: string;
   details?: string;
+  sku?: string;
+  barcode?: string;
+
+  // Classification
+  category?: CategoryName | string;
+  subcategory?: string;
+  designThemes?: DesignTheme[] | string[];
+  productType?: ProductType | string;
+  tags?: Tag[] | string[];
+  brand?: Brand | string;
+  manufacturer?: string;
+
+  // Specifications
   dimensions?: string;
-  material?: string;
+  weight?: string;
+  shippingWeight?: string;
+  material?: Material | string;
+  finish?: string;
   color?: string;
   baseColor?: string;
   colorDisplayName?: string;
-  stickySide?: "Front" | "Back"; // ✨ NEW
+  stickySide?: "Front" | "Back";
+  size?: Size | string;
+
+  // Media
   image: string;
-  category?: string;
-  subcategory?: string; // ✅ NEW
+  additionalImages?: string[];
+  placements?: Placement[] | string[];
+
+  // Pricing and Inventory
   price: number;
+  salePrice?: number;
+  onSale?: boolean;
+  costPrice?: number;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
+  shippingClass?: ShippingClass | string;
+
+  // Status
   inStock: boolean;
   badge?: string;
   isFeatured?: boolean;
   isHero?: boolean;
   isLiked?: boolean;
+  isCustomizable?: boolean;
+  isNewArrival?: boolean;
+
+  // Metadata
   createdAt: Timestamp | string;
   updatedAt?: Timestamp | string;
 }
 
 export interface SerializedProduct {
   id: string;
+
+  // Basic Information
   name: string;
   description?: string;
   details?: string;
+  sku?: string;
+  barcode?: string;
+
+  // Classification
+  category?: CategoryName | string;
+  subcategory?: string;
+  designThemes?: DesignTheme[] | string[];
+  productType?: ProductType | string;
+  tags?: Tag[] | string[];
+  brand?: Brand | string;
+  manufacturer?: string;
+
+  // Specifications
   dimensions?: string;
-  material?: string;
+  weight?: string;
+  shippingWeight?: string;
+  material?: Material | string;
+  finish?: string;
   color?: string;
   baseColor?: string;
   colorDisplayName?: string;
-  stickySide?: "Front" | "Back"; // ✨ NEW
+  stickySide?: "Front" | "Back";
+  size?: Size | string;
+
+  // Media
   image: string;
-  category?: string;
-  subcategory?: string; // ✅ NEW
+  additionalImages?: string[];
+  placements?: Placement[] | string[];
+
+  // Pricing and Inventory
   price: number;
+  salePrice?: number;
+  onSale?: boolean;
+  costPrice?: number;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
+  shippingClass?: ShippingClass | string;
+
+  // Status
   inStock: boolean;
   badge?: string;
   isFeatured?: boolean;
   isHero?: boolean;
   isLiked?: boolean;
+  isCustomizable?: boolean;
+  isNewArrival?: boolean;
+
+  // Metadata
   createdAt: string; // Always a string after serialization
   updatedAt?: string;
 }
@@ -93,48 +174,3 @@ export interface HeroSlide {
   cta?: string;
   ctaHref?: string;
 }
-/**
- * Category type representing a group of products with the same category
- */
-export interface Category {
-  /**
-   * Unique identifier for the category (slug format)
-   */
-  id: string;
-
-  /**
-   * Display name of the category
-   */
-  name: string;
-
-  /**
-   * Number of products in this category
-   */
-  count: number;
-
-  /**
-   * Optional image URL for the category (typically from a representative product)
-   */
-  image?: string;
-}
-
-/**
- * Success response when fetching categories
- */
-export interface GetCategoriesSuccess {
-  success: true;
-  data: Category[];
-}
-
-/**
- * Error response when fetching categories fails
- */
-export interface GetCategoriesError {
-  success: false;
-  error: string;
-}
-
-/**
- * Union type for category fetch results
- */
-export type GetCategoriesResult = GetCategoriesSuccess | GetCategoriesError;

@@ -1,3 +1,4 @@
+//src/providers/DashboardThemeProvider.tsx
 "use client";
 
 import type React from "react";

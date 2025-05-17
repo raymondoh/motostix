@@ -1,14 +1,13 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, type KeyboardEvent } from "react"
-import { useRouter } from "next/navigation"
-import { SearchIcon, X, ArrowUp, ArrowDown, Loader2 } from 'lucide-react'
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { useSearch } from "@/contexts/SearchContext"
-import { cn } from "@/lib/utils"
-import { VisuallyHidden } from "@/components/ui/visually-hidden" // Import if you have this component
+import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useRouter } from "next/navigation";
+import { SearchIcon, X, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useSearch } from "@/contexts/SearchContext";
+import { cn } from "@/lib/utils";
 
 export function SearchModal() {
   const {
@@ -24,66 +23,77 @@ export function SearchModal() {
     selectPrevResult,
     navigateToSelected,
     selectResult,
-    navigateToResult,
-  } = useSearch()
+    navigateToResult
+  } = useSearch();
 
-  const inputRef = useRef<HTMLInputElement>(null)
-  const selectedRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
+  const inputRef = useRef<HTMLInputElement>(null);
+  const selectedRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  useEffect(() => {
+    console.log("SearchModal state:", {
+      query,
+      resultsCount: results.length,
+      isSearching,
+      isOpen
+    });
+
+    if (results.length > 0) {
+      console.log("First few search results:", results.slice(0, 3));
+    }
+  }, [query, results, isSearching, isOpen]);
 
   // Focus input when modal opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
-        inputRef.current?.focus()
-      }, 100)
+        inputRef.current?.focus();
+      }, 100);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Scroll selected item into view
   useEffect(() => {
     if (selectedIndex >= 0 && selectedRef.current) {
       selectedRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "nearest",
-      })
+        block: "nearest"
+      });
     }
-  }, [selectedIndex])
+  }, [selectedIndex]);
 
   // Handle keyboard navigation
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {
       case "ArrowDown":
-        e.preventDefault()
-        selectNextResult()
-        break
+        e.preventDefault();
+        selectNextResult();
+        break;
       case "ArrowUp":
-        e.preventDefault()
-        selectPrevResult()
-        break
+        e.preventDefault();
+        selectPrevResult();
+        break;
       case "Enter":
-        e.preventDefault()
-        navigateToSelected()
-        break
+        e.preventDefault();
+        navigateToSelected();
+        break;
       case "Escape":
-        e.preventDefault()
-        closeSearch()
-        break
+        e.preventDefault();
+        closeSearch();
+        break;
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={closeSearch}>
       <DialogContent className="sm:max-w-[550px] p-0">
-        {/* Add DialogTitle for accessibility */}
         <DialogTitle className="sr-only">Search</DialogTitle>
-        
+
         <div className="flex items-center border-b p-4">
           <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
           <Input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search for anything..."
             className="border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -109,11 +119,10 @@ export function SearchModal() {
                   ref={index === selectedIndex ? selectedRef : null}
                   className={cn(
                     "px-4 py-2 cursor-pointer",
-                    index === selectedIndex ? "bg-primary/10" : "hover:bg-muted/50",
+                    index === selectedIndex ? "bg-primary/10" : "hover:bg-muted/50"
                   )}
                   onClick={() => navigateToResult(result)}
-                  onMouseEnter={() => selectResult(index)}
-                >
+                  onMouseEnter={() => selectResult(index)}>
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary font-medium">
@@ -170,5 +179,5 @@ export function SearchModal() {
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

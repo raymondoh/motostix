@@ -6,9 +6,6 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
-// Mark this module as server-only to prevent client imports
-import "server-only";
-
 function initializeAdminApp(): App {
   const apps = getApps();
   if (apps.length > 0) {

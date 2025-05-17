@@ -12,6 +12,19 @@ import type { UpdateProductResult } from "@/types/product";
  */
 export async function updateProduct(productId: string, data: UpdateProductInput): Promise<UpdateProductResult> {
   try {
+    // Log the incoming data for debugging
+    logger({
+      type: "info",
+      message: "Updating product - received data",
+      metadata: {
+        productId,
+        name: data.name,
+        price: data.price,
+        dataKeys: Object.keys(data)
+      },
+      context: "products"
+    });
+
     // ✅ Step 1: Validate incoming update data
     const validated = updateProductSchema.safeParse(data);
 
@@ -25,6 +38,18 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
       return { success: false, error: "Invalid product data: " + validated.error.message };
     }
 
+    // Log the validated data
+    logger({
+      type: "info",
+      message: "Validated product data",
+      metadata: {
+        productId,
+        name: validated.data.name,
+        validatedKeys: Object.keys(validated.data)
+      },
+      context: "products"
+    });
+
     // ✅ Step 2: Update product in database
     const result = await updateProductInDb(productId, validated.data);
 
@@ -32,17 +57,33 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
       logger({
         type: "info",
         message: "Product updated successfully",
-        metadata: { productId },
+        metadata: {
+          productId,
+          updatedName: result.product?.name || validated.data.name,
+          updatedPrice: result.product?.price || validated.data.price
+        },
         context: "products"
       });
 
-      // ✅ Step 3: Revalidate products page cache
-      revalidatePath("/admin/products"); // Assuming admin products page
+      // ✅ Step 3: Revalidate all relevant cache paths
+      revalidatePath("/admin/products"); // Admin products list
+      revalidatePath(`/admin/products/${productId}`); // Admin product detail
+      revalidatePath(`/products/${productId}`); // Public product detail
+      revalidatePath("/products"); // Public products list
+      revalidatePath("/"); // Homepage (in case featured products are shown)
+
+      // Force revalidation of dynamic routes that might show this product
+      revalidatePath("/products/category/[slug]", "page");
+      revalidatePath("/search", "page");
     } else {
       logger({
         type: "error",
         message: "Failed to update product",
-        metadata: { productId, error: result.error },
+        metadata: {
+          productId,
+          error: result.error,
+          attemptedName: validated.data.name
+        },
         context: "products"
       });
     }
@@ -58,7 +99,11 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
     logger({
       type: "error",
       message: "Unhandled exception in updateProduct",
-      metadata: { productId, error: message },
+      metadata: {
+        productId,
+        error: message,
+        attemptedData: JSON.stringify(data)
+      },
       context: "products"
     });
 

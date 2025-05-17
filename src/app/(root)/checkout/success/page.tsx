@@ -1,16 +1,17 @@
 // src/app/(root)/checkout/success/page.tsx
-
 import { Suspense } from "react";
-import { CheckoutSuccess } from "@/components/checkout/checkoutSuccess";
-import { Loader2, CheckCircle } from "lucide-react";
-import Link from "next/link";
+import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { CheckoutSuccessClient } from "@/components/checkout/CheckoutSuccessClient";
 
 function CheckoutSuccessFallback() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center text-muted-foreground">
-      <Loader2 className="w-8 h-8 animate-spin" />
-      <p className="text-lg">Loading your confirmation details...</p>
+    <div className="w-full max-w-md px-4 sm:px-6 mx-auto py-12">
+      <div className="flex flex-col items-center justify-center space-y-4 text-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <p className="text-lg text-muted-foreground">Loading order details...</p>
+      </div>
     </div>
   );
 }
@@ -33,8 +34,9 @@ export default function CheckoutSuccessPage() {
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-border/40 p-6 md:p-8">
+              {/* Wrap the client component in a Suspense boundary */}
               <Suspense fallback={<CheckoutSuccessFallback />}>
-                <CheckoutSuccess />
+                <CheckoutSuccessClient />
               </Suspense>
             </div>
 

@@ -61,6 +61,10 @@ export interface ProductCarouselProps {
    * @default "/products"
    */
   viewAllUrl?: string;
+  /**
+   * Description text for the section
+   */
+  description?: string;
 }
 
 export function ProductCarousel({
@@ -74,7 +78,8 @@ export function ProductCarousel({
   onAddToCart,
   addToCartText = "Add to Cart",
   showQuickView = false,
-  viewAllUrl = "/products"
+  viewAllUrl = "/products",
+  description = "Discover our most popular designs loved by riders everywhere."
 }: ProductCarouselProps) {
   const handleProductClick = (product: Product) => {
     if (onProductClick) {
@@ -102,9 +107,7 @@ export function ProductCarousel({
           <div className="flex flex-col items-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">{title}</h2>
             <div className="w-12 h-0.5 bg-primary mb-6"></div>
-            <p className="text-muted-foreground text-center max-w-2xl">
-              Discover our most popular designs loved by riders everywhere.
-            </p>
+            <p className="text-muted-foreground text-center max-w-2xl">{description}</p>
           </div>
         )}
 
@@ -142,6 +145,13 @@ export function ProductCarousel({
                       {product.badge && (
                         <Badge className="absolute top-2 right-2 z-10" variant="secondary">
                           {product.badge}
+                        </Badge>
+                      )}
+
+                      {/* New category badge */}
+                      {product.category && (
+                        <Badge className="absolute top-2 left-2 z-10" variant="outline">
+                          {product.category}
                         </Badge>
                       )}
 

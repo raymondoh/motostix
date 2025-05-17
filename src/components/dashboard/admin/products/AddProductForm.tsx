@@ -1,11 +1,917 @@
+// "use client";
+
+// import { Button } from "@/components/ui/button";
+
+// import type React from "react";
+
+// import { useState, useTransition, useRef } from "react";
+// import { useRouter } from "next/navigation";
+// import Image from "next/image";
+// import { addProductClient as addProduct } from "@/actions/client/add-product-client";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
+// import { Textarea } from "@/components/ui/textarea";
+// import { Switch } from "@/components/ui/switch";
+// import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+// import { SubmitButton } from "@/components/shared/SubmitButton";
+// import { toast } from "sonner";
+// import { uploadFile } from "@/utils/uploadFile";
+// import { validateFileSize } from "@/utils/validateFileSize";
+// import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
+// import { categories, subcategories } from "@/config/categories";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import { AlertCircle } from "lucide-react";
+// import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// interface ProductFormProps {
+//   onSuccess?: () => void;
+// }
+
+// // Standard color options for filtering
+// const standardColors = [
+//   "red",
+//   "blue",
+//   "green",
+//   "black",
+//   "white",
+//   "yellow",
+//   "orange",
+//   "purple",
+//   "pink",
+//   "gray",
+//   "brown",
+//   "silver",
+//   "gold",
+//   "clear"
+// ];
+
+// // Size options for products
+// const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+
+// // Weight options
+// const weightOptions = ["Light", "Medium", "Heavy"];
+
+// export function AddProductForm({ onSuccess }: ProductFormProps) {
+//   const router = useRouter();
+//   const [isPending, startTransition] = useTransition();
+//   const [isUploading, setIsUploading] = useState(false);
+//   const [activeTab, setActiveTab] = useState("basic");
+
+//   // Basic Information
+//   const [productName, setProductName] = useState("");
+//   const [price, setPrice] = useState("");
+//   const [description, setDescription] = useState("");
+//   const [badge, setBadge] = useState("");
+//   const [details, setDetails] = useState("");
+
+//   // Product Specifications
+//   const [dimensions, setDimensions] = useState("");
+//   const [material, setMaterial] = useState("");
+//   const [baseColor, setBaseColor] = useState("");
+//   const [colorDisplayName, setColorDisplayName] = useState("");
+//   const [stickySide, setStickySide] = useState<"Front" | "Back" | "">("");
+//   const [weight, setWeight] = useState("");
+//   const [size, setSize] = useState("");
+
+//   // New fields for additional product details
+//   const [sku, setSku] = useState("");
+//   const [barcode, setBarcode] = useState("");
+//   const [tags, setTags] = useState("");
+//   const [brand, setBrand] = useState("");
+//   const [manufacturer, setManufacturer] = useState("");
+
+//   // Classification
+//   const [category, setCategory] = useState("");
+//   const [subcategory, setSubcategory] = useState("");
+
+//   // Product Status
+//   const [inStock, setInStock] = useState(true);
+//   const [isFeatured, setIsFeatured] = useState(false);
+//   const [isHero, setIsHero] = useState(false);
+//   const [isNewArrival, setIsNewArrival] = useState(true);
+//   const [onSale, setOnSale] = useState(false);
+//   const [salePrice, setSalePrice] = useState("");
+
+//   // Shipping & Inventory
+//   const [stockQuantity, setStockQuantity] = useState("100");
+//   const [lowStockThreshold, setLowStockThreshold] = useState("10");
+//   const [shippingWeight, setShippingWeight] = useState("");
+//   const [shippingClass, setShippingClass] = useState("standard");
+
+//   // Media
+//   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+//   const [imageFile, setImageFile] = useState<File | null>(null);
+//   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
+//   const [additionalImagePreviews, setAdditionalImagePreviews] = useState<string[]>([]);
+
+//   // Validation
+//   const [nameError, setNameError] = useState<string | null>(null);
+//   const [formError, setFormError] = useState<string | null>(null);
+
+//   const imageInputRef = useRef<HTMLInputElement>(null);
+//   const additionalImagesInputRef = useRef<HTMLInputElement>(null);
+
+//   function resetForm() {
+//     // Reset all form fields
+//     setProductName("");
+//     setPrice("");
+//     setDescription("");
+//     setBadge("");
+//     setDetails("");
+//     setDimensions("");
+//     setMaterial("");
+//     setBaseColor("");
+//     setColorDisplayName("");
+//     setStickySide("");
+//     setWeight("");
+//     setSize("");
+//     setSku("");
+//     setBarcode("");
+//     setTags("");
+//     setBrand("");
+//     setManufacturer("");
+//     setCategory("");
+//     setSubcategory("");
+//     setInStock(true);
+//     setIsFeatured(false);
+//     setIsHero(false);
+//     setIsNewArrival(true);
+//     setOnSale(false);
+//     setSalePrice("");
+//     setStockQuantity("100");
+//     setLowStockThreshold("10");
+//     setShippingWeight("");
+//     setShippingClass("standard");
+//     setPreviewUrl(null);
+//     setImageFile(null);
+//     setAdditionalImages([]);
+//     setAdditionalImagePreviews([]);
+//     setNameError(null);
+//     setFormError(null);
+
+//     // Reset file inputs
+//     if (imageInputRef.current) imageInputRef.current.value = "";
+//     if (additionalImagesInputRef.current) additionalImagesInputRef.current.value = "";
+
+//     // Reset to first tab
+//     setActiveTab("basic");
+//   }
+
+//   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+
+//     const error = validateFileSize(file, 2);
+//     if (error) {
+//       toast.error(error);
+//       return;
+//     }
+
+//     setImageFile(file);
+//     const reader = new FileReader();
+//     reader.onload = e => setPreviewUrl(e.target?.result as string);
+//     reader.readAsDataURL(file);
+//   }
+
+//   function handleAdditionalImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+//     const files = e.target.files;
+//     if (!files || files.length === 0) return;
+
+//     const newFiles: File[] = [];
+//     const newPreviews: string[] = [];
+
+//     // Process each file
+//     Array.from(files).forEach(file => {
+//       const error = validateFileSize(file, 2);
+//       if (error) {
+//         toast.error(`${file.name}: ${error}`);
+//         return;
+//       }
+
+//       newFiles.push(file);
+
+//       const reader = new FileReader();
+//       reader.onload = e => {
+//         if (e.target?.result) {
+//           newPreviews.push(e.target.result as string);
+//           setAdditionalImagePreviews([...additionalImagePreviews, ...newPreviews]);
+//         }
+//       };
+//       reader.readAsDataURL(file);
+//     });
+
+//     setAdditionalImages([...additionalImages, ...newFiles]);
+//   }
+
+//   // Update colorDisplayName when baseColor changes if colorDisplayName is empty
+//   function handleBaseColorChange(value: string) {
+//     setBaseColor(value);
+//     if (!colorDisplayName) {
+//       // Capitalize first letter of base color for display name
+//       setColorDisplayName(value.charAt(0).toUpperCase() + value.slice(1));
+//     }
+//   }
+
+//   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+//     e.preventDefault();
+//     setFormError(null);
+
+//     // Validate required fields
+//     if (productName.trim().length < 2) {
+//       setNameError("Product name must be at least 2 characters.");
+//       toast.error("Please enter a valid product name.");
+//       setActiveTab("basic");
+//       return;
+//     }
+
+//     if (!price || isNaN(Number(price)) || Number(price) <= 0) {
+//       toast.error("Please enter a valid price.");
+//       setActiveTab("basic");
+//       return;
+//     }
+
+//     if (!category) {
+//       toast.error("Please select a category.");
+//       setActiveTab("classification");
+//       return;
+//     }
+
+//     if (onSale && (!salePrice || isNaN(Number(salePrice)) || Number(salePrice) <= 0)) {
+//       toast.error("Please enter a valid sale price.");
+//       setActiveTab("status");
+//       return;
+//     }
+
+//     startTransition(async () => {
+//       try {
+//         let imageUrl = "";
+//         let additionalImageUrls: string[] = [];
+
+//         // Upload main image
+//         if (imageFile) {
+//           setIsUploading(true);
+//           imageUrl = await uploadFile(imageFile, { prefix: "product" });
+
+//           // Upload additional images if any
+//           if (additionalImages.length > 0) {
+//             const uploadPromises = additionalImages.map(file => uploadFile(file, { prefix: "product" }));
+//             additionalImageUrls = await Promise.all(uploadPromises);
+//           }
+//         }
+
+//         // Prepare tags array from comma-separated string
+//         const tagsArray = tags
+//           .split(",")
+//           .map(tag => tag.trim())
+//           .filter(tag => tag);
+
+//         // Create product data object
+//         const productData = {
+//           name: productName.trim(),
+//           price: Number.parseFloat(price),
+//           description,
+//           badge: badge || undefined,
+//           details: details || undefined,
+//           dimensions: dimensions || undefined,
+//           material: material || undefined,
+//           baseColor: baseColor || undefined,
+//           colorDisplayName: colorDisplayName || undefined,
+//           color: colorDisplayName || baseColor || undefined, // Keep for backward compatibility
+//           stickySide: stickySide || undefined,
+//           weight: weight || undefined,
+//           size: size || undefined,
+//           sku: sku || undefined,
+//           barcode: barcode || undefined,
+//           tags: tagsArray.length > 0 ? tagsArray : undefined,
+//           brand: brand || undefined,
+//           manufacturer: manufacturer || undefined,
+//           category: category || undefined,
+//           subcategory: subcategory || undefined,
+//           inStock,
+//           isFeatured,
+//           isHero,
+//           isNewArrival,
+//           onSale,
+//           salePrice: onSale ? Number.parseFloat(salePrice) : undefined,
+//           stockQuantity: Number.parseInt(stockQuantity) || 100,
+//           lowStockThreshold: Number.parseInt(lowStockThreshold) || 10,
+//           shippingWeight: shippingWeight || undefined,
+//           shippingClass: shippingClass || "standard",
+//           image: imageUrl,
+//           additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined
+//         };
+
+//         // Add product
+//         const result = await addProduct(productData);
+
+//         if (result.success) {
+//           toast.success(`"${productName}" added successfully! Redirecting...`);
+//           resetForm();
+//           onSuccess?.();
+//           setTimeout(() => router.push("/admin/products"), 2000);
+//         } else {
+//           setFormError(result.error || "Failed to add product");
+//           toast.error(result.error || "Failed to add product");
+//         }
+//       } catch (error: unknown) {
+//         const message = isFirebaseError(error)
+//           ? firebaseError(error)
+//           : error instanceof Error
+//           ? error.message
+//           : "Unknown error occurred.";
+//         setFormError(message);
+//         toast.error(message);
+//         console.error("[AddProductForm]", error);
+//       } finally {
+//         setIsUploading(false);
+//       }
+//     });
+//   }
+
+//   return (
+//     <div className="container max-w-4xl mx-auto py-6">
+//       <Card>
+//         <CardHeader>
+//           <CardTitle className="text-3xl font-semibold tracking-tight">Add a New Product</CardTitle>
+//           <CardDescription>Fill out the form below to add a new product to your store.</CardDescription>
+//         </CardHeader>
+//         <CardContent>
+//           {formError && (
+//             <Alert variant="destructive" className="mb-6">
+//               <AlertCircle className="h-4 w-4" />
+//               <AlertDescription>{formError}</AlertDescription>
+//             </Alert>
+//           )}
+
+//           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+//             <TabsList className="grid grid-cols-5 mb-8">
+//               <TabsTrigger value="basic">Basic Info</TabsTrigger>
+//               <TabsTrigger value="classification">Classification</TabsTrigger>
+//               <TabsTrigger value="specifications">Specifications</TabsTrigger>
+//               <TabsTrigger value="status">Status</TabsTrigger>
+//               <TabsTrigger value="media">Media</TabsTrigger>
+//             </TabsList>
+
+//             <form onSubmit={handleSubmit} className="space-y-8">
+//               <TabsContent value="basic" className="space-y-6">
+//                 <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Basic Information</h3>
+
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                   <div className="space-y-2">
+//                     <Label htmlFor="productName" className="text-sm font-semibold uppercase tracking-wide">
+//                       Product Name*
+//                     </Label>
+//                     <Input
+//                       id="productName"
+//                       value={productName}
+//                       onChange={e => {
+//                         setProductName(e.target.value);
+//                         setNameError(e.target.value.length < 2 ? "Product name must be at least 2 characters." : null);
+//                       }}
+//                       required
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                     {nameError && <p className="text-sm text-red-600">{nameError}</p>}
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="price" className="text-base font-semibold uppercase tracking-wide">
+//                       Price (£)*
+//                     </Label>
+//                     <Input
+//                       id="price"
+//                       type="number"
+//                       step="0.01"
+//                       min="0"
+//                       value={price}
+//                       onChange={e => setPrice(e.target.value)}
+//                       required
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="sku" className="text-base font-semibold uppercase tracking-wide">
+//                       SKU
+//                     </Label>
+//                     <Input
+//                       id="sku"
+//                       value={sku}
+//                       onChange={e => setSku(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="e.g., STK-12345"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="barcode" className="text-base font-semibold uppercase tracking-wide">
+//                       Barcode / UPC
+//                     </Label>
+//                     <Input
+//                       id="barcode"
+//                       value={barcode}
+//                       onChange={e => setBarcode(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 <div className="space-y-2">
+//                   <Label htmlFor="description" className="text-base font-semibold uppercase tracking-wide">
+//                     Description*
+//                   </Label>
+//                   <Textarea
+//                     id="description"
+//                     rows={4}
+//                     value={description}
+//                     onChange={e => setDescription(e.target.value)}
+//                     required
+//                     className="min-h-[100px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+//                   />
+//                 </div>
+
+//                 <div className="space-y-2">
+//                   <Label htmlFor="details" className="text-base font-semibold uppercase tracking-wide">
+//                     Details (Optional)
+//                   </Label>
+//                   <Textarea
+//                     id="details"
+//                     rows={3}
+//                     value={details}
+//                     onChange={e => setDetails(e.target.value)}
+//                     className="min-h-[80px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+//                     placeholder="Additional product details, features, or care instructions"
+//                   />
+//                 </div>
+//               </TabsContent>
+
+//               <TabsContent value="classification" className="space-y-6">
+//                 <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Classification</h3>
+
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                   <div className="space-y-2">
+//                     <Label htmlFor="category" className="text-base font-semibold uppercase tracking-wide">
+//                       Category*
+//                     </Label>
+//                     <Select
+//                       value={category}
+//                       onValueChange={value => {
+//                         setCategory(value);
+//                         setSubcategory("");
+//                       }}>
+//                       <SelectTrigger id="category" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select Category" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         {categories.map(cat => (
+//                           <SelectItem key={cat} value={cat}>
+//                             {cat}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="subcategory" className="text-base font-semibold uppercase tracking-wide">
+//                       Subcategory
+//                     </Label>
+//                     <Select value={subcategory} onValueChange={setSubcategory} disabled={!category}>
+//                       <SelectTrigger id="subcategory" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select Subcategory" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         {subcategories[category as keyof typeof subcategories]?.map(subcat => (
+//                           <SelectItem key={subcat} value={subcat}>
+//                             {subcat}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="badge" className="text-base font-semibold uppercase tracking-wide">
+//                       Badge
+//                     </Label>
+//                     <Input
+//                       id="badge"
+//                       value={badge}
+//                       onChange={e => setBadge(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="e.g., New, Best Seller, Limited Edition"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="tags" className="text-base font-semibold uppercase tracking-wide">
+//                       Tags
+//                     </Label>
+//                     <Input
+//                       id="tags"
+//                       value={tags}
+//                       onChange={e => setTags(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="Enter tags separated by commas"
+//                     />
+//                     <p className="text-xs text-muted-foreground">Helps with search and filtering</p>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="brand" className="text-base font-semibold uppercase tracking-wide">
+//                       Brand
+//                     </Label>
+//                     <Input
+//                       id="brand"
+//                       value={brand}
+//                       onChange={e => setBrand(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="manufacturer" className="text-base font-semibold uppercase tracking-wide">
+//                       Manufacturer
+//                     </Label>
+//                     <Input
+//                       id="manufacturer"
+//                       value={manufacturer}
+//                       onChange={e => setManufacturer(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                   </div>
+//                 </div>
+//               </TabsContent>
+
+//               <TabsContent value="specifications" className="space-y-6">
+//                 <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Specifications</h3>
+
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                   <div className="space-y-2">
+//                     <Label htmlFor="material" className="text-base font-semibold uppercase tracking-wide">
+//                       Material
+//                     </Label>
+//                     <Input
+//                       id="material"
+//                       value={material}
+//                       onChange={e => setMaterial(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="e.g., Cotton, Vinyl, Polyester"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="dimensions" className="text-base font-semibold uppercase tracking-wide">
+//                       Dimensions
+//                     </Label>
+//                     <Input
+//                       id="dimensions"
+//                       value={dimensions}
+//                       onChange={e => setDimensions(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="e.g., 10cm x 15cm"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="baseColor" className="text-base font-semibold uppercase tracking-wide">
+//                       Base Color
+//                     </Label>
+//                     <Select value={baseColor} onValueChange={handleBaseColorChange}>
+//                       <SelectTrigger id="baseColor" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select a base color" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         {standardColors.map(color => (
+//                           <SelectItem key={color} value={color}>
+//                             {color.charAt(0).toUpperCase() + color.slice(1)}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="colorDisplayName" className="text-base font-semibold uppercase tracking-wide">
+//                       Color Display Name
+//                     </Label>
+//                     <Input
+//                       id="colorDisplayName"
+//                       value={colorDisplayName}
+//                       onChange={e => setColorDisplayName(e.target.value)}
+//                       placeholder="e.g., Electric Blue, Cameo Green"
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                     <p className="text-xs text-muted-foreground">Descriptive color name shown to customers</p>
+//                   </div>
+
+//                   {/* For stickers specifically */}
+//                   <div className="space-y-2">
+//                     <Label htmlFor="stickySide" className="text-base font-semibold uppercase tracking-wide">
+//                       Sticky Side
+//                     </Label>
+//                     <Select value={stickySide} onValueChange={value => setStickySide(value as "Front" | "Back" | "")}>
+//                       <SelectTrigger id="stickySide" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select sticky side" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         <SelectItem value="na">Not applicable</SelectItem>
+//                         <SelectItem value="Front">Front</SelectItem>
+//                         <SelectItem value="Back">Back</SelectItem>
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="size" className="text-base font-semibold uppercase tracking-wide">
+//                       Size
+//                     </Label>
+//                     <Select value={size} onValueChange={setSize}>
+//                       <SelectTrigger id="size" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select size" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         <SelectItem value="na">Not applicable</SelectItem>
+//                         {sizeOptions.map(option => (
+//                           <SelectItem key={option} value={option}>
+//                             {option}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="weight" className="text-base font-semibold uppercase tracking-wide">
+//                       Weight
+//                     </Label>
+//                     <Select value={weight} onValueChange={setWeight}>
+//                       <SelectTrigger id="weight" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select weight" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         <SelectItem value="na">Not applicable</SelectItem>
+//                         {weightOptions.map(option => (
+//                           <SelectItem key={option} value={option}>
+//                             {option}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="shippingWeight" className="text-base font-semibold uppercase tracking-wide">
+//                       Shipping Weight
+//                     </Label>
+//                     <Input
+//                       id="shippingWeight"
+//                       value={shippingWeight}
+//                       onChange={e => setShippingWeight(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="e.g., 0.5kg"
+//                     />
+//                   </div>
+//                 </div>
+//               </TabsContent>
+
+//               <TabsContent value="status" className="space-y-6">
+//                 <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Status</h3>
+
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="inStock" className="text-base font-semibold">
+//                       In Stock
+//                     </Label>
+//                     <Switch id="inStock" checked={inStock} onCheckedChange={setInStock} />
+//                   </div>
+
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="isFeatured" className="text-base font-semibold">
+//                       Featured Product
+//                     </Label>
+//                     <Switch id="isFeatured" checked={isFeatured} onCheckedChange={setIsFeatured} />
+//                   </div>
+
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="isHero" className="text-base font-semibold">
+//                       Hero Carousel
+//                     </Label>
+//                     <Switch id="isHero" checked={isHero} onCheckedChange={setIsHero} />
+//                   </div>
+
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="isNew" className="text-base font-semibold">
+//                       New Arrival
+//                     </Label>
+//                     <Switch id="isNew" checked={isNewArrival} onCheckedChange={setIsNewArrival} />
+//                   </div>
+
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="isSale" className="text-base font-semibold">
+//                       On Sale
+//                     </Label>
+//                     <Switch id="isSale" checked={onSale} onCheckedChange={setOnSale} />
+//                   </div>
+
+//                   {onSale && (
+//                     <div className="space-y-2">
+//                       <Label htmlFor="salePrice" className="text-base font-semibold uppercase tracking-wide">
+//                         Sale Price (£)
+//                       </Label>
+//                       <Input
+//                         id="salePrice"
+//                         type="number"
+//                         step="0.01"
+//                         min="0"
+//                         value={salePrice}
+//                         onChange={e => setSalePrice(e.target.value)}
+//                         required={onSale}
+//                         className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                       />
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 <h3 className="text-2xl font-semibold tracking-tight mt-8 mb-6 border-b pb-2">Inventory Management</h3>
+
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                   <div className="space-y-2">
+//                     <Label htmlFor="stockQuantity" className="text-base font-semibold uppercase tracking-wide">
+//                       Stock Quantity
+//                     </Label>
+//                     <Input
+//                       id="stockQuantity"
+//                       type="number"
+//                       min="0"
+//                       value={stockQuantity}
+//                       onChange={e => setStockQuantity(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="lowStockThreshold" className="text-base font-semibold uppercase tracking-wide">
+//                       Low Stock Threshold
+//                     </Label>
+//                     <Input
+//                       id="lowStockThreshold"
+//                       type="number"
+//                       min="0"
+//                       value={lowStockThreshold}
+//                       onChange={e => setLowStockThreshold(e.target.value)}
+//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+//                     />
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="shippingClass" className="text-base font-semibold uppercase tracking-wide">
+//                       Shipping Class
+//                     </Label>
+//                     <Select value={shippingClass} onValueChange={setShippingClass}>
+//                       <SelectTrigger id="shippingClass" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select shipping class" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         <SelectItem value="standard">Standard</SelectItem>
+//                         <SelectItem value="express">Express</SelectItem>
+//                         <SelectItem value="free">Free Shipping</SelectItem>
+//                         <SelectItem value="bulky">Bulky Item</SelectItem>
+//                         <SelectItem value="digital">Digital (No Shipping)</SelectItem>
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+//                 </div>
+//               </TabsContent>
+
+//               <TabsContent value="media" className="space-y-6">
+//                 <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Images</h3>
+
+//                 <div className="space-y-6">
+//                   <div className="space-y-2">
+//                     <Label htmlFor="image" className="text-base font-semibold uppercase tracking-wide">
+//                       Main Product Image*
+//                     </Label>
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                       <div>
+//                         <Input
+//                           id="image"
+//                           type="file"
+//                           accept="image/*"
+//                           onChange={handleImageChange}
+//                           ref={imageInputRef}
+//                           required
+//                           className="border-input"
+//                         />
+//                         <p className="text-xs text-muted-foreground mt-1">Max 2MB recommended.</p>
+//                       </div>
+//                       <div className="flex items-center justify-center border rounded-md h-[150px] bg-muted/30">
+//                         {previewUrl ? (
+//                           <div className="relative w-full h-full">
+//                             <Image
+//                               src={previewUrl || "/placeholder.svg"}
+//                               alt="Preview"
+//                               fill
+//                               className="object-contain p-2"
+//                             />
+//                           </div>
+//                         ) : (
+//                           <div className="text-muted-foreground text-sm">Image preview will appear here</div>
+//                         )}
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="additionalImages" className="text-base font-semibold uppercase tracking-wide">
+//                       Additional Images
+//                     </Label>
+//                     <Input
+//                       id="additionalImages"
+//                       type="file"
+//                       accept="image/*"
+//                       onChange={handleAdditionalImagesChange}
+//                       ref={additionalImagesInputRef}
+//                       multiple
+//                       className="border-input"
+//                     />
+//                     <p className="text-xs text-muted-foreground mt-1">Select multiple files (max 5 images, 2MB each)</p>
+
+//                     {additionalImagePreviews.length > 0 && (
+//                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+//                         {additionalImagePreviews.map((preview, index) => (
+//                           <div key={index} className="relative h-24 border rounded-md overflow-hidden">
+//                             <Image
+//                               src={preview || "/placeholder.svg"}
+//                               alt={`Additional image ${index + 1}`}
+//                               fill
+//                               className="object-contain p-1"
+//                             />
+//                           </div>
+//                         ))}
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               </TabsContent>
+
+//               <CardFooter className="justify-between p-0 pt-8 flex-wrap gap-4">
+//                 <div className="flex gap-2">
+//                   {activeTab !== "basic" && (
+//                     <Button
+//                       type="button"
+//                       variant="outline"
+//                       onClick={() => {
+//                         const tabs = ["basic", "classification", "specifications", "status", "media"];
+//                         const currentIndex = tabs.indexOf(activeTab);
+//                         if (currentIndex > 0) {
+//                           setActiveTab(tabs[currentIndex - 1]);
+//                         }
+//                       }}>
+//                       Previous
+//                     </Button>
+//                   )}
+
+//                   {activeTab !== "media" && (
+//                     <Button
+//                       type="button"
+//                       onClick={() => {
+//                         const tabs = ["basic", "classification", "specifications", "status", "media"];
+//                         const currentIndex = tabs.indexOf(activeTab);
+//                         if (currentIndex < tabs.length - 1) {
+//                           setActiveTab(tabs[currentIndex + 1]);
+//                         }
+//                       }}>
+//                       Next
+//                     </Button>
+//                   )}
+//                 </div>
+
+//                 <SubmitButton
+//                   isLoading={isPending || isUploading}
+//                   loadingText={isUploading ? "Uploading..." : "Saving..."}
+//                   className="min-w-[140px] h-14 text-md font-bold tracking-wide uppercase">
+//                   Add Product
+//                 </SubmitButton>
+//               </CardFooter>
+//             </form>
+//           </Tabs>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// }
 "use client";
+
+import { Button } from "@/components/ui/button";
 
 import type React from "react";
 
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { addProduct } from "@/actions/products";
+import { addProductClient as addProduct } from "@/actions/client/add-product-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,8 +922,11 @@ import { toast } from "sonner";
 import { uploadFile } from "@/utils/uploadFile";
 import { validateFileSize } from "@/utils/validateFileSize";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import { categories, subcategories, type Category } from "@/config/categories";
+import { categories, subcategories } from "@/config/categories";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ProductFormProps {
   onSuccess?: () => void;
@@ -41,38 +950,74 @@ const standardColors = [
   "clear"
 ];
 
+// Size options for products
+const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+
+// Weight options
+const weightOptions = ["Light", "Medium", "Heavy"];
+
 export function AddProductForm({ onSuccess }: ProductFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState("basic");
 
+  // Basic Information
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [badge, setBadge] = useState("");
   const [details, setDetails] = useState("");
+
+  // Product Specifications
   const [dimensions, setDimensions] = useState("");
   const [material, setMaterial] = useState("");
-
-  // Replace single color field with baseColor and colorDisplayName
   const [baseColor, setBaseColor] = useState("");
   const [colorDisplayName, setColorDisplayName] = useState("");
-
   const [stickySide, setStickySide] = useState<"Front" | "Back" | "">("");
-  const [category, setCategory] = useState<Category | "">(""); // Updated type to allow empty string
+  const [weight, setWeight] = useState("");
+  const [size, setSize] = useState("");
+
+  // New fields for additional product details
+  // SKU field removed - will be auto-generated
+  const [barcode, setBarcode] = useState("");
+  const [tags, setTags] = useState("");
+  const [brand, setBrand] = useState("");
+  const [manufacturer, setManufacturer] = useState("");
+
+  // Classification
+  const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
 
+  // Product Status
   const [inStock, setInStock] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isHero, setIsHero] = useState(false);
+  const [isNewArrival, setIsNewArrival] = useState(true);
+  const [onSale, setOnSale] = useState(false);
+  const [salePrice, setSalePrice] = useState("");
 
+  // Shipping & Inventory
+  const [stockQuantity, setStockQuantity] = useState("100");
+  const [lowStockThreshold, setLowStockThreshold] = useState("10");
+  const [shippingWeight, setShippingWeight] = useState("");
+  const [shippingClass, setShippingClass] = useState("standard");
+
+  // Media
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
+  const [additionalImagePreviews, setAdditionalImagePreviews] = useState<string[]>([]);
+
+  // Validation
   const [nameError, setNameError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const additionalImagesInputRef = useRef<HTMLInputElement>(null);
 
   function resetForm() {
+    // Reset all form fields
     setProductName("");
     setPrice("");
     setDescription("");
@@ -83,15 +1028,37 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
     setBaseColor("");
     setColorDisplayName("");
     setStickySide("");
-    setCategory(""); // Reset category
-    setSubcategory(""); // Reset subcategory
+    setWeight("");
+    setSize("");
+    setBarcode("");
+    setTags("");
+    setBrand("");
+    setManufacturer("");
+    setCategory("");
+    setSubcategory("");
     setInStock(true);
     setIsFeatured(false);
     setIsHero(false);
+    setIsNewArrival(true);
+    setOnSale(false);
+    setSalePrice("");
+    setStockQuantity("100");
+    setLowStockThreshold("10");
+    setShippingWeight("");
+    setShippingClass("standard");
     setPreviewUrl(null);
     setImageFile(null);
+    setAdditionalImages([]);
+    setAdditionalImagePreviews([]);
     setNameError(null);
+    setFormError(null);
+
+    // Reset file inputs
     if (imageInputRef.current) imageInputRef.current.value = "";
+    if (additionalImagesInputRef.current) additionalImagesInputRef.current.value = "";
+
+    // Reset to first tab
+    setActiveTab("basic");
   }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -110,6 +1077,36 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
     reader.readAsDataURL(file);
   }
 
+  function handleAdditionalImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
+
+    // Process each file
+    Array.from(files).forEach(file => {
+      const error = validateFileSize(file, 2);
+      if (error) {
+        toast.error(`${file.name}: ${error}`);
+        return;
+      }
+
+      newFiles.push(file);
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        if (e.target?.result) {
+          newPreviews.push(e.target.result as string);
+          setAdditionalImagePreviews([...additionalImagePreviews, ...newPreviews]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    setAdditionalImages([...additionalImages, ...newFiles]);
+  }
+
   // Update colorDisplayName when baseColor changes if colorDisplayName is empty
   function handleBaseColorChange(value: string) {
     setBaseColor(value);
@@ -121,24 +1118,59 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setFormError(null);
 
+    // Validate required fields
     if (productName.trim().length < 2) {
       setNameError("Product name must be at least 2 characters.");
       toast.error("Please enter a valid product name.");
+      setActiveTab("basic");
+      return;
+    }
+
+    if (!price || isNaN(Number(price)) || Number(price) <= 0) {
+      toast.error("Please enter a valid price.");
+      setActiveTab("basic");
+      return;
+    }
+
+    if (!category) {
+      toast.error("Please select a category.");
+      setActiveTab("classification");
+      return;
+    }
+
+    if (onSale && (!salePrice || isNaN(Number(salePrice)) || Number(salePrice) <= 0)) {
+      toast.error("Please enter a valid sale price.");
+      setActiveTab("status");
       return;
     }
 
     startTransition(async () => {
       try {
         let imageUrl = "";
+        let additionalImageUrls: string[] = [];
 
+        // Upload main image
         if (imageFile) {
           setIsUploading(true);
           imageUrl = await uploadFile(imageFile, { prefix: "product" });
+
+          // Upload additional images if any
+          if (additionalImages.length > 0) {
+            const uploadPromises = additionalImages.map(file => uploadFile(file, { prefix: "product" }));
+            additionalImageUrls = await Promise.all(uploadPromises);
+          }
         }
 
-        // Try with the new fields first
-        let result = await addProduct({
+        // Prepare tags array from comma-separated string
+        const tagsArray = tags
+          .split(",")
+          .map(tag => tag.trim())
+          .filter(tag => tag);
+
+        // Create product data object
+        const productData = {
           name: productName.trim(),
           price: Number.parseFloat(price),
           description,
@@ -148,36 +1180,33 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
           material: material || undefined,
           baseColor: baseColor || undefined,
           colorDisplayName: colorDisplayName || undefined,
-          color: colorDisplayName || undefined, // Keep the old color field for backward compatibility
+          color: colorDisplayName || baseColor || undefined, // Keep for backward compatibility
           stickySide: stickySide || undefined,
+          weight: weight || undefined,
+          size: size || undefined,
+          // SKU field removed - will be auto-generated
+          barcode: barcode || undefined,
+          tags: tagsArray.length > 0 ? tagsArray : undefined,
+          brand: brand || undefined,
+          manufacturer: manufacturer || undefined,
           category: category || undefined,
           subcategory: subcategory || undefined,
           inStock,
           isFeatured,
           isHero,
-          image: imageUrl
-        });
+          isNewArrival,
+          onSale,
+          salePrice: onSale ? Number.parseFloat(salePrice) : undefined,
+          stockQuantity: Number.parseInt(stockQuantity) || 100,
+          lowStockThreshold: Number.parseInt(lowStockThreshold) || 10,
+          shippingWeight: shippingWeight || undefined,
+          shippingClass: shippingClass || "standard",
+          image: imageUrl,
+          additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined
+        };
 
-        // If that fails, try again with just the color field
-        if (!result.success && result.error === "Invalid product data") {
-          result = await addProduct({
-            name: productName.trim(),
-            price: Number.parseFloat(price),
-            description,
-            badge: badge || undefined,
-            details: details || undefined,
-            dimensions: dimensions || undefined,
-            material: material || undefined,
-            color: colorDisplayName || baseColor || undefined, // Use colorDisplayName as the color
-            stickySide: stickySide || undefined,
-            category: category || undefined,
-            subcategory: subcategory || undefined,
-            inStock,
-            isFeatured,
-            isHero,
-            image: imageUrl
-          });
-        }
+        // Add product
+        const result = await addProduct(productData);
 
         if (result.success) {
           toast.success(`"${productName}" added successfully! Redirecting...`);
@@ -185,6 +1214,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
           onSuccess?.();
           setTimeout(() => router.push("/admin/products"), 2000);
         } else {
+          setFormError(result.error || "Failed to add product");
           toast.error(result.error || "Failed to add product");
         }
       } catch (error: unknown) {
@@ -193,6 +1223,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
           : error instanceof Error
           ? error.message
           : "Unknown error occurred.";
+        setFormError(message);
         toast.error(message);
         console.error("[AddProductForm]", error);
       } finally {
@@ -202,251 +1233,6 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
   }
 
   return (
-    // <div className="container max-w-3xl mx-auto py-6">
-    //   <Card>
-    //     <CardHeader>
-    //       <CardTitle>Add a New Product</CardTitle>
-    //       <CardDescription>Fill out the form below to add a new product to your store.</CardDescription>
-    //     </CardHeader>
-    //     <CardContent>
-    //       <form onSubmit={handleSubmit} className="space-y-8">
-    //         {/* Basic Information Section */}
-    //         <div>
-    //           <h3 className="text-lg font-medium mb-4 pb-2 border-b">Basic Information</h3>
-    //           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    //             <div className="space-y-2">
-    //               <Label htmlFor="productName">Product Name</Label>
-    //               <Input
-    //                 id="productName"
-    //                 value={productName}
-    //                 onChange={e => {
-    //                   setProductName(e.target.value);
-    //                   setNameError(e.target.value.length < 2 ? "Product name must be at least 2 characters." : null);
-    //                 }}
-    //                 required
-    //               />
-    //               {nameError && <p className="text-sm text-red-600">{nameError}</p>}
-    //             </div>
-
-    //             <div className="space-y-2">
-    //               <Label htmlFor="price">Price (£)</Label>
-    //               <Input
-    //                 id="price"
-    //                 type="number"
-    //                 step="0.01"
-    //                 min="0"
-    //                 value={price}
-    //                 onChange={e => setPrice(e.target.value)}
-    //                 required
-    //               />
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         {/* Classification Section */}
-    //         <div>
-    //           <h3 className="text-lg font-medium mb-4 pb-2 border-b">Classification</h3>
-    //           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    //             {/* Category Dropdown */}
-    //             <div className="space-y-2">
-    //               <Label htmlFor="category">Category</Label>
-    //               <select
-    //                 id="category"
-    //                 value={category}
-    //                 onChange={e => {
-    //                   setCategory(e.target.value as Category); // Set category to the selected category
-    //                   setSubcategory(""); // Reset subcategory when category changes
-    //                 }}
-    //                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-    //                 <option value="">Select Category</option>
-    //                 {categories.map(cat => (
-    //                   <option key={cat} value={cat}>
-    //                     {cat}
-    //                   </option>
-    //                 ))}
-    //               </select>
-    //             </div>
-
-    //             {/* Subcategory Dropdown */}
-    //             <div className="space-y-2">
-    //               <Label htmlFor="subcategory">Subcategory</Label>
-    //               <select
-    //                 id="subcategory"
-    //                 value={subcategory}
-    //                 onChange={e => setSubcategory(e.target.value)}
-    //                 disabled={!category}
-    //                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-    //                 <option value="">Select Subcategory (Optional)</option>
-    //                 {subcategories[category as Category]?.map(subcat => (
-    //                   <option key={subcat} value={subcat}>
-    //                     {subcat}
-    //                   </option>
-    //                 ))}
-    //               </select>
-    //             </div>
-
-    //             <div className="space-y-2">
-    //               <Label htmlFor="badge">Badge (Optional)</Label>
-    //               <Input id="badge" value={badge} onChange={e => setBadge(e.target.value)} />
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         {/* Product Status Section */}
-    //         <div>
-    //           <h3 className="text-lg font-medium mb-4 pb-2 border-b">Product Status</h3>
-    //           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    //             <div className="flex items-center justify-between space-x-2">
-    //               <Label htmlFor="inStock">In Stock</Label>
-    //               <Switch id="inStock" checked={inStock} onCheckedChange={setInStock} />
-    //             </div>
-
-    //             <div className="flex items-center justify-between space-x-2">
-    //               <Label htmlFor="isFeatured">Featured</Label>
-    //               <Switch id="isFeatured" checked={isFeatured} onCheckedChange={setIsFeatured} />
-    //             </div>
-
-    //             <div className="flex items-center justify-between space-x-2">
-    //               <Label htmlFor="isHero">Hero Carousel</Label>
-    //               <Switch id="isHero" checked={isHero} onCheckedChange={setIsHero} />
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         {/* Product Specifications Section */}
-    //         <div>
-    //           <h3 className="text-lg font-medium mb-4 pb-2 border-b">Product Specifications</h3>
-    //           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    //             <div className="space-y-2">
-    //               <Label htmlFor="stickySide">Sticky Side</Label>
-    //               <select
-    //                 id="stickySide"
-    //                 value={stickySide}
-    //                 onChange={e => setStickySide(e.target.value as "Front" | "Back" | "")}
-    //                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-    //                 <option value="">Select sticky side</option>
-    //                 <option value="Front">Front</option>
-    //                 <option value="Back">Back</option>
-    //               </select>
-    //             </div>
-
-    //             <div className="space-y-2">
-    //               <Label htmlFor="material">Material</Label>
-    //               <Input id="material" value={material} onChange={e => setMaterial(e.target.value)} />
-    //             </div>
-
-    //             {/* Replace single color field with baseColor and colorDisplayName */}
-    //             <div className="space-y-2">
-    //               <Label htmlFor="baseColor">Base Color (for filtering)</Label>
-    //               <Select value={baseColor} onValueChange={handleBaseColorChange}>
-    //                 <SelectTrigger id="baseColor">
-    //                   <SelectValue placeholder="Select a base color" />
-    //                 </SelectTrigger>
-    //                 <SelectContent>
-    //                   <SelectItem value="default">Select a color</SelectItem>
-    //                   {standardColors.map(color => (
-    //                     <SelectItem key={color} value={color}>
-    //                       {color.charAt(0).toUpperCase() + color.slice(1)}
-    //                     </SelectItem>
-    //                   ))}
-    //                 </SelectContent>
-    //               </Select>
-    //             </div>
-
-    //             <div className="space-y-2">
-    //               <Label htmlFor="colorDisplayName">Color Display Name</Label>
-    //               <Input
-    //                 id="colorDisplayName"
-    //                 value={colorDisplayName}
-    //                 onChange={e => setColorDisplayName(e.target.value)}
-    //                 placeholder="e.g., Electric Blue, Cameo Green"
-    //               />
-    //               <p className="text-xs text-muted-foreground">Descriptive color name shown to customers</p>
-    //             </div>
-
-    //             <div className="space-y-2">
-    //               <Label htmlFor="dimensions">Dimensions</Label>
-    //               <Input id="dimensions" value={dimensions} onChange={e => setDimensions(e.target.value)} />
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         {/* Product Description Section */}
-    //         <div>
-    //           <h3 className="text-lg font-medium mb-4 pb-2 border-b">Product Description</h3>
-    //           <div className="space-y-6">
-    //             <div className="space-y-2">
-    //               <Label htmlFor="description">Description</Label>
-    //               <Textarea
-    //                 id="description"
-    //                 rows={4}
-    //                 value={description}
-    //                 onChange={e => setDescription(e.target.value)}
-    //                 required
-    //                 className="min-h-[100px]"
-    //               />
-    //             </div>
-
-    //             <div className="space-y-2">
-    //               <Label htmlFor="details">Details (Optional)</Label>
-    //               <Textarea
-    //                 id="details"
-    //                 rows={3}
-    //                 value={details}
-    //                 onChange={e => setDetails(e.target.value)}
-    //                 className="min-h-[80px]"
-    //               />
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         {/* Product Image Section */}
-    //         <div>
-    //           <h3 className="text-lg font-medium mb-4 pb-2 border-b">Product Image</h3>
-    //           <div className="space-y-2">
-    //             <Label htmlFor="image">Product Image</Label>
-    //             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    //               <div>
-    //                 <Input
-    //                   id="image"
-    //                   type="file"
-    //                   accept="image/*"
-    //                   onChange={handleImageChange}
-    //                   ref={imageInputRef}
-    //                   required
-    //                 />
-    //                 <p className="text-xs text-muted-foreground mt-1">Max 2MB recommended.</p>
-    //               </div>
-    //               <div className="flex items-center justify-center border rounded-md h-[150px] bg-muted/30">
-    //                 {previewUrl ? (
-    //                   <div className="relative w-full h-full">
-    //                     <Image
-    //                       src={previewUrl || "/placeholder.svg"}
-    //                       alt="Preview"
-    //                       fill
-    //                       className="object-contain p-2"
-    //                     />
-    //                   </div>
-    //                 ) : (
-    //                   <div className="text-muted-foreground text-sm">Image preview will appear here</div>
-    //                 )}
-    //               </div>
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         <CardFooter className="justify-end p-0 pt-4">
-    //           <SubmitButton
-    //             isLoading={isPending || isUploading}
-    //             loadingText={isUploading ? "Uploading..." : "Saving..."}
-    //             className="min-w-[140px]">
-    //             Add Product
-    //           </SubmitButton>
-    //         </CardFooter>
-    //       </form>
-    //     </CardContent>
-    //   </Card>
-    // </div>
     <div className="container max-w-4xl mx-auto py-6">
       <Card>
         <CardHeader>
@@ -454,214 +1240,78 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
           <CardDescription>Fill out the form below to add a new product to your store.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-10">
-            {/* Basic Information */}
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Basic Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="productName" className="text-base font-semibold uppercase tracking-wide">
-                    Product Name
-                  </Label>
-                  <Input
-                    id="productName"
-                    value={productName}
-                    onChange={e => {
-                      setProductName(e.target.value);
-                      setNameError(e.target.value.length < 2 ? "Product name must be at least 2 characters." : null);
-                    }}
-                    required
-                    className="h-14 text-lg px-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary"
-                  />
-                  {nameError && <p className="text-sm text-red-600">{nameError}</p>}
+          {formError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
+          )}
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList className="grid grid-cols-5 mb-8">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="classification">Classification</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+              <TabsTrigger value="status">Status</TabsTrigger>
+              <TabsTrigger value="media">Media</TabsTrigger>
+            </TabsList>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <TabsContent value="basic" className="space-y-6">
+                <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Basic Information</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="productName" className="text-base font-semibold uppercase tracking-wide">
+                      Product Name*
+                    </Label>
+                    <Input
+                      id="productName"
+                      value={productName}
+                      onChange={e => {
+                        setProductName(e.target.value);
+                        setNameError(e.target.value.length < 2 ? "Product name must be at least 2 characters." : null);
+                      }}
+                      required
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                    {nameError && <p className="text-sm text-red-600">{nameError}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="price" className="text-base font-semibold uppercase tracking-wide">
+                      Price (£)*
+                    </Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={price}
+                      onChange={e => setPrice(e.target.value)}
+                      required
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* SKU field removed - will be auto-generated */}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="barcode" className="text-base font-semibold uppercase tracking-wide">
+                      Barcode / UPC
+                    </Label>
+                    <Input
+                      id="barcode"
+                      value={barcode}
+                      onChange={e => setBarcode(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="text-base font-semibold uppercase tracking-wide">
-                    Price (£)
-                  </Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={price}
-                    onChange={e => setPrice(e.target.value)}
-                    required
-                    className="h-14 text-lg px-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Classification */}
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Classification</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-base font-semibold uppercase tracking-wide">
-                    Category
-                  </Label>
-                  <select
-                    id="category"
-                    value={category}
-                    onChange={e => {
-                      setCategory(e.target.value as Category);
-                      setSubcategory("");
-                    }}
-                    className="h-14 text-lg px-4 w-full border-gray-300 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="">Select Category</option>
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subcategory" className="text-base font-semibold uppercase tracking-wide">
-                    Subcategory
-                  </Label>
-                  <select
-                    id="subcategory"
-                    value={subcategory}
-                    onChange={e => setSubcategory(e.target.value)}
-                    disabled={!category}
-                    className="h-14 text-lg px-4 w-full border-gray-300 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="">Select Subcategory (Optional)</option>
-                    {subcategories[category as Category]?.map(subcat => (
-                      <option key={subcat} value={subcat}>
-                        {subcat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="badge" className="text-base font-semibold uppercase tracking-wide">
-                    Badge (Optional)
-                  </Label>
-                  <Input
-                    id="badge"
-                    value={badge}
-                    onChange={e => setBadge(e.target.value)}
-                    className="h-14 text-lg px-4 border-gray-300"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Product Status */}
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Status</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="inStock" className="text-base font-semibold">
-                    In Stock
-                  </Label>
-                  <Switch id="inStock" checked={inStock} onCheckedChange={setInStock} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isFeatured" className="text-base font-semibold">
-                    Featured
-                  </Label>
-                  <Switch id="isFeatured" checked={isFeatured} onCheckedChange={setIsFeatured} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isHero" className="text-base font-semibold">
-                    Hero Carousel
-                  </Label>
-                  <Switch id="isHero" checked={isHero} onCheckedChange={setIsHero} />
-                </div>
-              </div>
-            </div>
-
-            {/* Specifications */}
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Specifications</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="stickySide" className="text-base font-semibold uppercase tracking-wide">
-                    Sticky Side
-                  </Label>
-                  <select
-                    id="stickySide"
-                    value={stickySide}
-                    onChange={e => setStickySide(e.target.value as "Front" | "Back" | "")}
-                    className="h-14 text-lg px-4 w-full border-gray-300 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="">Select sticky side</option>
-                    <option value="Front">Front</option>
-                    <option value="Back">Back</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="material" className="text-base font-semibold uppercase tracking-wide">
-                    Material
-                  </Label>
-                  <Input
-                    id="material"
-                    value={material}
-                    onChange={e => setMaterial(e.target.value)}
-                    className="h-14 text-lg px-4 border-gray-300"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="baseColor" className="text-base font-semibold uppercase tracking-wide">
-                    Base Color
-                  </Label>
-                  <Select value={baseColor} onValueChange={handleBaseColorChange}>
-                    <SelectTrigger id="baseColor" className="h-14 text-lg px-4 border-gray-300">
-                      <SelectValue placeholder="Select a base color" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Select a color</SelectItem>
-                      {standardColors.map(color => (
-                        <SelectItem key={color} value={color}>
-                          {color.charAt(0).toUpperCase() + color.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="colorDisplayName" className="text-base font-semibold uppercase tracking-wide">
-                    Color Display Name
-                  </Label>
-                  <Input
-                    id="colorDisplayName"
-                    value={colorDisplayName}
-                    onChange={e => setColorDisplayName(e.target.value)}
-                    placeholder="e.g., Electric Blue, Cameo Green"
-                    className="h-14 text-lg px-4 border-gray-300"
-                  />
-                  <p className="text-xs text-muted-foreground">Descriptive color name shown to customers</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dimensions" className="text-base font-semibold uppercase tracking-wide">
-                    Dimensions
-                  </Label>
-                  <Input
-                    id="dimensions"
-                    value={dimensions}
-                    onChange={e => setDimensions(e.target.value)}
-                    className="h-14 text-lg px-4 border-gray-300"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Description</h3>
-              <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-base font-semibold uppercase tracking-wide">
-                    Description
+                    Description*
                   </Label>
                   <Textarea
                     id="description"
@@ -669,7 +1319,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                     required
-                    className="min-h-[100px] text-lg px-4 py-3 border-gray-300"
+                    className="min-h-[100px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
@@ -682,61 +1332,463 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                     rows={3}
                     value={details}
                     onChange={e => setDetails(e.target.value)}
-                    className="min-h-[80px] text-lg px-4 py-3 border-gray-300"
+                    className="min-h-[80px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+                    placeholder="Additional product details, features, or care instructions"
                   />
                 </div>
-              </div>
-            </div>
+              </TabsContent>
 
-            {/* Image */}
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Image</h3>
-              <div className="space-y-2">
-                <Label htmlFor="image" className="text-base font-semibold uppercase tracking-wide">
-                  Product Image
-                </Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+              <TabsContent value="classification" className="space-y-6">
+                <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Classification</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="category" className="text-base font-semibold uppercase tracking-wide">
+                      Category*
+                    </Label>
+                    <Select
+                      value={category}
+                      onValueChange={value => {
+                        setCategory(value);
+                        setSubcategory("");
+                      }}>
+                      <SelectTrigger id="category" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map(cat => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="subcategory" className="text-base font-semibold uppercase tracking-wide">
+                      Subcategory
+                    </Label>
+                    <Select value={subcategory} onValueChange={setSubcategory} disabled={!category}>
+                      <SelectTrigger id="subcategory" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select Subcategory" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subcategories[category as keyof typeof subcategories]?.map(subcat => (
+                          <SelectItem key={subcat} value={subcat}>
+                            {subcat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="badge" className="text-base font-semibold uppercase tracking-wide">
+                      Badge
+                    </Label>
                     <Input
-                      id="image"
+                      id="badge"
+                      value={badge}
+                      onChange={e => setBadge(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      placeholder="e.g., New, Best Seller, Limited Edition"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="tags" className="text-base font-semibold uppercase tracking-wide">
+                      Tags
+                    </Label>
+                    <Input
+                      id="tags"
+                      value={tags}
+                      onChange={e => setTags(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      placeholder="Enter tags separated by commas"
+                    />
+                    <p className="text-xs text-muted-foreground">Helps with search and filtering</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="brand" className="text-base font-semibold uppercase tracking-wide">
+                      Brand
+                    </Label>
+                    <Input
+                      id="brand"
+                      value={brand}
+                      onChange={e => setBrand(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="manufacturer" className="text-base font-semibold uppercase tracking-wide">
+                      Manufacturer
+                    </Label>
+                    <Input
+                      id="manufacturer"
+                      value={manufacturer}
+                      onChange={e => setManufacturer(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="specifications" className="space-y-6">
+                <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Specifications</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="material" className="text-base font-semibold uppercase tracking-wide">
+                      Material
+                    </Label>
+                    <Input
+                      id="material"
+                      value={material}
+                      onChange={e => setMaterial(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      placeholder="e.g., Cotton, Vinyl, Polyester"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="dimensions" className="text-base font-semibold uppercase tracking-wide">
+                      Dimensions
+                    </Label>
+                    <Input
+                      id="dimensions"
+                      value={dimensions}
+                      onChange={e => setDimensions(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      placeholder="e.g., 10cm x 15cm"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="baseColor" className="text-base font-semibold uppercase tracking-wide">
+                      Base Color
+                    </Label>
+                    <Select value={baseColor} onValueChange={handleBaseColorChange}>
+                      <SelectTrigger id="baseColor" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select a base color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {standardColors.map(color => (
+                          <SelectItem key={color} value={color}>
+                            {color.charAt(0).toUpperCase() + color.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="colorDisplayName" className="text-base font-semibold uppercase tracking-wide">
+                      Color Display Name
+                    </Label>
+                    <Input
+                      id="colorDisplayName"
+                      value={colorDisplayName}
+                      onChange={e => setColorDisplayName(e.target.value)}
+                      placeholder="e.g., Electric Blue, Cameo Green"
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                    <p className="text-xs text-muted-foreground">Descriptive color name shown to customers</p>
+                  </div>
+
+                  {/* For stickers specifically */}
+                  <div className="space-y-2">
+                    <Label htmlFor="stickySide" className="text-base font-semibold uppercase tracking-wide">
+                      Sticky Side
+                    </Label>
+                    <Select value={stickySide} onValueChange={value => setStickySide(value as "Front" | "Back" | "")}>
+                      <SelectTrigger id="stickySide" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select sticky side" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="na">Not applicable</SelectItem>
+                        <SelectItem value="Front">Front</SelectItem>
+                        <SelectItem value="Back">Back</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="size" className="text-base font-semibold uppercase tracking-wide">
+                      Size
+                    </Label>
+                    <Select value={size} onValueChange={setSize}>
+                      <SelectTrigger id="size" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="na">Not applicable</SelectItem>
+                        {sizeOptions.map(option => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="weight" className="text-base font-semibold uppercase tracking-wide">
+                      Weight
+                    </Label>
+                    <Select value={weight} onValueChange={setWeight}>
+                      <SelectTrigger id="weight" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select weight" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="na">Not applicable</SelectItem>
+                        {weightOptions.map(option => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="shippingWeight" className="text-base font-semibold uppercase tracking-wide">
+                      Shipping Weight
+                    </Label>
+                    <Input
+                      id="shippingWeight"
+                      value={shippingWeight}
+                      onChange={e => setShippingWeight(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      placeholder="e.g., 0.5kg"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="status" className="space-y-6">
+                <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Status</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="inStock" className="text-base font-semibold">
+                      In Stock
+                    </Label>
+                    <Switch id="inStock" checked={inStock} onCheckedChange={setInStock} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="isFeatured" className="text-base font-semibold">
+                      Featured Product
+                    </Label>
+                    <Switch id="isFeatured" checked={isFeatured} onCheckedChange={setIsFeatured} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="isHero" className="text-base font-semibold">
+                      Hero Carousel
+                    </Label>
+                    <Switch id="isHero" checked={isHero} onCheckedChange={setIsHero} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="isNewArrival" className="text-base font-semibold">
+                      New Arrival
+                    </Label>
+                    <Switch id="isNewArrival" checked={isNewArrival} onCheckedChange={setIsNewArrival} />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="onSale" className="text-base font-semibold">
+                      On Sale
+                    </Label>
+                    <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
+                  </div>
+
+                  {onSale && (
+                    <div className="space-y-2">
+                      <Label htmlFor="salePrice" className="text-base font-semibold uppercase tracking-wide">
+                        Sale Price (£)
+                      </Label>
+                      <Input
+                        id="salePrice"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={salePrice}
+                        onChange={e => setSalePrice(e.target.value)}
+                        required={onSale}
+                        className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <h3 className="text-2xl font-semibold tracking-tight mt-8 mb-6 border-b pb-2">Inventory Management</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="stockQuantity" className="text-base font-semibold uppercase tracking-wide">
+                      Stock Quantity
+                    </Label>
+                    <Input
+                      id="stockQuantity"
+                      type="number"
+                      min="0"
+                      value={stockQuantity}
+                      onChange={e => setStockQuantity(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lowStockThreshold" className="text-base font-semibold uppercase tracking-wide">
+                      Low Stock Threshold
+                    </Label>
+                    <Input
+                      id="lowStockThreshold"
+                      type="number"
+                      min="0"
+                      value={lowStockThreshold}
+                      onChange={e => setLowStockThreshold(e.target.value)}
+                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="shippingClass" className="text-base font-semibold uppercase tracking-wide">
+                      Shipping Class
+                    </Label>
+                    <Select value={shippingClass} onValueChange={setShippingClass}>
+                      <SelectTrigger id="shippingClass" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select shipping class" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard</SelectItem>
+                        <SelectItem value="express">Express</SelectItem>
+                        <SelectItem value="free">Free Shipping</SelectItem>
+                        <SelectItem value="bulky">Bulky Item</SelectItem>
+                        <SelectItem value="digital">Digital (No Shipping)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="media" className="space-y-6">
+                <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Product Images</h3>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="image" className="text-base font-semibold uppercase tracking-wide">
+                      Main Product Image*
+                    </Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Input
+                          id="image"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          ref={imageInputRef}
+                          required
+                          className="border-input"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">Max 2MB recommended.</p>
+                      </div>
+                      <div className="flex items-center justify-center border rounded-md h-[150px] bg-muted/30">
+                        {previewUrl ? (
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={previewUrl || "/placeholder.svg"}
+                              alt="Preview"
+                              fill
+                              className="object-contain p-2"
+                            />
+                          </div>
+                        ) : (
+                          <div className="text-muted-foreground text-sm">Image preview will appear here</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="additionalImages" className="text-base font-semibold uppercase tracking-wide">
+                      Additional Images
+                    </Label>
+                    <Input
+                      id="additionalImages"
                       type="file"
                       accept="image/*"
-                      onChange={handleImageChange}
-                      ref={imageInputRef}
-                      required
-                      className="border-gray-300"
+                      onChange={handleAdditionalImagesChange}
+                      ref={additionalImagesInputRef}
+                      multiple
+                      className="border-input"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">Max 2MB recommended.</p>
-                  </div>
-                  <div className="flex items-center justify-center border rounded-md h-[150px] bg-muted/30">
-                    {previewUrl ? (
-                      <div className="relative w-full h-full border-gray-300">
-                        <Image
-                          src={previewUrl || "/placeholder.svg"}
-                          alt="Preview"
-                          fill
-                          className="object-contain p-2 border-gray-300"
-                        />
-                      </div>
-                    ) : (
-                      <div className="text-muted-foreground text-sm border-gray-300">
-                        Image preview will appear here
+                    <p className="text-xs text-muted-foreground mt-1">Select multiple files (max 5 images, 2MB each)</p>
+
+                    {additionalImagePreviews.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+                        {additionalImagePreviews.map((preview, index) => (
+                          <div key={index} className="relative h-24 border rounded-md overflow-hidden">
+                            <Image
+                              src={preview || "/placeholder.svg"}
+                              alt={`Additional image ${index + 1}`}
+                              fill
+                              className="object-contain p-1"
+                            />
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-            </div>
+              </TabsContent>
 
-            <CardFooter className="justify-end p-0 pt-4">
-              <SubmitButton
-                isLoading={isPending || isUploading}
-                loadingText={isUploading ? "Uploading..." : "Saving..."}
-                className="min-w-[140px] h-14 text-md font-bold tracking-wide uppercase">
-                Add Product
-              </SubmitButton>
-            </CardFooter>
-          </form>
+              <CardFooter className="justify-between p-0 pt-8 flex-wrap gap-4">
+                <div className="flex gap-2">
+                  {activeTab !== "basic" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const tabs = ["basic", "classification", "specifications", "status", "media"];
+                        const currentIndex = tabs.indexOf(activeTab);
+                        if (currentIndex > 0) {
+                          setActiveTab(tabs[currentIndex - 1]);
+                        }
+                      }}>
+                      Previous
+                    </Button>
+                  )}
+
+                  {activeTab !== "media" && (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const tabs = ["basic", "classification", "specifications", "status", "media"];
+                        const currentIndex = tabs.indexOf(activeTab);
+                        if (currentIndex < tabs.length - 1) {
+                          setActiveTab(tabs[currentIndex + 1]);
+                        }
+                      }}>
+                      Next
+                    </Button>
+                  )}
+                </div>
+
+                <SubmitButton
+                  isLoading={isPending || isUploading}
+                  loadingText={isUploading ? "Uploading..." : "Saving..."}
+                  className="min-w-[140px] h-14 text-md font-bold tracking-wide uppercase">
+                  Add Product
+                </SubmitButton>
+              </CardFooter>
+            </form>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,4 @@
-//src/firebase/actionAsyncStorage.ts
+//src/firebase/actions.ts
 "use server";
 
 import * as adminActivity from "./admin/activity";
@@ -6,6 +6,7 @@ import * as adminProducts from "./admin/products";
 import * as adminUsers from "./admin/user";
 import * as adminAuthFunctions from "./admin/auth";
 import * as adminOrders from "./admin/orders";
+import * as adminCategories from "./admin/categories";
 
 //import * as adminStorage from "./admin/storage";
 
@@ -104,7 +105,7 @@ export async function sendResetPasswordEmail(...args: Parameters<typeof adminAut
   return await adminAuthFunctions.sendResetPasswordEmail(...args);
 }
 
-// ================= Product =================
+// ================= Product Management =================
 
 export async function getAllProducts(...args: Parameters<typeof adminProducts.getAllProducts>) {
   return adminProducts.getAllProducts(...args);
@@ -136,6 +137,36 @@ export async function getRelatedProducts(...args: Parameters<typeof adminProduct
   return adminProducts.getRelatedProducts(...args);
 }
 
+// ================= Category Management =================
+export async function getCategories(...args: Parameters<typeof adminCategories.getCategories>) {
+  return adminCategories.getCategories(...args);
+}
+
+export async function getFeaturedCategories(...args: Parameters<typeof adminCategories.getFeaturedCategories>) {
+  return adminCategories.getFeaturedCategories(...args);
+}
+
+export async function getSubcategories(...args: Parameters<typeof adminCategories.getSubcategories>) {
+  return adminCategories.getSubcategories(...args);
+}
+
+export async function getDesignThemes(...args: Parameters<typeof adminCategories.getDesignThemes>) {
+  return adminCategories.getDesignThemes(...args);
+}
+
+export async function getProductTypes(...args: Parameters<typeof adminCategories.getProductTypes>) {
+  return adminCategories.getProductTypes(...args);
+}
+
+export async function getMaterials(...args: Parameters<typeof adminCategories.getMaterials>) {
+  return adminCategories.getMaterials(...args);
+}
+
+export async function getPlacements(...args: Parameters<typeof adminCategories.getPlacements>) {
+  return adminCategories.getPlacements(...args);
+}
+
+// ================= Product Likes =================
 export async function likeProduct(...args: Parameters<typeof adminProducts.likeProduct>) {
   return adminProducts.likeProduct(...args);
 }
@@ -146,7 +177,7 @@ export async function getUserLikedProducts(...args: Parameters<typeof adminProdu
   return adminProducts.getUserLikedProducts(...args);
 }
 
-// ================= Admin Auth Orders =================
+// ================= Order Management =================
 export async function createOrder(...args: Parameters<typeof adminOrders.createOrder>) {
   return adminOrders.createOrder(...args);
 }
@@ -165,13 +196,7 @@ export async function getUserOrders(...args: Parameters<typeof adminOrders.getUs
   return adminOrders.getUserOrders(...args);
 }
 
-// ================= Hero Slides =================
-
+// ================= Content Management =================
 export async function getHeroSlidesFromFirestore(...args: Parameters<typeof adminProducts.getHeroSlidesFromFirestore>) {
   return adminProducts.getHeroSlidesFromFirestore(...args);
 }
-
-// ================= Admin Auth Utilities =================
-
-// export async function getUserByEmail(...args: Parameters<typeof adminAuthFunctions.getUserByEmail>) {
-//   return await adminAuthFunctions.getUserByEmail(...args);

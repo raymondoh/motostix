@@ -1,7 +1,41 @@
-import Image from "next/image";
 import Link from "next/link";
+import { CategoryImage } from "@/components/sections/CategoryImage";
+import { getCategories } from "@/actions/categories/get-categories";
+import type { Category } from "@/types/category";
 
-export default function StickerGridSections() {
+export default async function StickerGridSections() {
+  // Fetch categories from the backend
+  const categoriesResult = await getCategories();
+
+  // Use type assertion to handle the undefined case properly
+  const allCategories: Category[] =
+    categoriesResult.success && categoriesResult.data ? (categoriesResult.data as Category[]) : [];
+
+  // Get car-related categories
+  const carCategories = allCategories.filter(cat => cat.name.toLowerCase().includes("car"));
+
+  // Get bike-related categories
+  const bikeCategories = allCategories.filter(
+    cat => cat.name.toLowerCase().includes("bike") || cat.name.toLowerCase().includes("motorcycle")
+  );
+
+  // Get custom design categories
+  const customCategories = allCategories.filter(cat => cat.name.toLowerCase().includes("custom"));
+
+  // Get vintage categories
+  const vintageCategories = allCategories.filter(cat => cat.name.toLowerCase().includes("vintage"));
+
+  // URLs pointing to the existing products page with query parameters
+  const carUrl = carCategories.length > 0 ? `/products?category=${carCategories[0].id}` : "/products?type=car";
+
+  const bikeUrl = bikeCategories.length > 0 ? `/products?category=${bikeCategories[0].id}` : "/products?type=bike";
+
+  const customUrl =
+    customCategories.length > 0 ? `/products?category=${customCategories[0].id}` : "/products?custom=true";
+
+  const vintageUrl =
+    vintageCategories.length > 0 ? `/products?category=${vintageCategories[0].id}` : "/products?style=vintage";
+
   return (
     <section className="py-16 w-full bg-secondary/5">
       <div className="container mx-auto px-4 space-y-24">
@@ -18,18 +52,16 @@ export default function StickerGridSections() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Car with sticker image */}
             <div className="rounded-xl overflow-hidden bg-background relative group h-64 md:h-72 shadow-sm">
-              <Image
-                src="/car.jpg"
-                alt="Car with sticker"
-                width={600}
-                height={400}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <div className="relative w-full h-full">
+                <CategoryImage
+                  src="/car.jpg"
+                  alt="Car with sticker"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
                 <h3 className="text-white text-xl font-bold">Car Stickers</h3>
-                <Link
-                  href="/category/car-stickers"
-                  className="text-white/80 hover:text-white text-sm inline-flex items-center mt-1">
+                <Link href={carUrl} className="text-white/80 hover:text-white text-sm inline-flex items-center mt-1">
                   Shop Now <span className="ml-1">→</span>
                 </Link>
               </div>
@@ -42,18 +74,16 @@ export default function StickerGridSections() {
 
             {/* Bike with sticker image */}
             <div className="rounded-xl overflow-hidden bg-background relative group h-64 md:h-72 shadow-sm">
-              <Image
-                src="/bike.jpg"
-                alt="Bike with sticker"
-                width={600}
-                height={400}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <div className="relative w-full h-full">
+                <CategoryImage
+                  src="/bike.jpg"
+                  alt="Bike with sticker"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
                 <h3 className="text-white text-xl font-bold">Bike Stickers</h3>
-                <Link
-                  href="/category/bike-stickers"
-                  className="text-white/80 hover:text-white text-sm inline-flex items-center mt-1">
+                <Link href={bikeUrl} className="text-white/80 hover:text-white text-sm inline-flex items-center mt-1">
                   Shop Now <span className="ml-1">→</span>
                 </Link>
               </div>
@@ -79,16 +109,16 @@ export default function StickerGridSections() {
 
             {/* Large bike image */}
             <div className="md:col-span-8 rounded-xl overflow-hidden bg-background relative h-80 group shadow-sm">
-              <Image
-                src="/bike.jpg"
-                alt="Custom bike stickers"
-                width={800}
-                height={500}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <div className="relative w-full h-full">
+                <CategoryImage
+                  src="/bike.jpg"
+                  alt="Custom bike stickers"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
                 <h3 className="text-white text-xl font-bold">Custom Designs</h3>
-                <Link href="/custom" className="text-white/80 hover:text-white text-sm inline-flex items-center mt-2">
+                <Link href={customUrl} className="text-white/80 hover:text-white text-sm inline-flex items-center mt-2">
                   Create Your Own <span className="ml-1">→</span>
                 </Link>
               </div>
@@ -96,17 +126,17 @@ export default function StickerGridSections() {
 
             {/* Small car image */}
             <div className="md:col-span-6 rounded-xl overflow-hidden bg-background relative h-80 group shadow-sm">
-              <Image
-                src="/car.jpg"
-                alt="Vintage car sticker"
-                width={600}
-                height={400}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <div className="relative w-full h-full">
+                <CategoryImage
+                  src="/car.jpg"
+                  alt="Vintage car sticker"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
                 <h3 className="text-white text-xl font-bold">Vintage Collection</h3>
                 <Link
-                  href="/category/vintage"
+                  href={vintageUrl}
                   className="text-white/80 hover:text-white text-sm inline-flex items-center mt-2">
                   Explore <span className="ml-1">→</span>
                 </Link>

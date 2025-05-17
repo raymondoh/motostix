@@ -1,6 +1,10 @@
 "use client";
 
+import type React from "react";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 
@@ -9,6 +13,16 @@ interface HeroBannerProps {
 }
 
 export function HeroBanner({ className }: HeroBannerProps) {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <section
       className={cn(
@@ -41,7 +55,7 @@ export function HeroBanner({ className }: HeroBannerProps) {
 
         {/* Search Bar */}
         <div className="mt-8 w-full max-w-2xl mx-auto">
-          <div className="flex overflow-hidden rounded-full bg-white">
+          <form onSubmit={handleSearch} className="flex overflow-hidden rounded-full bg-white">
             <div className="flex items-center pl-4 pr-2">
               <span className="rounded-md bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">Stickers</span>
             </div>
@@ -49,11 +63,13 @@ export function HeroBanner({ className }: HeroBannerProps) {
               type="text"
               placeholder="Search for sticker designs..."
               className="w-full py-4 px-4 text-black outline-none dark:bg-gray-100"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
             />
-            <button className="bg-gray-100 px-6 text-gray-700 transition hover:bg-gray-200">
+            <button type="submit" className="bg-gray-100 px-6 text-gray-700 transition hover:bg-gray-200">
               <Search size={20} />
             </button>
-          </div>
+          </form>
         </div>
       </div>
 

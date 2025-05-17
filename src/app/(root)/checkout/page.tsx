@@ -72,7 +72,7 @@ export default async function CheckoutPage() {
 
           {/* Checkout Form */}
           <div className="mx-auto max-w-4xl">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-border/40 p-6 md:p-8">
+            <div className="bg-white dark:bg-background rounded-xl shadow-sm border border-border/40 p-6 md:p-8">
               <CheckoutForm
                 userId={session.user.id}
                 user={{

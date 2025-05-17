@@ -1,3 +1,4 @@
+//src/providers/SessionProvider.tsx
 "use client";
 //import { connectFirebaseEmulator } from "@/firebase/connectEmulator";
 //import { useEffect } from "react";

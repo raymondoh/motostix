@@ -1,35 +1,20 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import { getCategories } from "@/actions/categories/get-categories";
+import { CategoryImage } from "@/components/sections/CategoryImage";
+import type { CategoryData } from "@/config/categories"; // Import the correct type
 
-const categories = [
-  {
-    name: "Sport Bike Decals",
-    image: "/bike.jpg",
-    slug: "/category/sport-bike",
-    count: 42
-  },
-  {
-    name: "Cruiser Graphics",
-    image: "/car.jpg",
-    slug: "/category/cruiser",
-    count: 38
-  },
-  {
-    name: "Off-Road Stickers",
-    image: "/bike.jpg",
-    slug: "/category/off-road",
-    count: 56
-  },
-  {
-    name: "Custom Designs",
-    image: "/car.jpg",
-    slug: "/category/custom",
-    count: 24
-  }
-];
+export async function FeaturedCategories() {
+  // Fetch categories from the backend
+  const categoriesResult = await getCategories();
+  const allCategories: CategoryData[] = categoriesResult.success ? categoriesResult.data || [] : [];
 
-export function FeaturedCategories() {
+  // Select featured categories (either the first 4 or specific ones you want to highlight)
+  // Using properties that exist in the CategoryData type
+  const featuredCategories = allCategories
+    .filter(category => category.image || category.count > 0) // Filter based on available properties
+    .slice(0, 4); // Limit to 4 categories
+
   return (
     <section className="py-16 w-full bg-background">
       <div className="container mx-auto px-4">
@@ -37,34 +22,47 @@ export function FeaturedCategories() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Shop By Category</h2>
           <div className="w-12 h-0.5 bg-primary mb-6"></div>
           <p className="text-muted-foreground text-center max-w-2xl">
-            Browse our extensive collection of high-quality decals and stickers for every type of motorcycle.
+            Browse our extensive collection of high-quality decals and stickers for every type of motorcycle and
+            vehicle.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map(category => (
-            <Link href={category.slug} key={category.slug}>
-              <Card className="overflow-hidden transition-all duration-300 hover:shadow-sm hover:border-primary/20 group h-full">
-                <div className="relative h-48 w-full overflow-hidden">
-                  <Image
-                    src={category.image || "/placeholder.svg"}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                </div>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-lg">{category.name}</h3>
-                    <span className="text-sm px-2 py-1 rounded-full bg-secondary/10 text-primary font-medium">
-                      {category.count}
-                    </span>
+          {featuredCategories.length === 0 ? (
+            <p className="text-center col-span-full text-muted-foreground">No categories available</p>
+          ) : (
+            featuredCategories.map(category => (
+              <Link href={`/products?category=${category.id}`} key={category.id}>
+                <Card className="overflow-hidden transition-all duration-300 hover:shadow-sm hover:border-primary/20 group h-full">
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <CategoryImage
+                      src={category.image || `/placeholder.svg?height=400&width=600&query=motorcycle+sticker`}
+                      alt={category.name}
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-bold text-lg">{category.name}</h3>
+                      <span className="text-sm px-2 py-1 rounded-full bg-secondary/10 text-primary font-medium">
+                        {category.count || 0}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))
+          )}
+        </div>
+
+        {/* View All Categories button */}
+        <div className="mt-10 text-center">
+          <Link
+            href="/products"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            View All Categories
+          </Link>
         </div>
       </div>
     </section>

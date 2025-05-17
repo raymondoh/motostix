@@ -18,13 +18,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductDialog } from "./ProductDialog";
 import type { Product } from "@/types/product";
+import type { Category } from "@/types/category";
 
+// interface ProductsDataTableProps {
+//   data: Product[];
+//   columns: ColumnDef<Product>[];
+//   onRefresh?: () => Promise<void>; // optional
+// }
 interface ProductsDataTableProps {
   data: Product[];
   columns: ColumnDef<Product>[];
-  onRefresh?: () => Promise<void>; // optional
+  onRefresh: () => void;
+  categories: Category[];
+  featuredCategories: Category[];
 }
-
 export function ProductsDataTable({ data, columns, onRefresh }: ProductsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");

@@ -8,9 +8,10 @@ import { Trash2, Loader2 } from "lucide-react";
 
 import { ProductsDataTable } from "./ProductsDataTable";
 import { getProductColumns } from "./products-columns";
-import { deleteProduct } from "@/actions/products";
+import { deleteProductClient as deleteProduct } from "@/actions/client/delete-product-client";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { Product } from "@/types/product";
+import { Category } from "@/types/category";
 import { fetchAllProductsClient } from "@/actions/client/fetch-all-products";
 
 import {
@@ -26,9 +27,15 @@ import {
 
 interface AdminProductsClientProps {
   products: Product[];
+  categories: Category[];
+  featuredCategories: Category[];
 }
 
-export function AdminProductsClient({ products: initialProducts }: AdminProductsClientProps) {
+export function AdminProductsClient({
+  products: initialProducts,
+  categories,
+  featuredCategories
+}: AdminProductsClientProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
@@ -94,9 +101,13 @@ export function AdminProductsClient({ products: initialProducts }: AdminProducts
         data={products}
         columns={getProductColumns({
           onEdit: handleEditProduct,
-          onDelete: handleDeleteRequest
+          onDelete: handleDeleteRequest,
+          categories: categories,
+          featuredCategories: featuredCategories
         })}
         onRefresh={refreshProducts}
+        categories={categories}
+        featuredCategories={featuredCategories}
       />
 
       <AlertDialog open={!!productToDelete} onOpenChange={open => !open && setProductToDelete(null)}>

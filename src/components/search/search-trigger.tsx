@@ -1,32 +1,32 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useSearch } from "@/contexts/SearchContext"
+import { useEffect } from "react";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useSearch } from "@/contexts/SearchContext";
 
 interface SearchTriggerProps {
-  className?: string
-  shortcut?: boolean
+  className?: string;
+  shortcut?: boolean;
 }
 
 export function SearchTrigger({ className, shortcut = true }: SearchTriggerProps) {
-  const { openSearch } = useSearch()
+  const { openSearch } = useSearch();
 
   // Add keyboard shortcut (Ctrl+K or Cmd+K)
   useEffect(() => {
-    if (!shortcut) return
+    if (!shortcut) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault()
-        openSearch()
+        e.preventDefault();
+        openSearch();
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [openSearch, shortcut])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openSearch, shortcut]);
 
   return (
     <Button variant="outline" size="sm" className={className} onClick={openSearch}>
@@ -38,5 +38,5 @@ export function SearchTrigger({ className, shortcut = true }: SearchTriggerProps
         </kbd>
       )}
     </Button>
-  )
+  );
 }
