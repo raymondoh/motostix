@@ -139,7 +139,7 @@ export function CategoryCards({ categories, selectedCategory, onCategorySelect }
             const isSelected = selectedCategory === category.id;
 
             return (
-              <CarouselItem key={category.id} className={`pl-2 ${slideWidth}`} value={category.id}>
+              <CarouselItem key={category.id} className={`pl-2 ${slideWidth}`} data-value={category.id}>
                 <button
                   type="button"
                   aria-label={`Filter by ${category.name}`}

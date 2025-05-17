@@ -224,7 +224,7 @@ export function SubcategoryCards({ parentCategory, selectedSubcategory, onSubcat
             const id = slug(subcat);
             const isSelected = selectedSubcategory === id;
             return (
-              <CarouselItem key={id} className={`pl-2 ${slideWidth}`} value={id}>
+              <CarouselItem key={id} className={`pl-2 ${slideWidth}`} data-value={id}>
                 <button
                   type="button"
                   aria-label={`Filter by ${subcat}`}

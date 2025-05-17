@@ -818,38 +818,47 @@ export async function getFilteredProducts(filters: {
 // ===================
 // ADD PRODUCT
 // ===================
+/**
+ * Add a new product document.
+ * Accepts all Product fields *except* id / createdAt / updatedAt (those are added here).
+ */
 export async function addProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt">) {
   try {
-    const parsed = productSchema.omit({ id: true, createdAt: true, updatedAt: true }).safeParse(data);
+    /* ── quick sanity-check (ignores unknown keys) ─────────────── */
+    const parsed = productSchema.safeParse(data);
     if (!parsed.success) {
       console.error("❌ Invalid product data:", parsed.error.flatten());
       return { success: false as const, error: "Invalid product data" };
     }
 
     const now = Timestamp.now();
+
+    /* ── write to Firestore ────────────────────────────────────── */
     const docRef = await adminDb.collection("products").add({
-      ...parsed.data,
+      ...data,
       createdAt: now,
       updatedAt: now
     });
 
-    // Generate SKU if not provided
-    const productData = { ...parsed.data };
-    if (!productData.sku) {
-      const sku = `SKU-${docRef.id.substring(0, 8).toUpperCase()}`;
-      await docRef.update({ sku });
-      productData.sku = sku;
-    }
+    /* ── ensure a SKU exists ───────────────────────────────────── */
+    const finalSku = data.sku ?? `SKU-${docRef.id.substring(0, 8).toUpperCase()}`; // generate simple SKU
+    if (!data.sku) await docRef.update({ sku: finalSku });
 
+    /* ── compose full product object for return ───────────────── */
     const fullProduct: Product = {
       id: docRef.id,
-      ...productData,
-      inStock: productData.inStock ?? true, // Ensure inStock is always a boolean with default true
+      ...data,
+      sku: finalSku,
+      inStock: data.inStock ?? true, // default when caller omits it
       createdAt: now,
       updatedAt: now
     };
 
-    return { success: true as const, id: docRef.id, product: serializeProduct(fullProduct) };
+    return {
+      success: true as const,
+      id: docRef.id,
+      product: serializeProduct(fullProduct)
+    };
   } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
