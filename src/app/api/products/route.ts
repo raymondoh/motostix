@@ -40,8 +40,17 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
 
-    // Note: We don't need to set the SKU here
-    // The SKU will be auto-generated in the addProduct function if not provided
+    // Check if we're getting a valid image URL
+    if (!data.image || typeof data.image !== "string" || !data.image.startsWith("http")) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid product data",
+          details: "A valid image URL is required"
+        },
+        { status: 400 }
+      );
+    }
 
     const result = await addProduct(data);
 
@@ -53,10 +62,14 @@ export async function POST(request: NextRequest) {
     try {
       await logActivity({
         userId: session.user.id,
-        type: "create", // Changed from 'action' to 'actionType'
-        resourceType: "product",
-        resourceId: result.id,
-        details: `Created product: ${data.name}`
+        type: "create_product",
+        description: `Created product: ${data.name}`,
+        status: "success",
+        metadata: {
+          productId: result.id,
+          productName: data.name,
+          price: data.price
+        }
       });
     } catch (logError) {
       console.error("Failed to log activity:", logError);

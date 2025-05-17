@@ -3,34 +3,9 @@ import { updateProduct } from "@/actions/products/update-product";
 import { deleteProduct } from "@/actions/products/delete-product";
 import { updateProductSchema } from "@/schemas/product";
 import { revalidatePath } from "next/cache";
+import { logActivity } from "@/firebase/actions";
 import { auth } from "@/auth";
 
-// export async function DELETE(request: Request, { params }: any) {
-//   try {
-//     const productId = params.id;
-
-//     if (!productId) {
-//       return NextResponse.json({ success: false, error: "Product ID is required" }, { status: 400 });
-//     }
-
-//     const result = await deleteProduct(productId);
-
-//     if (!result.success) {
-//       return NextResponse.json({ success: false, error: result.error }, { status: 400 });
-//     }
-
-//     return NextResponse.json(result);
-//   } catch (error) {
-//     console.error("[API_DELETE_PRODUCT]", error);
-//     return NextResponse.json(
-//       {
-//         success: false,
-//         error: error instanceof Error ? error.message : "Failed to delete product"
-//       },
-//       { status: 500 }
-//     );
-//   }
-// }
 export async function DELETE(request: Request, { params }: any) {
   try {
     // Check authentication using auth import
@@ -51,6 +26,21 @@ export async function DELETE(request: Request, { params }: any) {
       return NextResponse.json({ success: false, error: result.error }, { status: 400 });
     }
 
+    // Log activity
+    try {
+      await logActivity({
+        userId: session.user.id,
+        type: "delete_product",
+        description: `Deleted product with ID: ${productId}`,
+        status: "success",
+        metadata: {
+          productId
+        }
+      });
+    } catch (logError) {
+      console.error("Failed to log activity:", logError);
+    }
+
     // Revalidate relevant paths
     revalidatePath("/admin/products");
     revalidatePath("/products");
@@ -67,51 +57,7 @@ export async function DELETE(request: Request, { params }: any) {
     );
   }
 }
-// export async function PUT(request: Request, { params }: any) {
-//   try {
-//     const productId = params.id;
 
-//     if (!productId) {
-//       return NextResponse.json({ success: false, error: "Product ID is required" }, { status: 400 });
-//     }
-
-//     const body = await request.json();
-//     console.log("Received update request for product:", productId);
-//     console.log("Update data:", JSON.stringify(body, null, 2));
-
-//     // Validate the request body against the schema
-//     const validated = updateProductSchema.safeParse(body);
-
-//     if (!validated.success) {
-//       console.error("Validation error:", validated.error);
-//       return NextResponse.json(
-//         {
-//           success: false,
-//           error: "Invalid product data: " + validated.error.message
-//         },
-//         { status: 400 }
-//       );
-//     }
-
-//     const result = await updateProduct(productId, validated.data);
-//     console.log("Update result:", result);
-
-//     if (!result.success) {
-//       return NextResponse.json({ success: false, error: result.error }, { status: 400 });
-//     }
-
-//     return NextResponse.json(result);
-//   } catch (error) {
-//     console.error("[API_UPDATE_PRODUCT]", error);
-//     return NextResponse.json(
-//       {
-//         success: false,
-//         error: error instanceof Error ? error.message : "Failed to update product"
-//       },
-//       { status: 500 }
-//     );
-//   }
-// }
 export async function PUT(request: Request, { params }: any) {
   try {
     // Check authentication using auth import
@@ -162,6 +108,22 @@ export async function PUT(request: Request, { params }: any) {
     // Log the updated product name if available
     if (result.success && result.product) {
       console.log(`Product updated successfully. New name: "${result.product.name}"`);
+
+      // Log activity
+      try {
+        await logActivity({
+          userId: session.user.id,
+          type: "update_product",
+          description: `Updated product: ${result.product.name}`,
+          status: "success",
+          metadata: {
+            productId,
+            updatedFields: Object.keys(validated.data)
+          }
+        });
+      } catch (logError) {
+        console.error("Failed to log activity:", logError);
+      }
     }
 
     if (!result.success) {

@@ -18,7 +18,11 @@ export type ActivityType =
   | "device_authorized"
   | "data_export"
   | "deletion_request"
-  | "deletion_completed";
+  | "deletion_completed"
+  // Product-related activities
+  | "create_product"
+  | "update_product"
+  | "delete_product";
 
 /**
  * Status of an activity

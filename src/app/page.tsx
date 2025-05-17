@@ -38,11 +38,9 @@ export default async function HomePage() {
     .slice(0, 10);
 
   // Find specific category products if needed
-  const bikeCategory = categories.find(
-    cat =>
-      cat.name.toLowerCase().includes("bike") ||
-      cat.name.toLowerCase().includes("motorcycle") ||
-      cat.slug?.includes("bike")
+  const bikeCategory = categories?.find(
+    cat => cat.name.toLowerCase().includes("bike") || cat.name.toLowerCase().includes("motorcycle")
+    // Removed the slug reference since it doesn't exist in CategoryData
   );
 
   const bikeProducts = bikeCategory ? allProducts.filter(product => product.category === bikeCategory.name) : [];

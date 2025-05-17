@@ -56,11 +56,11 @@ export async function FeaturedCategories() {
           )}
         </div>
 
-        {/* View All Categories button */}
+        {/* View All Categories button - link text */}
         <div className="mt-10 text-center">
           <Link
             href="/products"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            className="inline-block rounded-full bg-black text-white dark:bg-white dark:text-black px-10 py-4 text-lg font-medium hover:bg-black/90 dark:hover:bg-white/90 transition-colors">
             View All Categories
           </Link>
         </div>

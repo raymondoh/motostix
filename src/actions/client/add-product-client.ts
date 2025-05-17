@@ -1,23 +1,3 @@
-// // src/actions/client/add-product.ts
-// "use client";
-
-// import { addProduct as serverAddProduct } from "@/actions/products/add-product";
-// import type { CreateProductInput } from "@/schemas/product";
-// import type { AddProductResult } from "@/types/product/result";
-
-// export async function addProductClient(data: CreateProductInput): Promise<AddProductResult> {
-//   try {
-//     // Call the server action with the data
-//     return await serverAddProduct(data);
-//   } catch (error) {
-//     // Handle any errors
-//     console.error("Error in client addProduct:", error);
-//     return {
-//       success: false,
-//       error: error instanceof Error ? error.message : "Unknown error occurred"
-//     };
-//   }
-// }
 "use client";
 import type { Product } from "@/types/product";
 

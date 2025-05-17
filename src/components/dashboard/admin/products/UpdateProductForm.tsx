@@ -19,7 +19,15 @@
 // import { validateFileSize } from "@/utils/validateFileSize";
 // import { ArrowLeft, AlertCircle } from "lucide-react";
 // import type { Product } from "@/types/product";
-// import { categories, subcategories } from "@/config/categories";
+// import {
+//   categories,
+//   subcategories,
+//   designThemes,
+//   productTypes,
+//   brands,
+//   materials,
+//   shippingClasses
+// } from "@/config/categories";
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -84,14 +92,19 @@
 //   // Classification
 //   const [category, setCategory] = useState(product.category || "");
 //   const [subcategory, setSubcategory] = useState(product.subcategory || "");
+//   const [designThemesStr, setDesignThemesStr] = useState(
+//     Array.isArray(product.designThemes) ? product.designThemes.join(", ") : ""
+//   );
+//   const [productType, setProductType] = useState(product.productType || "");
 
 //   // Product Status
 //   const [inStock, setInStock] = useState(product.inStock !== false);
 //   const [isFeatured, setIsFeatured] = useState(product.isFeatured === true);
 //   const [isHero, setIsHero] = useState(product.isHero === true);
-//   const [isNewArrival, setIsNewArrival] = useState(product.isNewArrival === true); // Changed from isNew
-//   const [onSale, setOnSale] = useState(product.onSale === true); // Changed from isSale
+//   const [isNewArrival, setIsNewArrival] = useState(true);
+//   const [onSale, setOnSale] = useState(false);
 //   const [salePrice, setSalePrice] = useState(product.salePrice?.toString() || "");
+
 //   // Shipping & Inventory
 //   const [stockQuantity, setStockQuantity] = useState(product.stockQuantity?.toString() || "100");
 //   const [lowStockThreshold, setLowStockThreshold] = useState(product.lowStockThreshold?.toString() || "10");
@@ -146,6 +159,8 @@
 //     setManufacturer(product.manufacturer || "");
 //     setCategory(product.category || "");
 //     setSubcategory(product.subcategory || "");
+//     setDesignThemesStr(Array.isArray(product.designThemes) ? product.designThemes.join(", ") : "");
+//     setProductType(product.productType || "");
 //     setInStock(product.inStock !== false);
 //     setIsFeatured(product.isFeatured === true);
 //     setIsHero(product.isHero === true);
@@ -280,6 +295,12 @@
 //           .map(tag => tag.trim())
 //           .filter(tag => tag);
 
+//         // Prepare design themes array from comma-separated string
+//         const designThemesArray = designThemesStr
+//           .split(",")
+//           .map(theme => theme.trim())
+//           .filter(theme => theme);
+
 //         // Create product data object
 //         const productData = {
 //           name: productName.trim(),
@@ -302,11 +323,13 @@
 //           manufacturer: manufacturer || undefined,
 //           category: category || undefined,
 //           subcategory: subcategory || undefined,
+//           designThemes: designThemesArray.length > 0 ? designThemesArray : undefined,
+//           productType: productType || undefined,
 //           inStock,
 //           isFeatured,
 //           isHero,
-//           isNewArrival, // Changed from isNew
-//           onSale, // Changed from isSale
+//           isNewArrival,
+//           onSale,
 //           salePrice: onSale ? Number.parseFloat(salePrice) : undefined,
 //           stockQuantity: Number.parseInt(stockQuantity) || 100,
 //           lowStockThreshold: Number.parseInt(lowStockThreshold) || 10,
@@ -316,11 +339,14 @@
 //           additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined
 //         };
 
+//         console.log("Submitting product data:", JSON.stringify(productData, null, 2));
+
 //         // Update product
 //         const result = await updateProduct(product.id, productData);
 
 //         if (result.success) {
 //           toast.success(`"${productName}" updated successfully! Redirecting...`);
+//           router.refresh();
 //           setTimeout(() => router.push("/admin/products"), 2000);
 //         } else {
 //           setFormError(result.error || "Failed to update product");
@@ -504,6 +530,38 @@
 //                   </div>
 
 //                   <div className="space-y-2">
+//                     <Label htmlFor="productType" className="text-base font-semibold uppercase tracking-wide">
+//                       Product Type
+//                     </Label>
+//                     <Select value={productType} onValueChange={setProductType}>
+//                       <SelectTrigger id="productType" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select Product Type" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         {productTypes.map(type => (
+//                           <SelectItem key={type} value={type}>
+//                             {type}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
+//                   </div>
+
+//                   <div className="space-y-2">
+//                     <Label htmlFor="designThemes" className="text-base font-semibold uppercase tracking-wide">
+//                       Design Themes
+//                     </Label>
+//                     <Textarea
+//                       id="designThemes"
+//                       value={designThemesStr}
+//                       onChange={e => setDesignThemesStr(e.target.value)}
+//                       className="min-h-[80px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+//                       placeholder="Enter design themes separated by commas (e.g., Vintage, Racing, Minimalist)"
+//                     />
+//                     <p className="text-xs text-muted-foreground">Available themes: {designThemes.join(", ")}</p>
+//                   </div>
+
+//                   <div className="space-y-2">
 //                     <Label htmlFor="badge" className="text-base font-semibold uppercase tracking-wide">
 //                       Badge
 //                     </Label>
@@ -534,12 +592,18 @@
 //                     <Label htmlFor="brand" className="text-base font-semibold uppercase tracking-wide">
 //                       Brand
 //                     </Label>
-//                     <Input
-//                       id="brand"
-//                       value={brand}
-//                       onChange={e => setBrand(e.target.value)}
-//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
-//                     />
+//                     <Select value={brand} onValueChange={setBrand}>
+//                       <SelectTrigger id="brand" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select a brand" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         {brands.map(brandOption => (
+//                           <SelectItem key={brandOption} value={brandOption}>
+//                             {brandOption}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
 //                   </div>
 
 //                   <div className="space-y-2">
@@ -564,13 +628,18 @@
 //                     <Label htmlFor="material" className="text-base font-semibold uppercase tracking-wide">
 //                       Material
 //                     </Label>
-//                     <Input
-//                       id="material"
-//                       value={material}
-//                       onChange={e => setMaterial(e.target.value)}
-//                       className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
-//                       placeholder="e.g., Cotton, Vinyl, Polyester"
-//                     />
+//                     <Select value={material} onValueChange={setMaterial}>
+//                       <SelectTrigger id="material" className="h-14 text-lg px-4 border-input">
+//                         <SelectValue placeholder="Select a material" />
+//                       </SelectTrigger>
+//                       <SelectContent>
+//                         {materials.map(materialOption => (
+//                           <SelectItem key={materialOption} value={materialOption}>
+//                             {materialOption}
+//                           </SelectItem>
+//                         ))}
+//                       </SelectContent>
+//                     </Select>
 //                   </div>
 
 //                   <div className="space-y-2">
@@ -713,14 +782,18 @@
 //                     <Switch id="isHero" checked={isHero} onCheckedChange={setIsHero} />
 //                   </div>
 
-//                   <div className="flex items-center justify-between space-x-2">
-//                     <Label htmlFor="isNewArrival">New Arrival</Label>
-//                     <Switch id="isNewArrival" checked={isNewArrival} onCheckedChange={setIsNewArrival} />
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="isNew" className="text-base font-semibold">
+//                       New Arrival
+//                     </Label>
+//                     <Switch id="isNew" checked={isNewArrival} onCheckedChange={setIsNewArrival} />
 //                   </div>
 
-//                   <div className="flex items-center justify-between space-x-2">
-//                     <Label htmlFor="onSale">On Sale</Label>
-//                     <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
+//                   <div className="flex items-center justify-between">
+//                     <Label htmlFor="isSale" className="text-base font-semibold">
+//                       On Sale
+//                     </Label>
+//                     <Switch id="isSale" checked={onSale} onCheckedChange={setOnSale} />
 //                   </div>
 
 //                   {onSale && (
@@ -782,11 +855,11 @@
 //                         <SelectValue placeholder="Select shipping class" />
 //                       </SelectTrigger>
 //                       <SelectContent>
-//                         <SelectItem value="standard">Standard</SelectItem>
-//                         <SelectItem value="express">Express</SelectItem>
-//                         <SelectItem value="free">Free Shipping</SelectItem>
-//                         <SelectItem value="bulky">Bulky Item</SelectItem>
-//                         <SelectItem value="digital">Digital (No Shipping)</SelectItem>
+//                         {shippingClasses.map(option => (
+//                           <SelectItem key={option} value={option}>
+//                             {option}
+//                           </SelectItem>
+//                         ))}
 //                       </SelectContent>
 //                     </Select>
 //                   </div>
@@ -937,7 +1010,15 @@ import { uploadFile } from "@/utils/uploadFile";
 import { validateFileSize } from "@/utils/validateFileSize";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import type { Product } from "@/types/product";
-import { categories, subcategories } from "@/config/categories";
+import {
+  categories,
+  subcategories,
+  designThemes,
+  productTypes,
+  brands,
+  materials,
+  shippingClasses
+} from "@/config/categories";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -1002,6 +1083,10 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
   // Classification
   const [category, setCategory] = useState(product.category || "");
   const [subcategory, setSubcategory] = useState(product.subcategory || "");
+  const [designThemesStr, setDesignThemesStr] = useState(
+    Array.isArray(product.designThemes) ? product.designThemes.join(", ") : ""
+  );
+  const [productType, setProductType] = useState(product.productType || "");
 
   // Product Status
   const [inStock, setInStock] = useState(product.inStock !== false);
@@ -1044,51 +1129,53 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
     }
   }, [product]);
 
-  function resetForm() {
-    // Reset all form fields to original product values
-    setProductName(product.name);
-    setPrice(product.price.toString());
-    setDescription(product.description || "");
-    setBadge(product.badge || "");
-    setDetails(product.details || "");
-    setDimensions(product.dimensions || "");
-    setMaterial(product.material || "");
-    setBaseColor(product.baseColor || "");
-    setColorDisplayName(product.colorDisplayName || product.color || "");
-    setStickySide(product.stickySide || "");
-    setWeight(product.weight || "");
-    setSize(product.size || "");
-    setSku(product.sku || "");
-    setBarcode(product.barcode || "");
-    setTags(Array.isArray(product.tags) ? product.tags.join(", ") : "");
-    setBrand(product.brand || "");
-    setManufacturer(product.manufacturer || "");
-    setCategory(product.category || "");
-    setSubcategory(product.subcategory || "");
-    setInStock(product.inStock !== false);
-    setIsFeatured(product.isFeatured === true);
-    setIsHero(product.isHero === true);
-    setIsNewArrival(product.isNewArrival === true);
-    setOnSale(product.onSale === true);
-    setSalePrice(product.salePrice?.toString() || "");
-    setStockQuantity(product.stockQuantity?.toString() || "100");
-    setLowStockThreshold(product.lowStockThreshold?.toString() || "10");
-    setShippingWeight(product.shippingWeight || "");
-    setShippingClass(product.shippingClass || "standard");
-    setPreviewUrl(product.image || null);
-    setNewImageFile(null);
-    setAdditionalImages([]);
-    setAdditionalImagePreviews(Array.isArray(product.additionalImages) ? product.additionalImages : []);
-    setNameError(null);
-    setFormError(null);
+  // function resetForm() {
+  //   // Reset all form fields to original product values
+  //   setProductName(product.name);
+  //   setPrice(product.price.toString());
+  //   setDescription(product.description || "");
+  //   setBadge(product.badge || "");
+  //   setDetails(product.details || "");
+  //   setDimensions(product.dimensions || "");
+  //   setMaterial(product.material || "");
+  //   setBaseColor(product.baseColor || "");
+  //   setColorDisplayName(product.colorDisplayName || product.color || "");
+  //   setStickySide(product.stickySide || "");
+  //   setWeight(product.weight || "");
+  //   setSize(product.size || "");
+  //   setSku(product.sku || "");
+  //   setBarcode(product.barcode || "");
+  //   setTags(Array.isArray(product.tags) ? product.tags.join(", ") : "");
+  //   setBrand(product.brand || "");
+  //   setManufacturer(product.manufacturer || "");
+  //   setCategory(product.category || "");
+  //   setSubcategory(product.subcategory || "");
+  //   setDesignThemesStr(Array.isArray(product.designThemes) ? product.designThemes.join(", ") : "");
+  //   setProductType(product.productType || "");
+  //   setInStock(product.inStock !== false);
+  //   setIsFeatured(product.isFeatured === true);
+  //   setIsHero(product.isHero === true);
+  //   setIsNewArrival(product.isNewArrival === true);
+  //   setOnSale(product.onSale === true);
+  //   setSalePrice(product.salePrice?.toString() || "");
+  //   setStockQuantity(product.stockQuantity?.toString() || "100");
+  //   setLowStockThreshold(product.lowStockThreshold?.toString() || "10");
+  //   setShippingWeight(product.shippingWeight || "");
+  //   setShippingClass(product.shippingClass || "standard");
+  //   setPreviewUrl(product.image || null);
+  //   setNewImageFile(null);
+  //   setAdditionalImages([]);
+  //   setAdditionalImagePreviews(Array.isArray(product.additionalImages) ? product.additionalImages : []);
+  //   setNameError(null);
+  //   setFormError(null);
 
-    // Reset file inputs
-    if (imageInputRef.current) imageInputRef.current.value = "";
-    if (additionalImagesInputRef.current) additionalImagesInputRef.current.value = "";
+  //   // Reset file inputs
+  //   if (imageInputRef.current) imageInputRef.current.value = "";
+  //   if (additionalImagesInputRef.current) additionalImagesInputRef.current.value = "";
 
-    // Reset to first tab
-    setActiveTab("basic");
-  }
+  //   // Reset to first tab
+  //   setActiveTab("basic");
+  // }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -1199,6 +1286,12 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
           .map(tag => tag.trim())
           .filter(tag => tag);
 
+        // Prepare design themes array from comma-separated string
+        const designThemesArray = designThemesStr
+          .split(",")
+          .map(theme => theme.trim())
+          .filter(theme => theme);
+
         // Create product data object
         const productData = {
           name: productName.trim(),
@@ -1217,10 +1310,12 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
           sku: sku || undefined,
           barcode: barcode || undefined,
           tags: tagsArray.length > 0 ? tagsArray : undefined,
-          brand: brand || undefined,
+          brand: brand ? brand.trim() : undefined,
           manufacturer: manufacturer || undefined,
           category: category || undefined,
           subcategory: subcategory || undefined,
+          designThemes: designThemesArray.length > 0 ? designThemesArray : undefined,
+          productType: productType || undefined,
           inStock,
           isFeatured,
           isHero,
@@ -1235,11 +1330,14 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
           additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined
         };
 
+        console.log("Submitting product data:", JSON.stringify(productData, null, 2));
+
         // Update product
         const result = await updateProduct(product.id, productData);
 
         if (result.success) {
           toast.success(`"${productName}" updated successfully! Redirecting...`);
+          router.refresh();
           setTimeout(() => router.push("/admin/products"), 2000);
         } else {
           setFormError(result.error || "Failed to update product");
@@ -1423,6 +1521,38 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="productType" className="text-base font-semibold uppercase tracking-wide">
+                      Product Type
+                    </Label>
+                    <Select value={productType} onValueChange={setProductType}>
+                      <SelectTrigger id="productType" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select Product Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {productTypes.map(type => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="designThemes" className="text-base font-semibold uppercase tracking-wide">
+                      Design Themes
+                    </Label>
+                    <Textarea
+                      id="designThemes"
+                      value={designThemesStr}
+                      onChange={e => setDesignThemesStr(e.target.value)}
+                      className="min-h-[80px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+                      placeholder="Enter design themes separated by commas (e.g., Vintage, Racing, Minimalist)"
+                    />
+                    <p className="text-xs text-muted-foreground">Available themes: {designThemes.join(", ")}</p>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="badge" className="text-base font-semibold uppercase tracking-wide">
                       Badge
                     </Label>
@@ -1453,12 +1583,18 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
                     <Label htmlFor="brand" className="text-base font-semibold uppercase tracking-wide">
                       Brand
                     </Label>
-                    <Input
-                      id="brand"
-                      value={brand}
-                      onChange={e => setBrand(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
-                    />
+                    <Select value={brand} onValueChange={value => setBrand(value.trim())}>
+                      <SelectTrigger id="brand" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select a brand" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {brands.map(brandOption => (
+                          <SelectItem key={brandOption} value={brandOption}>
+                            {brandOption}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
@@ -1483,13 +1619,18 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
                     <Label htmlFor="material" className="text-base font-semibold uppercase tracking-wide">
                       Material
                     </Label>
-                    <Input
-                      id="material"
-                      value={material}
-                      onChange={e => setMaterial(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
-                      placeholder="e.g., Cotton, Vinyl, Polyester"
-                    />
+                    <Select value={material} onValueChange={setMaterial}>
+                      <SelectTrigger id="material" className="h-14 text-lg px-4 border-input">
+                        <SelectValue placeholder="Select a material" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {materials.map(materialOption => (
+                          <SelectItem key={materialOption} value={materialOption}>
+                            {materialOption}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
@@ -1705,11 +1846,11 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
                         <SelectValue placeholder="Select shipping class" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="standard">Standard</SelectItem>
-                        <SelectItem value="express">Express</SelectItem>
-                        <SelectItem value="free">Free Shipping</SelectItem>
-                        <SelectItem value="bulky">Bulky Item</SelectItem>
-                        <SelectItem value="digital">Digital (No Shipping)</SelectItem>
+                        {shippingClasses.map(option => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
