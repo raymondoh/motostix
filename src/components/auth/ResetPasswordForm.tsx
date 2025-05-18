@@ -8,7 +8,6 @@
 // import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
-// import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 // import { toast } from "sonner";
 // import { auth } from "@/firebase/client/firebase-client-init";
 // import { confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
@@ -110,154 +109,141 @@
 
 //   if (status === "success") {
 //     return (
-//       <CenteredCard
-//         icon={<CheckCircle className="h-10 w-10 text-green-600" />}
-//         title="Password Reset Successful!"
-//         description="Your password has been reset successfully."
-//         footer={
-//           <Button asChild>
-//             <Link href="/login">Continue to Login</Link>
-//           </Button>
-//         }
-//       />
+//       <div className="w-full">
+//         <div className="relative py-8 sm:py-10 text-center">
+//           <div className="flex justify-center mb-6">
+//             <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+//               <CheckCircle className="h-10 w-10 text-green-600" />
+//             </div>
+//           </div>
+
+//           <div className="space-y-2 mb-6">
+//             <h1 className="text-3xl font-semibold tracking-tight">Password Reset Successful!</h1>
+//             <p className="text-muted-foreground">Your password has been reset successfully.</p>
+//           </div>
+
+//           <div className="mt-8">
+//             <Button asChild className="w-full h-14 text-lg font-semibold">
+//               <Link href="/login">Continue to Login</Link>
+//             </Button>
+//           </div>
+//         </div>
+//       </div>
 //     );
 //   }
 
 //   if (status === "error") {
 //     return (
-//       <CenteredCard
-//         icon={<XCircle className="h-10 w-10 text-red-600" />}
-//         title="Reset Link Invalid"
-//         description={errorMessage}
-//         footer={
-//           <Button
-//             variant="default"
-//             onClick={() => {
-//               resetForm();
-//               router.push("/forgot-password");
-//             }}>
-//             Request New Reset Link
-//           </Button>
-//         }
-//       />
+//       <div className="w-full">
+//         <div className="relative py-8 sm:py-10 text-center">
+//           <div className="flex justify-center mb-6">
+//             <div className="h-20 w-20 rounded-full bg-destructive/10 flex items-center justify-center">
+//               <XCircle className="h-10 w-10 text-destructive" />
+//             </div>
+//           </div>
+
+//           <div className="space-y-2 mb-6">
+//             <h1 className="text-3xl font-semibold tracking-tight">Reset Link Invalid</h1>
+//             <p className="text-muted-foreground">{errorMessage}</p>
+//           </div>
+
+//           <div className="mt-8">
+//             <Button
+//               variant="default"
+//               className="w-full h-14 text-lg font-semibold"
+//               onClick={() => {
+//                 resetForm();
+//                 router.push("/forgot-password");
+//               }}>
+//               Request New Reset Link
+//             </Button>
+//           </div>
+//         </div>
+//       </div>
 //     );
 //   }
 
 //   return (
-//     <div className="container flex items-center justify-center min-h-screen py-12">
-//       <Card className="max-w-md w-full">
-//         <CardHeader className="space-y-1">
-//           <div className="flex justify-center mb-4">
-//             <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-//               <KeyRound className="h-10 w-10 text-primary" />
+//     <div className="w-full">
+//       <div className="relative py-8 sm:py-10">
+//         <div className="flex justify-center mb-6">
+//           <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+//             <KeyRound className="h-10 w-10 text-primary" />
+//           </div>
+//         </div>
+
+//         <div className="text-center mb-8">
+//           <h1 className="text-2xl font-semibold mb-2">Reset Your Password</h1>
+//           <p className="text-muted-foreground">Create a new password for {email}</p>
+//         </div>
+
+//         <form onSubmit={handleSubmit} className="space-y-6">
+//           <div className="space-y-2">
+//             <Label htmlFor="password" className="text-base font-semibold uppercase tracking-wide">
+//               New Password
+//             </Label>
+//             <div className="relative">
+//               <Input
+//                 id="password"
+//                 type={showPassword ? "text" : "password"}
+//                 placeholder="Enter new password"
+//                 value={password}
+//                 onChange={e => setPassword(e.target.value)}
+//                 required
+//                 className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary focus:border-primary"
+//               />
+//               <Button
+//                 type="button"
+//                 variant="ghost"
+//                 size="sm"
+//                 className="absolute right-0 top-0 h-full px-4 py-2 hover:bg-transparent"
+//                 onClick={() => setShowPassword(!showPassword)}>
+//                 {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+//               </Button>
 //             </div>
 //           </div>
-//           <CardTitle className="text-2xl text-center">Reset Your Password</CardTitle>
-//           <CardDescription className="text-center">Create a new password for {email}</CardDescription>
-//         </CardHeader>
-//         <CardContent>
-//           <form onSubmit={handleSubmit} className="space-y-4">
-//             <PasswordInput
-//               id="password"
-//               label="New Password"
-//               value={password}
-//               onChange={setPassword}
-//               show={showPassword}
-//               toggleShow={() => setShowPassword(prev => !prev)}
-//             />
-//             <PasswordInput
-//               id="confirmPassword"
-//               label="Confirm New Password"
-//               value={confirmPassword}
-//               onChange={setConfirmPassword}
-//               show={showConfirmPassword}
-//               toggleShow={() => setShowConfirmPassword(prev => !prev)}
-//             />
-//             <SubmitButton
-//               isLoading={status === "submitting"}
-//               loadingText="Resetting..."
-//               className="w-full"
-//               variant="default">
-//               Reset Password
-//             </SubmitButton>
-//           </form>
-//         </CardContent>
-//         <CardFooter className="flex justify-center">
-//           <div className="text-sm text-muted-foreground">
+
+//           <div className="space-y-2">
+//             <Label htmlFor="confirmPassword" className="text-base font-semibold uppercase tracking-wide">
+//               Confirm New Password
+//             </Label>
+//             <div className="relative">
+//               <Input
+//                 id="confirmPassword"
+//                 type={showConfirmPassword ? "text" : "password"}
+//                 placeholder="Confirm new password"
+//                 value={confirmPassword}
+//                 onChange={e => setConfirmPassword(e.target.value)}
+//                 required
+//                 className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary focus:border-primary"
+//               />
+//               <Button
+//                 type="button"
+//                 variant="ghost"
+//                 size="sm"
+//                 className="absolute right-0 top-0 h-full px-4 py-2 hover:bg-transparent"
+//                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+//                 {showConfirmPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+//               </Button>
+//             </div>
+//           </div>
+
+//           <SubmitButton
+//             isLoading={status === "submitting"}
+//             loadingText="Resetting..."
+//             className="w-full h-14 text-lg font-bold">
+//             Reset Password
+//           </SubmitButton>
+//         </form>
+
+//         <div className="py-8 flex justify-center border-t mt-8">
+//           <p className="text-base text-muted-foreground">
 //             Remember your password?{" "}
-//             <Button variant="link" className="p-0 h-auto" asChild>
-//               <Link href="/login">Back to login</Link>
-//             </Button>
-//           </div>
-//         </CardFooter>
-//       </Card>
-//     </div>
-//   );
-// }
-
-// function CenteredCard({
-//   icon,
-//   title,
-//   description,
-//   footer
-// }: {
-//   icon: React.ReactNode;
-//   title: string;
-//   description: string;
-//   footer?: React.ReactNode;
-// }) {
-//   return (
-//     <div className="container flex items-center justify-center min-h-screen py-12">
-//       <Card className="max-w-md w-full">
-//         <CardHeader className="space-y-1">
-//           <div className="flex justify-center mb-4">
-//             <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">{icon}</div>
-//           </div>
-//           <CardTitle className="text-2xl text-center">{title}</CardTitle>
-//           <CardDescription className="text-center">{description}</CardDescription>
-//         </CardHeader>
-//         <CardContent className="text-center space-y-4" />
-//         {footer && <CardFooter className="flex justify-center">{footer}</CardFooter>}
-//       </Card>
-//     </div>
-//   );
-// }
-
-// function PasswordInput({
-//   id,
-//   label,
-//   value,
-//   onChange,
-//   show,
-//   toggleShow
-// }: {
-//   id: string;
-//   label: string;
-//   value: string;
-//   onChange: (val: string) => void;
-//   show: boolean;
-//   toggleShow: () => void;
-// }) {
-//   return (
-//     <div className="space-y-2">
-//       <Label htmlFor={id}>{label}</Label>
-//       <div className="relative">
-//         <Input
-//           id={id}
-//           type={show ? "text" : "password"}
-//           placeholder={label}
-//           value={value}
-//           onChange={e => onChange(e.target.value)}
-//           required
-//         />
-//         <Button
-//           type="button"
-//           variant="ghost"
-//           size="sm"
-//           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-//           onClick={toggleShow}>
-//           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-//         </Button>
+//             <Link href="/login" className="font-semibold text-primary hover:underline">
+//               Back to login
+//             </Link>
+//           </p>
+//         </div>
 //       </div>
 //     </div>
 //   );
@@ -434,11 +420,6 @@ export function ResetPasswordForm() {
           <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
             <KeyRound className="h-10 w-10 text-primary" />
           </div>
-        </div>
-
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold mb-2">Reset Your Password</h1>
-          <p className="text-muted-foreground">Create a new password for {email}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

@@ -1,4 +1,3 @@
-// components/auth/AuthModal.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -11,7 +10,7 @@ export function AuthModal({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        router.back(); // This is the recommended way to close the modal
+        router.back();
       }
     };
 
@@ -21,7 +20,7 @@ export function AuthModal({ children }: { children: React.ReactNode }) {
 
   const handleClick = (e: React.MouseEvent) => {
     if (e.target === overlay.current) {
-      router.back(); // This is the recommended way to close the modal
+      router.back();
     }
   };
 
@@ -30,7 +29,9 @@ export function AuthModal({ children }: { children: React.ReactNode }) {
       ref={overlay}
       onClick={handleClick}
       className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-      <div className="max-w-md w-full mx-auto animate-in fade-in zoom-in duration-300">{children}</div>
+      <div className="max-w-md w-full mx-auto rounded-lg bg-card p-6 shadow-lg animate-in fade-in zoom-in duration-300">
+        {children}
+      </div>
     </div>
   );
 }

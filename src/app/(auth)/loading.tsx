@@ -1,9 +1,9 @@
 export default function AuthLoading() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background text-foreground transition-colors">
       <section className="py-12 md:py-16 w-full">
         <div className="container mx-auto px-4">
-          <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-border/40 p-8 md:p-10">
+          <div className="w-full max-w-md mx-auto bg-background text-foreground rounded-xl shadow-sm border border-border/40 p-8 md:p-10 transition-colors">
             {/* Logo placeholder */}
             <div className="flex justify-center mb-8">
               <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ export default function AuthLoading() {
               </div>
 
               {/* Button placeholder */}
-              <div className="h-10 w-full bg-black/20 dark:bg-white/20 rounded-full animate-pulse mt-8"></div>
+              <div className="h-10 w-full bg-primary/20 dark:bg-primary/30 rounded-full animate-pulse mt-8"></div>
 
               {/* Links placeholder */}
               <div className="flex justify-center mt-4">

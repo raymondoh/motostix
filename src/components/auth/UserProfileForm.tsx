@@ -1,5 +1,7 @@
 // "use client";
 
+// import type React from "react";
+
 // import { useState, useEffect, useRef, startTransition, useActionState } from "react";
 // import { useRouter } from "next/navigation";
 // import { useSession } from "next-auth/react";
@@ -177,7 +179,7 @@
 //   }
 
 //   return (
-//     <Card>
+//     <Card className="border-border/40 shadow-sm">
 //       <CardHeader>
 //         <CardTitle>Personal Information</CardTitle>
 //         <CardDescription>Update your personal details and profile picture.</CardDescription>
@@ -186,8 +188,8 @@
 //         <CardContent className="grid gap-6">
 //           {state?.error && (
 //             <Alert variant="destructive">
-//               <AlertCircle className="h-4 w-4" />
-//               <AlertDescription>{state.error}</AlertDescription>
+//               <AlertCircle className="h-6 w-6" />
+//               <AlertDescription className="text-base">{state.error}</AlertDescription>
 //             </Alert>
 //           )}
 
@@ -198,8 +200,8 @@
 //               size="icon"
 //               className="h-20 w-20 p-1 rounded-full
 //              ring-0 ring-offset-0
-//              hover:ring-2 hover:ring-gray-400
-//              focus:ring-2 focus:ring-gray-400
+//              hover:ring-2 hover:ring-primary/50
+//              focus:ring-2 focus:ring-primary/50
 //              transition duration-200">
 //               <UserAvatar
 //                 src={photoURL}
@@ -237,23 +239,35 @@
 //           </div>
 
 //           <div className="space-y-2">
-//             <Label htmlFor="name">Name</Label>
-//             <Input id="name" value={name} onChange={e => setName(e.target.value)} required />
+//             <Label htmlFor="name" className="text-base font-medium">
+//               Name
+//             </Label>
+//             <Input
+//               id="name"
+//               value={name}
+//               onChange={e => setName(e.target.value)}
+//               required
+//               className="h-12 border-input focus:ring-2 focus:ring-primary focus:border-primary"
+//             />
 //           </div>
 
 //           <div className="space-y-2">
-//             <Label htmlFor="email">Email</Label>
-//             <Input id="email" value={session?.user?.email || ""} disabled className="bg-muted" />
+//             <Label htmlFor="email" className="text-base font-medium">
+//               Email
+//             </Label>
+//             <Input id="email" value={session?.user?.email || ""} disabled className="h-12 bg-muted border-input" />
 //           </div>
 
 //           <div className="space-y-2">
-//             <Label htmlFor="bio">Bio</Label>
+//             <Label htmlFor="bio" className="text-base font-medium">
+//               Bio
+//             </Label>
 //             <Textarea
 //               id="bio"
 //               value={bio}
 //               onChange={e => setBio(e.target.value)}
 //               placeholder="Tell us a bit about yourself"
-//               className="resize-none min-h-[100px]"
+//               className="resize-none min-h-[100px] border-input focus:ring-2 focus:ring-primary focus:border-primary"
 //             />
 //           </div>
 //         </CardContent>
@@ -261,15 +275,21 @@
 //           <SubmitButton
 //             isLoading={isPending || isUploading}
 //             variant="default"
-//             loadingText={isUploading ? "Uploading..." : "Saving..."}>
+//             loadingText={isUploading ? "Uploading..." : "Saving..."}
+//             className="h-12 px-6">
 //             Save changes
 //           </SubmitButton>
 
-//           <Button type="button" variant="outline" onClick={handleCancel} disabled={isPending || isUploading}>
+//           <Button
+//             type="button"
+//             variant="outline"
+//             onClick={handleCancel}
+//             disabled={isPending || isUploading}
+//             className="h-12 px-6">
 //             Cancel
 //           </Button>
 
-//           {isSuccess && <p className="text-sm text-green-600">Profile updated successfully.</p>}
+//           {isSuccess && <p className="text-sm font-medium text-green-600">Profile updated successfully.</p>}
 //         </CardFooter>
 //       </form>
 //     </Card>
@@ -278,7 +298,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useEffect, useRef, startTransition, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -399,10 +418,8 @@ export function UserProfileForm({ id, onCancel, redirectAfterSuccess, isAdmin = 
       const formChanged =
         name !== initialName || bio !== initialBio || (photoURL !== initialPhotoURL && photoURL !== null);
 
-      if (formChanged) {
-        if (!window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
-          return;
-        }
+      if (formChanged && !window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
+        return;
       }
 
       resetForm();
@@ -475,11 +492,7 @@ export function UserProfileForm({ id, onCancel, redirectAfterSuccess, isAdmin = 
               type="button"
               variant="ghost"
               size="icon"
-              className="h-20 w-20 p-1 rounded-full 
-             ring-0 ring-offset-0 
-             hover:ring-2 hover:ring-primary/50 
-             focus:ring-2 focus:ring-primary/50 
-             transition duration-200">
+              className="h-20 w-20 p-1 rounded-full ring-0 ring-offset-0 hover:ring-2 hover:ring-primary/50 focus:ring-2 focus:ring-primary/50 transition duration-200">
               <UserAvatar
                 src={photoURL}
                 name={session?.user?.name}

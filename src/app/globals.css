@@ -7,208 +7,106 @@
     text-wrap: balance;
   }
 }
-
+/* ✅ Updated root CSS variables in :root for better light mode visibility */
 @layer base {
   :root {
-    /* Light Mode Theme Colors - Monochromatic */
-    --background: 0 0% 98%; /* Slightly off-white background */
-    --foreground: 0 0% 10%; /* Dark gray text */
+    /* Light Mode Theme Colors - Monochromatic with better dashboard contrast */
+    --background: 0 0% 95%; /* Slightly darker for dashboard contrast */
+    --foreground: 0 0% 10%;
 
-    --primary: 0 0% 20%; /* Dark gray primary */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --primary: 0 0% 20%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 90%; /* Light gray secondary */
-    --secondary-foreground: 0 0% 20%; /* Dark gray text on secondary */
+    --secondary: 0 0% 85%; /* Slightly darker than before */
+    --secondary-foreground: 0 0% 20%;
 
-    /* Accent color - slightly darker than primary for contrast */
-    --accent: 0 0% 15%; /* Darker gray accent */
-    --accent-foreground: 0 0% 100%; /* White text on accent */
+    --accent: 0 0% 25%; /* Darker for better action emphasis */
+    --accent-foreground: 0 0% 100%;
 
-    --muted: 0 0% 96%; /* Light gray muted */
-    --muted-foreground: 0 0% 45%; /* Medium gray text */
+    --muted: 0 0% 92%; /* Slightly darker muted */
+    --muted-foreground: 0 0% 40%;
 
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 0 0% 10%; /* Dark text on cards */
+    --card: 0 0% 98%; /* Slight contrast from background */
+    --card-foreground: 0 0% 10%;
 
-    --popover: 0 0% 100%; /* White popovers */
-    --popover-foreground: 0 0% 10%; /* Dark text on popovers */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    --destructive: 0 84% 60%; /* Keep original */
-    --destructive-foreground: 0 0% 98%; /* Keep original */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%; /* Light border */
-    --input: 0 0% 90%; /* Light input border */
-    --ring: 0 0% 20%; /* Dark ring */
+    --border: 0 0% 75%; /* Darker border for more visible grid lines */
+    --input: 0 0% 75%;
+    --ring: 0 0% 25%;
 
-    /* Updated chart colors to monochromatic scheme */
     --chart-1: 0 0% 20%;
     --chart-2: 0 0% 40%;
     --chart-3: 0 0% 60%;
     --chart-4: 0 0% 80%;
     --chart-5: 0 0% 30%;
 
-    /* Sidebar colors for light mode - monochromatic */
-    --sidebar-background: 0 0% 100%; /* White sidebar */
-    --sidebar-foreground: 0 0% 20%; /* Dark text for sidebar */
-    --sidebar-primary: 0 0% 20%; /* Dark gray primary */
-    --sidebar-primary-foreground: 0 0% 100%; /* White text on primary */
-    --sidebar-accent: 0 0% 95%; /* Very light gray accent */
-    --sidebar-accent-foreground: 0 0% 20%; /* Dark text on accent */
-    --sidebar-border: 0 0% 90%; /* Light border */
-    --sidebar-ring: 0 0% 20%; /* Dark ring */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 0 0% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 0 0% 75%;
+    --sidebar-ring: 0 0% 25%;
 
-    /* Keep existing toast styling */
     --toaster-font-size: 1.25rem !important;
     --toaster-padding: 24px !important;
     --toaster-width: 420px !important;
     --toaster-border-radius: 12px !important;
     --toaster-icon-size: 28px !important;
 
-    /* Border radius - Standard radius for cards and dropdowns */
     --radius: 0.5rem;
   }
 
-  /* Dark theme variables */
   .dark {
-    /* Dark Mode Theme Colors */
-    --background: 0 0% 10%; /* Dark gray background (removed blue tint) */
-    --foreground: 0 0% 98%; /* Light text for dark mode */
+    --separator: 0 0% 30%;
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 16%; /* Dark cards */
-    --card-foreground: 0 0% 98%; /* Light text on cards */
+    --card: 0 0% 16%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 16%; /* Dark popovers */
-    --popover-foreground: 0 0% 98%; /* Light text on popovers */
+    --popover: 0 0% 16%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 48 100% 50%; /* #FFCE00 - Yellow (keeping this for contrast) */
-    --primary-foreground: 0 0% 0%; /* Black text on yellow */
+    --primary: 48 100% 50%; /* Yellow */
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 0 0% 29%; /* Dark Gray */
-    --secondary-foreground: 0 0% 100%; /* White text on dark gray */
+    --secondary: 0 0% 29%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Yellow as accent color */
-    --accent: 48 100% 50%; /* #FFCE00 - Yellow */
-    --accent-foreground: 0 0% 0%; /* Black text on yellow */
+    --accent: 48 100% 50%; /* Yellow */
+    --accent-foreground: 0 0% 0%;
 
-    --muted: 0 0% 14.9%; /* Dark gray for dark mode */
-    --muted-foreground: 0 0% 63.9%; /* Light gray text for dark mode */
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
 
-    --destructive: 0 62.8% 30.6%; /* Keep original */
-    --destructive-foreground: 0 0% 98%; /* Keep original */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 14.9%; /* Dark border for dark mode */
-    --input: 0 0% 14.9%; /* Dark input border for dark mode */
-    --ring: 48 100% 50%; /* #FFCE00 - Yellow */
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 48 100% 50%;
 
-    /* Updated chart colors for dark mode */
-    --chart-1: 48 100% 50%; /* Yellow */
-    --chart-2: 0 0% 80%; /* Light gray */
-    --chart-3: 0 0% 60%; /* Medium gray */
-    --chart-4: 0 0% 40%; /* Dark gray */
-    --chart-5: 48 70% 60%; /* Muted yellow */
+    --chart-1: 48 100% 50%;
+    --chart-2: 0 0% 80%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 48 70% 60%;
 
-    /* Sidebar colors for dark mode */
-    --sidebar-background: 0 0% 12%; /* Very dark gray sidebar (removed blue tint) */
-    --sidebar-foreground: 0 0% 95.9%; /* Light gray sidebar text */
-    --sidebar-primary: 0 0% 98%; /* Light gray sidebar primary */
-    --sidebar-primary-foreground: 0 0% 10%; /* Dark gray sidebar primary text */
-    --sidebar-accent: 0 0% 18%; /* Dark gray sidebar accent */
-    --sidebar-accent-foreground: 0 0% 95.9%; /* Light gray sidebar accent text */
-    --sidebar-border: 0 0% 18%; /* Dark gray sidebar border */
-    --sidebar-ring: 48 100% 50%; /* Yellow sidebar ring */
-
-    /* Keep existing toast styling */
-    --toaster-font-size: 1.25rem;
-    --toaster-padding: 24px;
-    --toaster-width: 420px;
-    --toaster-border-radius: 12px;
-    --toaster-icon-size: 28px;
-  }
-
-  /* Dashboard specific theme - Monochromatic */
-  .dashboard-theme {
-    /* Background colors */
-    --background: 0 0% 100%; /* Pure white */
-    --foreground: 0 0% 15%; /* Dark gray text */
-
-    /* Card colors */
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 0 0% 15%; /* Dark gray text */
-
-    /* Primary colors - dark gray */
-    --primary: 0 0% 20%; /* Dark gray */
-    --primary-foreground: 0 0% 100%; /* White text */
-
-    /* Secondary colors */
-    --secondary: 0 0% 95%; /* Very light gray */
-    --secondary-foreground: 0 0% 20%; /* Dark gray text */
-
-    /* Muted colors */
-    --muted: 0 0% 96%; /* Light gray background */
-    --muted-foreground: 0 0% 45%; /* Medium gray text */
-
-    /* Accent colors */
-    --accent: 0 0% 90%; /* Light gray */
-    --accent-foreground: 0 0% 20%; /* Dark gray */
-
-    /* Border colors */
-    --border: 0 0% 90%; /* Light gray border */
-    --input: 0 0% 90%; /* Light gray input */
-
-    /* Ring color */
-    --ring: 0 0% 20%; /* Dark gray ring */
-
-    /* Sidebar colors for dashboard - monochromatic */
-    --sidebar-background: 0 0% 100%; /* White sidebar */
-    --sidebar-foreground: 0 0% 20%; /* Dark text */
-    --sidebar-primary: 0 0% 20%; /* Dark gray */
-    --sidebar-primary-foreground: 0 0% 100%; /* White text */
-    --sidebar-accent: 0 0% 95%; /* Very light gray */
-    --sidebar-accent-foreground: 0 0% 20%; /* Dark text */
-    --sidebar-border: 0 0% 90%; /* Light gray border */
-    --sidebar-ring: 0 0% 20%; /* Dark gray ring */
-  }
-
-  /* Dashboard dark theme - Monochromatic */
-  .dashboard-theme[data-theme="dark"] {
-    /* Background colors */
-    --background: 0 0% 10%; /* Dark gray background */
-    --foreground: 0 0% 90%; /* Light gray text */
-
-    /* Card colors */
-    --card: 0 0% 15%; /* Slightly lighter gray cards */
-    --card-foreground: 0 0% 90%; /* Light gray text */
-
-    /* Primary colors */
-    --primary: 0 0% 80%; /* Light gray primary */
-    --primary-foreground: 0 0% 10%; /* Dark gray text */
-
-    /* Secondary colors */
-    --secondary: 0 0% 20%; /* Dark gray secondary */
-    --secondary-foreground: 0 0% 90%; /* Light gray text */
-
-    /* Muted colors */
-    --muted: 0 0% 20%; /* Dark gray muted */
-    --muted-foreground: 0 0% 70%; /* Medium-light gray text */
-
-    /* Accent colors */
-    --accent: 0 0% 25%; /* Dark gray accent */
-    --accent-foreground: 0 0% 90%; /* Light gray text */
-
-    /* Border colors */
-    --border: 0 0% 25%; /* Dark gray border */
-    --input: 0 0% 25%; /* Dark gray input */
-    --ring: 0 0% 80%; /* Light gray ring */
-
-    /* Sidebar colors for dashboard dark mode - monochromatic */
-    --sidebar-background: 0 0% 12%; /* Very dark gray sidebar */
-    --sidebar-foreground: 0 0% 90%; /* Light gray text */
-    --sidebar-primary: 0 0% 80%; /* Light gray primary */
-    --sidebar-primary-foreground: 0 0% 10%; /* Dark gray text */
-    --sidebar-accent: 0 0% 20%; /* Dark gray accent */
-    --sidebar-accent-foreground: 0 0% 90%; /* Light gray text */
-    --sidebar-border: 0 0% 25%; /* Dark gray border */
-    --sidebar-ring: 0 0% 80%; /* Light gray ring */
+    --sidebar-background: 0 0% 12%;
+    --sidebar-foreground: 0 0% 95.9%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 0 0% 95.9%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 48 100% 50%;
   }
 }
 
@@ -217,7 +115,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
     font-family: var(--font-inter), sans-serif;
   }
 
@@ -261,9 +159,9 @@ body {
 }
 
 /* Remove pattern background in dashboard */
-.dashboard-theme body {
+/* .dashboard-theme body {
   background-image: none;
-}
+} */
 
 /* Add this to ensure your main app header has a higher z-index */
 .main-header {
@@ -538,3 +436,7 @@ body {
 .dashboard-theme .accent-text {
   @apply text-primary;
 }
+/* Lighten dropdown separator lines in dark mode */
+/* .dark [data-radix-dropdown-menu-content] > div[role="separator"] {
+  border-color: hsl(0 0% 30%) !important;
+} */

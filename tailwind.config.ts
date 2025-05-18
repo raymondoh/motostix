@@ -55,63 +55,6 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))"
         }
-        // Brand colors
-        // primary: {
-        //   DEFAULT: siteConfig.theme.colors.primary,
-        //   light: siteConfig.theme.colors.primaryLight,
-        //   dark: siteConfig.theme.colors.primaryDark,
-        // },
-        // secondary: {
-        //   DEFAULT: siteConfig.theme.colors.secondary,
-        //   light: siteConfig.theme.colors.secondaryLight,
-        //   dark: siteConfig.theme.colors.secondaryDark,
-        // },
-        // accent: {
-        //   DEFAULT: siteConfig.theme.colors.accent,
-        //   light: siteConfig.theme.colors.accentLight,
-        //   dark: siteConfig.theme.colors.accentDark,
-        // },
-
-        // // Text colors
-        // text: {
-        //   primary: siteConfig.theme.colors.text.primary,
-        //   secondary: siteConfig.theme.colors.text.secondary,
-        //   disabled: siteConfig.theme.colors.text.disabled,
-        // },
-
-        // // Status colors
-        // success: siteConfig.theme.colors.status.success,
-        // warning: siteConfig.theme.colors.status.warning,
-        // error: siteConfig.theme.colors.status.error,
-        // info: siteConfig.theme.colors.status.info,
-
-        // // Background colors
-        // background: siteConfig.theme.colors.background,
-        // "light-background": siteConfig.theme.colors.lightBackground,
-
-        // // shadcn/ui required colors
-        // border: siteConfig.theme.colors.border,
-        // input: siteConfig.theme.colors.border,
-        // ring: siteConfig.theme.colors.primary,
-        // foreground: siteConfig.theme.colors.text.primary,
-
-        // // Additional shadcn/ui colors
-        // muted: {
-        //   DEFAULT: siteConfig.theme.colors.secondaryLight,
-        //   foreground: siteConfig.theme.colors.text.secondary,
-        // },
-        // destructive: {
-        //   DEFAULT: siteConfig.theme.colors.status.error,
-        //   foreground: "#FFFFFF",
-        // },
-        // card: {
-        //   DEFAULT: siteConfig.theme.colors.lightBackground,
-        //   foreground: siteConfig.theme.colors.text.primary,
-        // },
-        // popover: {
-        //   DEFAULT: siteConfig.theme.colors.lightBackground,
-        //   foreground: siteConfig.theme.colors.text.primary,
-        // },
       },
       borderRadius: {
         lg: "var(--radius)",

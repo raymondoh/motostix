@@ -1,5 +1,3 @@
-// // // src/components/checkout/checkout-form.tsx
-
 // "use client";
 
 // import { useState, useEffect } from "react";
@@ -9,7 +7,7 @@
 // import { ShippingForm } from "./shipping-form";
 // import { PaymentForm } from "./payment-form";
 // import { Button } from "@/components/ui/button";
-// import { ArrowLeft } from "lucide-react";
+// import { ArrowLeft, CheckCircle } from "lucide-react";
 // import type { ShippingFormValues } from "@/schemas/ecommerce/stripe";
 // import { formatPriceWithCode } from "@/lib/utils";
 
@@ -22,7 +20,7 @@
 
 // export function CheckoutForm({ userId, user }: CheckoutFormProps) {
 //   const [step, setStep] = useState<CheckoutStep>("shipping");
-//   const [shippingDetails, setShippingDetails] = useState<ShippingFormValues | undefined>(undefined); // Use `undefined` instead of `null`
+//   const [shippingDetails, setShippingDetails] = useState<ShippingFormValues | undefined>(undefined);
 //   const [orderId, setOrderId] = useState<string | null>(null);
 //   const { items, subtotal, clearCart } = useCart();
 //   const router = useRouter();
@@ -76,15 +74,18 @@
 //         )}
 
 //         {step === "confirmation" && orderId && (
-//           <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center dark:border-green-900 dark:bg-green-950">
-//             <h2 className="mb-4 text-3xl font-semibold text-green-700 dark:text-green-300">🎉 Order Confirmed!</h2>
-//             <p className="mb-2 text-green-600 dark:text-green-400">Thank you for your purchase.</p>
-//             <p className="mb-2 font-medium text-green-600 dark:text-green-400">Order ID: {orderId}</p>
-//             <p className="mb-2 font-medium text-green-600 dark:text-green-400">
-//               Total Paid: {formatPriceWithCode(total, "GB")}
-//             </p>
-//             <p className="mb-6 text-green-600 dark:text-green-400">A confirmation email has been sent to you.</p>
-//             <Button onClick={() => router.push("/")} className="mt-2">
+//           <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
+//             <div className="flex justify-center mb-4">
+//               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+//                 <CheckCircle className="h-8 w-8 text-primary" />
+//               </div>
+//             </div>
+//             <h2 className="mb-4 text-3xl font-semibold">Order Confirmed!</h2>
+//             <p className="mb-2 text-foreground/80">Thank you for your purchase.</p>
+//             <p className="mb-2 font-medium">Order ID: {orderId}</p>
+//             <p className="mb-2 font-medium">Total Paid: {formatPriceWithCode(total, "GB")}</p>
+//             <p className="mb-6 text-foreground/80">A confirmation email has been sent to you.</p>
+//             <Button onClick={() => router.push("/")} className="mt-2 h-12 px-6">
 //               Return to Home
 //             </Button>
 //           </div>
@@ -105,22 +106,24 @@
 //     </div>
 //   );
 // }
+// Refactored checkout structure based on provided files and suggestions
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { CheckoutSummary } from "./checkout-summary";
 import { ShippingForm } from "./shipping-form";
 import { PaymentForm } from "./payment-form";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle } from "lucide-react";
 import type { ShippingFormValues } from "@/schemas/ecommerce/stripe";
 import { formatPriceWithCode } from "@/lib/utils";
 
 interface CheckoutFormProps {
   userId: string;
-  user?: Partial<ShippingFormValues>; // Allows partial pre-filling of the form
+  user?: Partial<ShippingFormValues>;
 }
 
 type CheckoutStep = "shipping" | "payment" | "confirmation";
