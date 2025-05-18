@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export function PromoSection() {
   return (
@@ -17,12 +18,16 @@ export function PromoSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="bg-black text-white dark:bg-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90">
-                SHOP NOW
-              </Button>
-              <Button variant="outline" className="border-primary/20 hover:border-primary/40">
-                LEARN MORE <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="/products">
+                <Button className="bg-black text-white dark:bg-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90">
+                  SHOP NOW
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button variant="outline" className="border-primary/20 hover:border-primary/40">
+                  LEARN MORE <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
 

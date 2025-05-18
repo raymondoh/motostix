@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/header/ModeToggle";
-import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus, User, Search } from 'lucide-react';
+import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus, User, Search } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSession, signOut } from "next-auth/react";
 import { generalNavItems, adminNavItems, type NavItem } from "@/lib/navigation";
@@ -68,7 +68,7 @@ const NavLinks = ({ setOpen, isMobile }: { setOpen?: (open: boolean) => void; is
         "text-sm font-bold uppercase tracking-wide transition-colors px-4 py-2 rounded-full",
         isActive(item.href)
           ? "bg-black text-white dark:bg-white dark:text-black"
-          : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800",
+          : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-secondary/60",
         isMobile ? "w-full text-center" : ""
       )}
       onClick={() => setOpen?.(false)}>
@@ -122,11 +122,10 @@ export const Navbar = () => {
                 </SheetHeader>
                 <div className="py-4">
                   {/* Add search button to mobile menu */}
-                  <HeaderIconButton 
-                    onClick={openSearch} 
+                  <HeaderIconButton
+                    onClick={openSearch}
                     className="w-full flex justify-center items-center gap-2 mb-4"
-                    aria-label="Search"
-                  >
+                    aria-label="Search">
                     <Search className="h-5 w-5" />
                     <span>Search</span>
                   </HeaderIconButton>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Mail, Phone, Clock, Send } from "lucide-react";
+import { MapPin, Mail, Phone, Send } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact MotoStix | Get in Touch",
@@ -59,7 +59,7 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
+                {/* <div className="flex items-start gap-3">
                   <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium">Business Hours</p>
@@ -69,7 +69,7 @@ export default function ContactPage() {
                       <li>Sunday: Closed</li>
                     </ul>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
