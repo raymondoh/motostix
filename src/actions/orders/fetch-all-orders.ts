@@ -3,12 +3,12 @@
 "use server";
 
 import { getAllOrders } from "@/firebase/actions";
-import type { Order } from "@/types/order";
-
+//import type { Order } from "@/types/order";
+import type { Order } from "@/types";
 /**
  * Server Action: Fetch all orders (admin only)
  */
-export async function fetchAllOrders(): Promise<Order[]> {
+export async function fetchAllOrders(): Promise<Order.Order[]> {
   try {
     const orders = await getAllOrders();
     return orders;

@@ -1,14 +1,16 @@
 "use client";
 
 import { toast } from "sonner";
-import type { UpdateProductInput } from "@/schemas/product";
-import type { UpdateProductResult } from "@/types/product";
+import type { Product } from "@/types";
 
 /**
  * Client-friendly wrapper for the updateProduct server action
  * This function calls the API endpoint which then calls the server action
  */
-export async function updateProductClient(productId: string, data: UpdateProductInput): Promise<UpdateProductResult> {
+export async function updateProductClient(
+  productId: string,
+  data: Product.UpdateProductInput
+): Promise<Product.UpdateProductResult> {
   try {
     console.log("Updating product with data:", JSON.stringify(data, null, 2));
 

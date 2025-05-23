@@ -1,13 +1,13 @@
 //src/actions/client/index.ts
 "use client";
 
-import type { FetchActivityLogsParams, FetchActivityLogsResponse } from "@/types/dashboard/activity";
+import type { Dashboard } from "@/types";
 
 export async function clientFetchActivityLogs({
   limit = 10,
   startAfter,
   type
-}: FetchActivityLogsParams): Promise<FetchActivityLogsResponse> {
+}: Dashboard.FetchActivityLogsParams): Promise<Dashboard.FetchActivityLogsResponse> {
   try {
     const params = new URLSearchParams();
     params.set("limit", String(limit));

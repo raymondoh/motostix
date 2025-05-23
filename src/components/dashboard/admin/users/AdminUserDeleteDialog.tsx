@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { deleteUserAsAdmin } from "@/actions/auth/delete";
 import { toast } from "sonner";
 import type { SerializedUser } from "@/types/user";
 import { useSession } from "next-auth/react";
 import { SubmitButton } from "@/components/shared/SubmitButton";
+import { deleteUserAsAdmin } from "@/actions/auth/delete";
 
 interface AdminUserDeleteDialogProps {
   user: SerializedUser;

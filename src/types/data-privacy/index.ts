@@ -9,7 +9,7 @@
 export type { DeleteAccountState, DeletionRequestStatus, DeletionRequest, ProcessDeletionsResult } from "./deletion";
 
 // Data export types
-export type { ExportFormat, ExportDataState } from "./export";
+export type { ExportFormat, ExportDataState, ExportedActivityLog } from "./export";
 
 // Alternative approach with grouped exports
 // export type {

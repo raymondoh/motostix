@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { deleteProduct as deleteProductFromDb } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logger } from "@/utils/logger";
-import type { DeleteProductResult } from "@/types/product/result";
+//import type { DeleteProductResult } from "@/types/product/result";
+import type { Product } from "@/types";
 
-export async function deleteProduct(productId: string): Promise<DeleteProductResult> {
+export async function deleteProduct(productId: string): Promise<Product.DeleteProductResult> {
   try {
     // ✅ Step 1: Call Firebase function
     const result = await deleteProductFromDb(productId);

@@ -5,13 +5,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Trash2, Loader2 } from "lucide-react";
-
 import { ProductsDataTable } from "./ProductsDataTable";
 import { getProductColumns } from "./products-columns";
-import { deleteProductClient as deleteProduct } from "@/actions/client/delete-product-client";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { Product } from "@/types/product";
 import { Category } from "@/types/category";
+import { deleteProductClient as deleteProduct } from "@/actions/client/delete-product-client";
 import { fetchAllProductsClient } from "@/actions/client/fetch-all-products";
 
 import {

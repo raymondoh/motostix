@@ -7,11 +7,15 @@ import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logActivity } from "@/firebase/actions";
 import { logServerEvent, logger } from "@/utils/logger";
 import { convertTimestamps } from "@/firebase/utils/firestore";
-import type { ExportFormat, ExportDataState } from "@/types/data-privacy/export";
-import { ExportedActivityLog } from "@/types/data-privacy/export";
+//import type { ExportFormat, ExportDataState } from "@/types/data-privacy/export";
+//import { ExportedActivityLog } from "@/types/data-privacy/export";
+import type { DataPrivacy } from "@/types";
 import { objectToCSV } from "@/actions/utils/format-helpers";
 
-export async function exportUserData(prevState: ExportDataState | null, formData: FormData): Promise<ExportDataState> {
+export async function exportUserData(
+  prevState: DataPrivacy.ExportDataState | null,
+  formData: FormData
+): Promise<DataPrivacy.ExportDataState> {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -24,7 +28,7 @@ export async function exportUserData(prevState: ExportDataState | null, formData
   }
 
   try {
-    const format = formData.get("format") as ExportFormat;
+    const format = formData.get("format") as DataPrivacy.ExportFormat;
     const result = exportDataSchema.safeParse({ format });
 
     if (!result.success) {
@@ -47,7 +51,7 @@ export async function exportUserData(prevState: ExportDataState | null, formData
       return { success: false, error: "User data not found" };
     }
 
-    let activityLogs: ExportedActivityLog[] = [];
+    let activityLogs: DataPrivacy.ExportedActivityLog[] = [];
 
     try {
       const snapshot = await adminDb
@@ -58,7 +62,7 @@ export async function exportUserData(prevState: ExportDataState | null, formData
         .get();
 
       activityLogs = snapshot.docs.map(doc => ({
-        ...(convertTimestamps(doc.data()) as ExportedActivityLog),
+        ...(convertTimestamps(doc.data()) as DataPrivacy.ExportedActivityLog),
         id: doc.id
       }));
     } catch (indexError) {

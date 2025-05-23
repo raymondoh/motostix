@@ -6,7 +6,7 @@ import { adminAuth } from "@/firebase/admin/firebase-admin-init";
 import { logActivity } from "@/firebase/actions";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
-import type { SignInWithFirebaseInput, SignInWithFirebaseResponse } from "@/types/auth/firebase-auth";
+import type { Auth } from "@/types";
 
 // ================= Sign In With Firebase =================
 
@@ -15,7 +15,9 @@ import type { SignInWithFirebaseInput, SignInWithFirebaseResponse } from "@/type
  * Verifies the token, attempts NextAuth credentials login,
  * and logs both success and failure cases.
  */
-export async function signInWithFirebase({ idToken }: SignInWithFirebaseInput): Promise<SignInWithFirebaseResponse> {
+export async function signInWithFirebase({
+  idToken
+}: Auth.SignInWithFirebaseInput): Promise<Auth.SignInWithFirebaseResponse> {
   let uid = "unknown";
 
   try {

@@ -5,14 +5,13 @@
 import { formatDate } from "@/utils/date";
 import { formatPriceWithCode } from "@/lib/utils";
 import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
-
-import type { Order } from "@/types/order";
 import type { ColumnDef } from "@tanstack/react-table";
-import { updateOrderStatusAction } from "@/actions/orders/update-order-status";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { updateOrderStatusAction } from "@/actions/orders/update-order-status";
+import type { Order } from "@/types/order";
 
 export function getAdminOrderColumns(): ColumnDef<Order>[] {
   return [

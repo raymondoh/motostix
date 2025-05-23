@@ -8,15 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, RefreshCw } from "lucide-react";
 import { formatDate } from "@/utils/date";
-
-import type { ActivityLogClientProps } from "@/types/dashboard/activity";
 import { getDisplayName } from "@/utils/getDisplayName";
-import { UserAvatar } from "@/components/shared/UserAvatar"; // if not already imported
+import { UserAvatar } from "@/components/shared/UserAvatar";
+import type { Dashboard } from "@/types";
+
 export function AdminActivityLogClient({
   activities,
   showFilters = true,
   isRefreshing = false
-}: ActivityLogClientProps) {
+}: Dashboard.ActivityLogClientProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string | null>(null);
 

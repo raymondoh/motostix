@@ -8,7 +8,8 @@ import { accountDeletionSchema } from "@/schemas/data-privacy";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logActivity } from "@/firebase/actions";
 import { logServerEvent, logger } from "@/utils/logger";
-import type { DeleteAccountState } from "@/types/data-privacy/deletion";
+//import type { DeleteAccountState } from "@/types/data-privacy/deletion";
+import type { DataPrivacy } from "@/types";
 import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 /**
@@ -99,9 +100,9 @@ export async function processAccountDeletion(userId: string): Promise<boolean> {
  * Create a pending deletion request (or delete immediately)
  */
 export async function requestAccountDeletion(
-  prevState: DeleteAccountState | null,
+  prevState: DataPrivacy.DeleteAccountState | null,
   formData: FormData
-): Promise<DeleteAccountState> {
+): Promise<DataPrivacy.DeleteAccountState> {
   const session = await auth();
 
   if (!session?.user?.id) {

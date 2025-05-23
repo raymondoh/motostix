@@ -7,7 +7,7 @@ import Stripe from "stripe";
 import { paymentIntentSchema } from "@/schemas/ecommerce/stripe";
 import { logger, logServerEvent } from "@/utils/logger";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import type { ActionResponse } from "@/types";
+import type { Common } from "@/types";
 import { DEFAULT_CURRENCY } from "@/config/checkout";
 
 // ================= Stripe Init =================
@@ -18,7 +18,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 // ================= Create Payment Intent =================
 export async function createPaymentIntent(
   data: z.infer<typeof paymentIntentSchema>
-): Promise<{ clientSecret: string } | ActionResponse> {
+): Promise<{ clientSecret: string } | Common.ActionResponse> {
   try {
     const validated = paymentIntentSchema.parse(data);
 

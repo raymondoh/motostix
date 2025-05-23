@@ -4,15 +4,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AdminActivityLogClient } from "./AdminActivityLogClient";
-import type { SerializedActivity } from "@/types/firebase/activity";
-import { clientFetchActivityLogs } from "@/actions/client/fetch-activity"; // instead of server-only import
+import type { Firebase } from "@/types";
+import { clientFetchActivityLogs } from "@/actions/client/fetch-activity";
 
 interface AdminActivityPageClientProps {
-  initialLogs: SerializedActivity[];
+  initialLogs: Firebase.SerializedActivity[];
 }
 
 export function AdminActivityPageClient({ initialLogs }: AdminActivityPageClientProps) {
-  const [activities, setActivities] = useState<SerializedActivity[]>(initialLogs);
+  const [activities, setActivities] = useState<Firebase.SerializedActivity[]>(initialLogs);
   //const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 

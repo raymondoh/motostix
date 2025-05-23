@@ -6,7 +6,7 @@ import { deleteUserImage } from "@/firebase/admin/auth";
 import { logActivity } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
-import type { ActionResponse } from "@/types";
+import type { Common } from "@/types";
 
 // ================= Types =================
 
@@ -21,7 +21,7 @@ export interface DeleteUserAsAdminInput {
  * Deletes a user from Firestore, Firebase Auth, and optionally Storage.
  * Logs the deletion for auditing purposes.
  */
-export async function deleteUserAsAdmin({ userId, adminId }: DeleteUserAsAdminInput): Promise<ActionResponse> {
+export async function deleteUserAsAdmin({ userId, adminId }: DeleteUserAsAdminInput): Promise<Common.ActionResponse> {
   if (!userId || typeof userId !== "string") {
     logger({ type: "warn", message: "Invalid userId passed to deleteUserAsAdmin", context: "users" });
     return { success: false, error: "Invalid user ID passed to deleteUserAsAdmin" };

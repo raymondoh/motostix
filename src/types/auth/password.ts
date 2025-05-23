@@ -13,6 +13,7 @@ export interface ForgotPasswordState {
 export interface ResetPasswordState {
   success: boolean;
   message?: string;
+  //email: string;
   error?: string;
 }
 

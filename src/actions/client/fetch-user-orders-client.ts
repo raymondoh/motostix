@@ -1,21 +1,42 @@
-// ✅ src/actions/client/fetch-user-orders-client.ts
-
-"use client";
-
-import { fetchUserOrders } from "@/actions/orders/fetch-user-orders";
-import type { Order } from "@/types/order";
+import type { Order } from "@/types";
 
 /**
  * Client-side action: Fetches the user's orders safely.
  */
-export async function fetchUserOrdersClient(): Promise<Order[]> {
+export async function fetchUserOrdersClient(): Promise<Order.Order[]> {
   try {
-    const orders = await fetchUserOrders();
+    // Add error handling for the fetch request
+    const res = await fetch("/api/orders");
 
-    // Because orders from fetchUserOrders() are like OrderData[], we manually map to Order[]
-    const mappedOrders: Order[] = orders.map((order: any) => ({
-      id: order.id ?? "", // fallback empty string if missing
-      userId: order.userId ?? "", // fallback empty string if missing
+    // Check if the response is OK
+    if (!res.ok) {
+      // Try to parse error as JSON, but handle case where it's not JSON
+      const errorText = await res.text();
+      let errorMessage = "Failed to fetch orders";
+
+      try {
+        // Try to parse as JSON
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // If it's not JSON, log the raw text for debugging
+        console.error("Non-JSON error response:", errorText);
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    // Parse the JSON response
+    const data = await res.json();
+
+    if (!data.success) {
+      throw new Error(data.error || "Failed to fetch orders");
+    }
+
+    // Map the orders to ensure type safety
+    const mappedOrders: Order.Order[] = (data.orders || []).map((order: any) => ({
+      id: order.id ?? "",
+      userId: order.userId ?? "",
       paymentIntentId: order.paymentIntentId,
       amount: order.amount,
       customerEmail: order.customerEmail,
@@ -36,6 +57,6 @@ export async function fetchUserOrdersClient(): Promise<Order[]> {
     return mappedOrders;
   } catch (error) {
     console.error("Error fetching user orders:", error);
-    throw new Error("Failed to fetch your orders.");
+    throw new Error(error instanceof Error ? error.message : "Failed to fetch your orders.");
   }
 }

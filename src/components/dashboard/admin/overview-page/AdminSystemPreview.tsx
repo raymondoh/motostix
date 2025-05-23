@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Activity, UserPlus, Calendar } from "lucide-react";
-import { SystemStats } from "@/types/dashboard/activity";
+//import { SystemStats } from "@/types/dashboard/activity";
+import { Dashboard } from "@/types";
 
 interface SystemOverviewClientProps {
-  systemStats: SystemStats;
+  systemStats: Dashboard.SystemStats;
 }
 
 interface StatCardProps {

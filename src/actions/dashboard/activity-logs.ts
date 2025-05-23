@@ -2,13 +2,14 @@ import { getUserActivityLogs, getAllActivityLogs } from "@/firebase/actions";
 import { auth } from "@/auth";
 import { serializeActivityLogs } from "@/utils/serializeActivity";
 import { logger } from "@/utils/logger";
-import type { FetchActivityLogsParams, FetchActivityLogsResponse } from "@/types/dashboard/activity";
+//import type { FetchActivityLogsParams, FetchActivityLogsResponse } from "@/types/dashboard/activity";
+import type { Dashboard } from "@/types";
 
 export async function fetchActivityLogs({
   limit = 10,
   startAfter,
   type
-}: FetchActivityLogsParams): Promise<FetchActivityLogsResponse> {
+}: Dashboard.FetchActivityLogsParams): Promise<Dashboard.FetchActivityLogsResponse> {
   const session = await auth();
 
   if (!session?.user?.id) {

@@ -2,9 +2,9 @@
 
 "use client";
 
-import type { SerializedUser } from "@/types/user";
+import type { User } from "@/types";
 
-export async function fetchAllUsersClient(): Promise<SerializedUser[]> {
+export async function fetchAllUsersClient(): Promise<User.SerializedUser[]> {
   try {
     const res = await fetch("/api/users");
     const json = await res.json();

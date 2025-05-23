@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { UpdatePasswordState } from "@/types";
+import type { Auth } from "@/types";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 
 // Import the server action directly.
@@ -27,7 +27,9 @@ export function ChangePasswordForm() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Call the server action directly using useActionState.
-  const [state, action, isPending] = useActionState<UpdatePasswordState, FormData>(updatePassword, { success: false });
+  const [state, action, isPending] = useActionState<Auth.UpdatePasswordState, FormData>(updatePassword, {
+    success: false
+  });
 
   useEffect(() => {
     if (state?.success) {

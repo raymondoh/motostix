@@ -6,8 +6,8 @@ import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
 import { loginSchema } from "@/schemas/auth";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
-import type { LoginResponse } from "@/types/auth/login";
-
+//import type { LoginResponse } from "@/types/auth/login";
+import type { Auth } from "@/types";
 // ================= Login User =================
 
 /**
@@ -18,7 +18,7 @@ import type { LoginResponse } from "@/types/auth/login";
  * 3. Verifies password against stored hash.
  * 4. Returns a custom token if successful.
  */
-export async function loginUser(_prevState: LoginResponse | null, formData: FormData): Promise<LoginResponse> {
+export async function loginUser(_prevState: Auth.LoginState | null, formData: FormData): Promise<Auth.LoginState> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const isRegistration = formData.get("isRegistration") === "true";

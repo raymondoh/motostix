@@ -209,158 +209,344 @@
 //     </div>
 //   );
 // }
+
+////////////////////////////////
+
 "use client";
 
-import { useState } from "react";
+import type React from "react";
+import { useState, useEffect, useRef, startTransition, useActionState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, ShieldCheck } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { SubmitButton } from "@/components/shared/SubmitButton";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/client/firebase-client-init";
+import {
+  signInWithCustomToken,
+  getMultiFactorResolver,
+  PhoneAuthProvider,
+  PhoneMultiFactorGenerator
+} from "firebase/auth";
+import { auth, getRecaptchaVerifier, resetRecaptchaVerifier } from "@/firebase/client/firebase-client-init";
+import { loginUser } from "@/actions/auth";
+import { signInWithNextAuth } from "@/firebase/client/next-auth";
+import type { LoginResponse } from "@/types/auth/login";
 import { GoogleAuthButton } from "@/components";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
+import { SubmitButton } from "../shared/SubmitButton";
 
-export function LoginForm() {
+// Create a valid initial state for LoginResponse
+// const initialLoginState: LoginResponse = {
+//   success: false,
+//   message: "",
+//   data: undefined
+// };
+
+type LoginState = LoginResponse | null;
+
+export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+  const { update } = useSession();
+
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  // 2FA related states
+  const [mfaInProgress, setMfaInProgress] = useState(false);
+  const [mfaResolver, setMfaResolver] = useState<any>(null);
+  const [verificationId, setVerificationId] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+  const [state, action, isPending] = useActionState<LoginState, FormData>(loginUser, null, formKey.toString());
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await userCredential.user.getIdToken();
+  const loginErrorToastShown = useRef(false);
+  const isRedirecting = useRef(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
-      const res = await signIn("credentials", {
-        idToken,
-        callbackUrl,
-        redirect: false
-      });
+  function resetForm() {
+    setEmail("");
+    setPassword("");
+    setMfaInProgress(false);
+    setVerificationCode("");
+    loginErrorToastShown.current = false;
+    isRedirecting.current = false;
+    emailInputRef.current?.focus();
+    resetRecaptchaVerifier(); // Reset the recaptcha verifier
+  }
 
-      if (res?.error) {
-        setError("Authentication failed. Please try again.");
-        toast.error("Login failed.");
-      } else {
-        toast.success("Welcome back!");
-        window.location.href = callbackUrl;
+  const handleInputChange =
+    (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setter(e.target.value);
+      // Reset error state when user types
+      if (state?.message && !state.success) {
+        setFormKey(prev => prev + 1);
+        loginErrorToastShown.current = false;
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Invalid email or password.");
-      toast.error("Login failed. Please check your credentials.");
-    } finally {
-      setIsLoading(false);
+    };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // If we're in MFA verification mode, handle that instead
+    if (mfaInProgress) {
+      handleMfaVerification();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("isRegistration", "false");
+    startTransition(() => {
+      action(formData);
+    });
+  };
+
+  // Handle MFA verification
+  const handleMfaVerification = async () => {
+    if (!verificationCode) {
+      toast.error("Please enter the verification code");
+      return;
+    }
+
+    try {
+      const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
+      const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
+
+      // Complete sign-in with MFA
+      const userCredential = await mfaResolver.resolveSignIn(multiFactorAssertion);
+
+      // Get the token and continue with NextAuth
+      const idToken = await userCredential.user.getIdToken();
+      const signInResult = await signInWithNextAuth({ idToken });
+
+      if (!signInResult.success) throw new Error("NextAuth sign-in failed");
+
+      await update();
+      toast.success("Login successful!");
+      router.push("/");
+    } catch (error) {
+      console.error("[MFA] Error during verification:", error);
+      toast.error(isFirebaseError(error) ? firebaseError(error) : "Failed to verify code");
+      setVerificationCode("");
+      resetRecaptchaVerifier(); // Reset on error
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      await signIn("google", { callbackUrl });
-    } catch (error) {
-      console.error("Google login error:", error);
-      toast.error("Google sign-in failed.");
+  useEffect(() => {
+    if (!state || loginErrorToastShown.current) return;
+
+    if (state.success) {
+      toast.success(state.message || "Login successful!");
+      loginErrorToastShown.current = true;
+      isRedirecting.current = true;
+
+      const handleRedirect = async () => {
+        try {
+          if (!navigator.onLine) throw new Error("You are offline");
+          if (!auth || !state.data?.customToken) throw new Error("Missing auth or customToken");
+
+          try {
+            const userCredential = await signInWithCustomToken(auth, state.data.customToken);
+            const idToken = await userCredential.user.getIdToken();
+            const signInResult = await signInWithNextAuth({ idToken });
+
+            if (!signInResult.success) throw new Error("NextAuth sign-in failed");
+
+            await update();
+            router.push("/");
+          } catch (error) {
+            // Check if this is a MFA required error
+            if (isFirebaseError(error) && error.code === "auth/multi-factor-auth-required") {
+              // Handle MFA challenge
+              const resolver = getMultiFactorResolver(auth, error as import("firebase/auth").MultiFactorError);
+              setMfaResolver(resolver);
+              setMfaInProgress(true);
+
+              // Get the recaptchaVerifier instance
+              const recaptchaVerifier = getRecaptchaVerifier();
+              // Make sure we have a valid recaptchaVerifier before proceeding
+              if (!recaptchaVerifier) {
+                throw new Error("RecaptchaVerifier not initialized");
+              }
+
+              // Send verification code to the user's phone
+              const phoneInfoOptions = {
+                multiFactorHint: resolver.hints[0],
+                session: resolver.session
+              };
+
+              const phoneAuthProvider = new PhoneAuthProvider(auth);
+              const verificationId = await phoneAuthProvider.verifyPhoneNumber(phoneInfoOptions, recaptchaVerifier);
+
+              setVerificationId(verificationId);
+              isRedirecting.current = false;
+              loginErrorToastShown.current = false;
+              toast.info("Please enter the verification code sent to your phone");
+            } else {
+              throw error; // Re-throw for the catch block below
+            }
+          }
+        } catch (error) {
+          console.error("[LOGIN] Error during redirect:", error);
+          toast.error(isFirebaseError(error) ? firebaseError(error) : "An error occurred during login");
+          loginErrorToastShown.current = false;
+          isRedirecting.current = false;
+          resetRecaptchaVerifier(); // Reset on error
+        }
+      };
+
+      handleRedirect();
+    } else if (state.message && !state.success && !loginErrorToastShown.current) {
+      // Handle initial login action failure (e.g., wrong password before custom token generation)
+      loginErrorToastShown.current = true;
+      toast.error(state.message || "Login failed.");
     }
-  };
+  }, [state, router, update, auth]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-6 w-6" />
-          <AlertDescription className="text-base">{error}</AlertDescription>
-        </Alert>
-      )}
+    <div className={`w-full ${className}`} {...props}>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {state?.message && !state.success && !mfaInProgress && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-6 w-6" />
+            <AlertDescription className="text-base">{state.message}</AlertDescription>
+          </Alert>
+        )}
 
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-base font-semibold uppercase tracking-wide">
-          Email
-        </Label>
-        <Input
-          id="email"
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-          placeholder="Enter your email"
-          className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary focus:border-primary"
-        />
-      </div>
+        {mfaInProgress ? (
+          // 2FA Verification UI
+          <div className="space-y-6">
+            <Alert className="bg-amber-50 border-amber-200 text-amber-800">
+              <ShieldCheck className="h-5 w-5" />
+              <AlertDescription className="text-base">
+                Two-factor authentication is enabled for your account. Please enter the verification code sent to your
+                phone.
+              </AlertDescription>
+            </Alert>
 
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password" className="text-base font-semibold uppercase tracking-wide">
-            Password
-          </Label>
-          <Link href="/forgot-password" className="text-sm text-primary font-medium hover:underline">
-            Forgot password?
-          </Link>
-        </div>
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            placeholder="Enter your password"
-            className="h-14 text-lg px-4 pr-12 border-input focus:ring-2 focus:ring-primary focus:border-primary"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(prev => !prev)}
-            className="absolute inset-y-0 right-0 px-4 flex items-center justify-center text-muted-foreground"
-            aria-label={showPassword ? "Hide password" : "Show password"}>
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="verificationCode" className="text-base font-semibold uppercase tracking-wide">
+                Verification Code
+              </Label>
+              <Input
+                id="verificationCode"
+                type="text"
+                value={verificationCode}
+                onChange={e => setVerificationCode(e.target.value)}
+                placeholder="Enter 6-digit code"
+                className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary focus:border-primary"
+                autoComplete="one-time-code"
+              />
+            </div>
 
-      <SubmitButton isLoading={isLoading} loadingText="Signing in..." className="w-full h-14 text-lg font-bold">
-        Sign in
-      </SubmitButton>
+            <SubmitButton isLoading={isPending} loadingText="Verifying..." className="w-full h-14 text-lg font-bold">
+              Verify & Sign In
+            </SubmitButton>
 
-      <div className="my-10">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-muted" />
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-14 text-lg"
+              onClick={() => {
+                setMfaInProgress(false);
+                setVerificationCode("");
+                resetForm();
+              }}>
+              Cancel
+            </Button>
           </div>
-          <div className="relative flex justify-center">
-            <span className="bg-background px-4 text-sm text-muted-foreground">Or continue with</span>
-          </div>
+        ) : (
+          // Regular Login UI
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-base font-semibold uppercase tracking-wide">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                ref={emailInputRef}
+                value={email}
+                onChange={handleInputChange(setEmail)}
+                placeholder="Enter your email"
+                className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary focus:border-primary"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-base font-semibold uppercase tracking-wide">
+                  Password
+                </Label>
+                <Link href="/forgot-password" className="text-sm text-primary font-medium hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={handleInputChange(setPassword)}
+                  placeholder="Enter your password"
+                  className="h-14 text-lg px-4 pr-12 border-input focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute inset-y-0 right-0 px-4 flex items-center justify-center text-muted-foreground"
+                  aria-label={showPassword ? "Hide password" : "Show password"}>
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <SubmitButton
+              isLoading={isPending || isRedirecting.current}
+              loadingText={isRedirecting.current ? "Redirecting..." : "Signing in..."}
+              className="w-full h-14 text-lg font-bold">
+              Sign in
+            </SubmitButton>
+
+            <div className="my-10">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-muted" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-background px-4 text-sm text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+              <GoogleAuthButton
+                mode="signin"
+                className="mt-4 h-14 text-base font-medium bg-secondary hover:bg-secondary/80 text-white dark:text-white transition-colors"
+              />
+            </div>
+          </>
+        )}
+
+        <div id="recaptcha-container" className="mt-4"></div>
+
+        <div className="pt-6 text-center">
+          <p className="text-base text-muted-foreground">
+            Don't have an account?{" "}
+            <Link href="/register" className="font-semibold text-primary hover:underline">
+              Sign up
+            </Link>
+          </p>
         </div>
-        <GoogleAuthButton
-          mode="signup"
-          className="mt-4 h-14 text-base font-medium bg-secondary hover:bg-secondary/80 text-white dark:text-white transition-colors"
-        />
-      </div>
-
-      {/* <GoogleAuthButton
-        mode="signin"
-        className="w-full h-14 text-base font-medium bg-secondary hover:text-white hover:bg-secondary/80 transition-colors"
-      /> */}
-
-      <div className="pt-6 text-center">
-        <p className="text-base text-muted-foreground">
-          Don’t have an account?{" "}
-          <Link href="/register" className="font-semibold text-primary hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

@@ -3,10 +3,11 @@
 
 import { cache } from "react";
 import { categories as categoryNames, subcategories } from "@/config/categories";
-import type { Category } from "@/types/category";
+//import type { Category } from "@/types/category";
+import type { Category } from "@/types";
 
 // Convert string categories to Category objects
-const categories: Category[] = categoryNames.map(name => ({
+const categories: Category.Category[] = categoryNames.map(name => ({
   id: name.toLowerCase().replace(/\s+/g, "-"), // Convert name to lowercase and replace spaces with hyphens for ID
   name,
   image: `/placeholder.svg?height=200&width=200&query=${name}`, // Placeholder image

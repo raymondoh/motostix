@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail, ArrowRight, LoaderCircle, XCircle } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/client/firebase-client-init";
 import { applyActionCode } from "firebase/auth";

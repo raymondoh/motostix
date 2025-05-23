@@ -6,10 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SubmitButton } from "@/components/shared/SubmitButton";
 import { toast } from "sonner";
-import { createUser } from "@/actions/user/admin";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import type { UserRole } from "@/types/user";
 import { Button } from "@/components/ui/button";
+import { createUser } from "@/actions/user/admin";
 
 interface AddUserFormProps {
   onSuccess?: () => void;

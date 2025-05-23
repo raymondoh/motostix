@@ -7,19 +7,22 @@ import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
 import { hashPassword } from "@/utils/hashPassword";
 
-import type {
-  LogPasswordResetInput,
-  ResetPasswordResponse,
-  GetUserIdByEmailInput,
-  GetUserIdByEmailResponse,
-  UpdatePasswordHashInput
-} from "@/types/auth/password";
-import type { ActionResponse } from "@/types";
+// import type {
+//   LogPasswordResetInput,
+//   ResetPasswordResponse,
+//   GetUserIdByEmailInput,
+//   GetUserIdByEmailResponse,
+//   UpdatePasswordHashInput
+// } from "@/types/auth/password";
+import type { Auth } from "@/types";
+import type { Common } from "@/types";
 
 /**
  * Logs a password reset activity
  */
-export async function logPasswordResetActivity({ email }: LogPasswordResetInput): Promise<ResetPasswordResponse> {
+export async function logPasswordResetActivity({
+  email
+}: Auth.LogPasswordResetInput): Promise<Auth.ResetPasswordState> {
   if (!email) {
     logger({ type: "warn", message: "logPasswordResetActivity called with no email", context: "auth" });
     return { success: false, error: "Email is required" };
@@ -65,7 +68,7 @@ export async function logPasswordResetActivity({ email }: LogPasswordResetInput)
 /**
  * Gets a user ID by email
  */
-export async function getUserIdByEmail({ email }: GetUserIdByEmailInput): Promise<GetUserIdByEmailResponse> {
+export async function getUserIdByEmail({ email }: Auth.GetUserIdByEmailInput): Promise<Auth.GetUserIdByEmailResponse> {
   if (!email) {
     logger({ type: "warn", message: "getUserIdByEmail called with no email", context: "auth" });
     return { success: false, error: "Email is required" };
@@ -105,7 +108,10 @@ export async function getUserIdByEmail({ email }: GetUserIdByEmailInput): Promis
 /**
  * Updates password hash in Firestore
  */
-export async function updatePasswordHash({ userId, newPassword }: UpdatePasswordHashInput): Promise<ActionResponse> {
+export async function updatePasswordHash({
+  userId,
+  newPassword
+}: Auth.UpdatePasswordHashInput): Promise<Common.ActionResponse> {
   if (!userId || !newPassword) {
     logger({ type: "warn", message: "updatePasswordHash called with missing userId or password", context: "auth" });
     return { success: false, error: "User ID and new password are required" };

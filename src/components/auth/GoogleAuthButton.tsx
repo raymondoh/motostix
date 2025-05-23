@@ -1,12 +1,11 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { LoaderCircle } from "lucide-react";
-import { signIn } from "next-auth/react";
 import type { ButtonHTMLAttributes } from "react";
+import { signIn } from "next-auth/react";
+import { LoaderCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface GoogleAuthButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   mode?: "signin" | "signup";

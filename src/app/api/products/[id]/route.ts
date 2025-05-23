@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { updateProduct } from "@/actions/products/update-product";
-import { deleteProduct } from "@/actions/products/delete-product";
+import { updateProduct } from "@/actions";
+import { deleteProduct } from "@/actions";
 import { updateProductSchema } from "@/schemas/product";
 import { revalidatePath } from "next/cache";
 import { logActivity } from "@/firebase/actions";

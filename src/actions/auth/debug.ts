@@ -1,11 +1,11 @@
 "use server";
 
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
-import bcryptjs from "bcryptjs";
-import { auth } from "@/auth";
 import { UserRecord } from "firebase-admin/auth";
 import { DocumentSnapshot } from "firebase-admin/firestore";
+import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
+import bcryptjs from "bcryptjs";
+import { auth } from "@/auth";
 
 export async function debugPasswordVerification(email: string, password: string) {
   if (process.env.NODE_ENV === "production") {

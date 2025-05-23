@@ -10,9 +10,11 @@ import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
 import { hashPassword } from "@/utils/hashPassword";
 import { logPasswordResetActivity } from "./reset-password";
-import type { ForgotPasswordState, UpdatePasswordState } from "@/types/auth/password";
-import type { UserData } from "@/types/user";
-import type { ActionResponse } from "@/types";
+//import type { ForgotPasswordState, UpdatePasswordState } from "@/types/auth/password";
+import type { Auth } from "@/types";
+//import type { UserData } from "@/types/user";
+import type { User } from "@/types";
+import type { Common } from "@/types";
 
 /**
  * Helper to safely extract a string value from FormData
@@ -26,9 +28,9 @@ function getFormValue(formData: FormData, key: string): string | null {
  * REQUEST PASSWORD RESET
  */
 export async function requestPasswordReset(
-  prevState: ForgotPasswordState,
+  prevState: Auth.ForgotPasswordState,
   formData: FormData
-): Promise<ForgotPasswordState> {
+): Promise<Auth.ForgotPasswordState> {
   const email = getFormValue(formData, "email");
   if (!email) {
     logger({ type: "warn", message: "Password reset requested with no email", context: "auth" });
@@ -90,7 +92,7 @@ export async function requestPasswordReset(
 /**
  * SYNC PASSWORD WITH FIRESTORE (used after reset to update local hash)
  */
-export async function syncPasswordWithFirestore(email: string, password: string): Promise<ActionResponse> {
+export async function syncPasswordWithFirestore(email: string, password: string): Promise<Common.ActionResponse> {
   try {
     const userRecord = await adminAuth.getUserByEmail(email);
     const hashedPassword = await hashPassword(password);
@@ -128,7 +130,10 @@ export async function syncPasswordWithFirestore(email: string, password: string)
 /**
  * UPDATE PASSWORD FOR LOGGED-IN USER
  */
-export async function updatePassword(prevState: UpdatePasswordState, formData: FormData): Promise<UpdatePasswordState> {
+export async function updatePassword(
+  prevState: Auth.UpdatePasswordState,
+  formData: FormData
+): Promise<Auth.UpdatePasswordState> {
   const session = await auth();
   if (!session?.user?.id) {
     logger({ type: "warn", message: "Unauthorized password update attempt", context: "auth" });
@@ -152,7 +157,7 @@ export async function updatePassword(prevState: UpdatePasswordState, formData: F
 
   try {
     const userDoc = await adminDb.collection("users").doc(session.user.id).get();
-    const userData = userDoc.exists ? (userDoc.data() as UserData | undefined) : undefined;
+    const userData = userDoc.exists ? (userDoc.data() as User.UserData | undefined) : undefined;
 
     if (!userData?.passwordHash) {
       logger({ type: "warn", message: "User data missing or password not set during updatePassword", context: "auth" });

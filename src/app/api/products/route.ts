@@ -1,7 +1,8 @@
 // src/app/api/products/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getAllProducts, addProduct } from "@/firebase/actions";
-import type { ProductFilterOptions } from "@/types/product/filter";
+//import type { ProductFilterOptions } from "@/types/product/filter";
+import type { Product } from "@/types";
 import { auth } from "@/auth";
 import { logActivity } from "@/firebase/actions";
 
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
-    const filters: ProductFilterOptions = {
+    const filters: Product.ProductFilterOptions = {
       category: searchParams.get("category") || undefined,
       subcategory: searchParams.get("subcategory") || undefined, // ✅ Added
       material: searchParams.get("material") || undefined,

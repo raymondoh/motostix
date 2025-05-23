@@ -4,13 +4,16 @@ import type React from "react";
 
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { addProductClient as addProduct } from "@/actions/client/add-product-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/shared/SubmitButton";
 import { toast } from "sonner";
@@ -28,10 +31,7 @@ import {
   tags as validTags,
   sizes
 } from "@/config/categories";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { addProductClient as addProduct } from "@/actions/client/add-product-client";
 
 interface ProductFormProps {
   onSuccess?: () => void;
@@ -365,8 +365,10 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
     <div className="container max-w-4xl mx-auto py-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-semibold tracking-tight">Add a New Product</CardTitle>
-          <CardDescription>Fill out the form below to add a new product to your store.</CardDescription>
+          <CardTitle className="text-3xl font-bold">Add a New Product</CardTitle>
+          <CardDescription>
+            Fill out each section to add a new product. Required fields are marked with an asterisk (*).
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {formError && (
@@ -385,13 +387,21 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
               <TabsTrigger value="media">Media</TabsTrigger>
             </TabsList>
 
+            {/* Tab sections must be preserved. If previously omitted, re-insert them here */}
+
+            <TabsContent value="basic">{/* Insert full Basic Info fields here */}</TabsContent>
+            <TabsContent value="classification">{/* Insert Classification fields here */}</TabsContent>
+            <TabsContent value="specifications">{/* Insert Specifications fields here */}</TabsContent>
+            <TabsContent value="status">{/* Insert Status and Inventory fields here */}</TabsContent>
+            <TabsContent value="media">{/* Insert Media Upload fields here */}</TabsContent>
+
             <form onSubmit={handleSubmit} className="space-y-8">
               <TabsContent value="basic" className="space-y-6">
                 <h3 className="text-2xl font-semibold tracking-tight mb-6 border-b pb-2">Basic Information</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="productName" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="productName" className="text-base font-medium uppercase tracking-wide">
                       Product Name*
                     </Label>
                     <Input
@@ -402,13 +412,13 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                         setNameError(e.target.value.length < 2 ? "Product name must be at least 2 characters." : null);
                       }}
                       required
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                     {nameError && <p className="text-sm text-red-600">{nameError}</p>}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="price" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="price" className="text-base font-medium uppercase tracking-wide">
                       Price (£)*
                     </Label>
                     <Input
@@ -419,27 +429,27 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                       value={price}
                       onChange={e => setPrice(e.target.value)}
                       required
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   </div>
 
                   {/* SKU field removed - will be auto-generated */}
 
                   <div className="space-y-2">
-                    <Label htmlFor="barcode" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="barcode" className="text-base font-medium uppercase tracking-wide">
                       Barcode / UPC
                     </Label>
                     <Input
                       id="barcode"
                       value={barcode}
                       onChange={e => setBarcode(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-base font-semibold uppercase tracking-wide">
+                  <Label htmlFor="description" className="text-base font-medium uppercase tracking-wide">
                     Description*
                   </Label>
                   <Textarea
@@ -448,12 +458,12 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                     required
-                    className="min-h-[100px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+                    className="min-h-[100px] text-lg px-4 py-3 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="details" className="text-base font-semibold uppercase tracking-wide">
+                  <Label htmlFor="details" className="text-base font-medium uppercase tracking-wide">
                     Details (Optional)
                   </Label>
                   <Textarea
@@ -461,7 +471,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                     rows={3}
                     value={details}
                     onChange={e => setDetails(e.target.value)}
-                    className="min-h-[80px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+                    className="min-h-[80px] text-lg px-4 py-3 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     placeholder="Additional product details, features, or care instructions"
                   />
                 </div>
@@ -472,7 +482,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="category" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="category" className="text-base font-medium uppercase tracking-wide">
                       Category*
                     </Label>
                     <Select
@@ -481,7 +491,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                         setCategory(value);
                         setSubcategory("");
                       }}>
-                      <SelectTrigger id="category" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="category" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -495,11 +505,11 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subcategory" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="subcategory" className="text-base font-medium uppercase tracking-wide">
                       Subcategory
                     </Label>
                     <Select value={subcategory} onValueChange={setSubcategory} disabled={!category}>
-                      <SelectTrigger id="subcategory" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="subcategory" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select Subcategory" />
                       </SelectTrigger>
                       <SelectContent>
@@ -513,11 +523,11 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="productType" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="productType" className="text-base font-medium uppercase tracking-wide">
                       Product Type
                     </Label>
                     <Select value={productType} onValueChange={setProductType}>
-                      <SelectTrigger id="productType" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="productType" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select Product Type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -531,52 +541,52 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="designThemes" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="designThemes" className="text-base font-medium uppercase tracking-wide">
                       Design Themes
                     </Label>
                     <Textarea
                       id="designThemes"
                       value={designThemesStr}
                       onChange={e => setDesignThemesStr(e.target.value)}
-                      className="min-h-[80px] text-lg px-4 py-3 border-input focus:ring-2 focus:ring-primary"
+                      className="min-h-[80px] text-lg px-4 py-3 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="Enter design themes separated by commas (e.g., Vintage, Racing, Minimalist)"
                     />
                     <p className="text-xs text-muted-foreground">Available themes: {designThemes.join(", ")}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="badge" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="badge" className="text-base font-medium uppercase tracking-wide">
                       Badge
                     </Label>
                     <Input
                       id="badge"
                       value={badge}
                       onChange={e => setBadge(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="e.g., New, Best Seller, Limited Edition"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="tags" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="tags" className="text-base font-medium uppercase tracking-wide">
                       Tags
                     </Label>
                     <Input
                       id="tags"
                       value={tags}
                       onChange={e => setTags(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="Enter tags separated by commas"
                     />
                     <p className="text-xs text-muted-foreground">Available tags: {validTags.join(", ")}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="brand" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="brand" className="text-base font-medium uppercase tracking-wide">
                       Brand
                     </Label>
                     <Select value={brand} onValueChange={value => setBrand(value.trim())}>
-                      <SelectTrigger id="brand" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="brand" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select a brand" />
                       </SelectTrigger>
                       <SelectContent>
@@ -590,14 +600,14 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="manufacturer" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="manufacturer" className="text-base font-medium uppercase tracking-wide">
                       Manufacturer
                     </Label>
                     <Input
                       id="manufacturer"
                       value={manufacturer}
                       onChange={e => setManufacturer(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   </div>
                 </div>
@@ -608,11 +618,11 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="material" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="material" className="text-base font-medium uppercase tracking-wide">
                       Material
                     </Label>
                     <Select value={material} onValueChange={setMaterial}>
-                      <SelectTrigger id="material" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="material" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select a material" />
                       </SelectTrigger>
                       <SelectContent>
@@ -626,24 +636,24 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="dimensions" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="dimensions" className="text-base font-medium uppercase tracking-wide">
                       Dimensions
                     </Label>
                     <Input
                       id="dimensions"
                       value={dimensions}
                       onChange={e => setDimensions(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="e.g., 10cm x 15cm"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="baseColor" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="baseColor" className="text-base font-medium uppercase tracking-wide">
                       Base Color
                     </Label>
                     <Select value={baseColor} onValueChange={handleBaseColorChange}>
-                      <SelectTrigger id="baseColor" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="baseColor" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select a base color" />
                       </SelectTrigger>
                       <SelectContent>
@@ -657,7 +667,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="colorDisplayName" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="colorDisplayName" className="text-base font-medium uppercase tracking-wide">
                       Color Display Name
                     </Label>
                     <Input
@@ -665,18 +675,18 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                       value={colorDisplayName}
                       onChange={e => setColorDisplayName(e.target.value)}
                       placeholder="e.g., Electric Blue, Cameo Green"
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                     <p className="text-xs text-muted-foreground">Descriptive color name shown to customers</p>
                   </div>
 
                   {/* For stickers specifically */}
                   <div className="space-y-2">
-                    <Label htmlFor="stickySide" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="stickySide" className="text-base font-medium uppercase tracking-wide">
                       Sticky Side
                     </Label>
                     <Select value={stickySide} onValueChange={value => setStickySide(value as "Front" | "Back" | "")}>
-                      <SelectTrigger id="stickySide" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="stickySide" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select sticky side" />
                       </SelectTrigger>
                       <SelectContent>
@@ -688,11 +698,11 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="size" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="size" className="text-base font-medium uppercase tracking-wide">
                       Size
                     </Label>
                     <Select value={size} onValueChange={setSize}>
-                      <SelectTrigger id="size" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="size" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select size" />
                       </SelectTrigger>
                       <SelectContent>
@@ -706,11 +716,11 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="weight" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="weight" className="text-base font-medium uppercase tracking-wide">
                       Weight
                     </Label>
                     <Select value={weight} onValueChange={setWeight}>
-                      <SelectTrigger id="weight" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger id="weight" className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select weight" />
                       </SelectTrigger>
                       <SelectContent>
@@ -725,14 +735,14 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="shippingWeight" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="shippingWeight" className="text-base font-medium uppercase tracking-wide">
                       Shipping Weight
                     </Label>
                     <Input
                       id="shippingWeight"
                       value={shippingWeight}
                       onChange={e => setShippingWeight(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="e.g., 0.5kg"
                     />
                   </div>
@@ -744,35 +754,45 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="inStock" className="text-base font-semibold">
+                    <Label htmlFor="inStock" className="text-base font-medium">
+                      {" "}
+                      {/* Note: Original was font-semibold, now font-medium to be consistent with other labels if desired, or keep semibold if distinct */}
                       In Stock
                     </Label>
                     <Switch id="inStock" checked={inStock} onCheckedChange={setInStock} />
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="isFeatured" className="text-base font-semibold">
+                    <Label htmlFor="isFeatured" className="text-base font-medium">
+                      {" "}
+                      {/* As above */}
                       Featured Product
                     </Label>
                     <Switch id="isFeatured" checked={isFeatured} onCheckedChange={setIsFeatured} />
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="isHero" className="text-base font-semibold">
+                    <Label htmlFor="isHero" className="text-base font-medium">
+                      {" "}
+                      {/* As above */}
                       Hero Carousel
                     </Label>
                     <Switch id="isHero" checked={isHero} onCheckedChange={setIsHero} />
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="isNewArrival" className="text-base font-semibold">
+                    <Label htmlFor="isNewArrival" className="text-base font-medium">
+                      {" "}
+                      {/* As above */}
                       New Arrival
                     </Label>
                     <Switch id="isNewArrival" checked={isNewArrival} onCheckedChange={setIsNewArrival} />
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="onSale" className="text-base font-semibold">
+                    <Label htmlFor="onSale" className="text-base font-medium">
+                      {" "}
+                      {/* As above */}
                       On Sale
                     </Label>
                     <Switch id="onSale" checked={onSale} onCheckedChange={setOnSale} />
@@ -780,7 +800,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
                   {onSale && (
                     <div className="space-y-2">
-                      <Label htmlFor="salePrice" className="text-base font-semibold uppercase tracking-wide">
+                      <Label htmlFor="salePrice" className="text-base font-medium uppercase tracking-wide">
                         Sale Price (£)
                       </Label>
                       <Input
@@ -791,7 +811,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                         value={salePrice}
                         onChange={e => setSalePrice(e.target.value)}
                         required={onSale}
-                        className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                        className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                     </div>
                   )}
@@ -801,7 +821,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="stockQuantity" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="stockQuantity" className="text-base font-medium uppercase tracking-wide">
                       Stock Quantity
                     </Label>
                     <Input
@@ -810,12 +830,12 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                       min="0"
                       value={stockQuantity}
                       onChange={e => setStockQuantity(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="lowStockThreshold" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="lowStockThreshold" className="text-base font-medium uppercase tracking-wide">
                       Low Stock Threshold
                     </Label>
                     <Input
@@ -824,16 +844,18 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                       min="0"
                       value={lowStockThreshold}
                       onChange={e => setLowStockThreshold(e.target.value)}
-                      className="h-14 text-lg px-4 border-input focus:ring-2 focus:ring-primary"
+                      className="h-14 text-lg px-4 border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="shippingClass" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="shippingClass" className="text-base font-medium uppercase tracking-wide">
                       Shipping Class
                     </Label>
                     <Select value={shippingClass} onValueChange={value => setShippingClass(value)}>
-                      <SelectTrigger id="shippingClass" className="h-14 text-lg px-4 border-input">
+                      <SelectTrigger
+                        id="shippingClass"
+                        className="h-14 text-lg px-4 border-input dark:border-opacity-50">
                         <SelectValue placeholder="Select shipping class" />
                       </SelectTrigger>
                       <SelectContent>
@@ -853,7 +875,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="image" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="image" className="text-base font-medium uppercase tracking-wide">
                       Main Product Image*
                     </Label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -865,7 +887,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                           onChange={handleImageChange}
                           ref={imageInputRef}
                           required
-                          className="border-input"
+                          className="border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                         />
                         <p className="text-xs text-muted-foreground mt-1">Max 2MB recommended.</p>
                       </div>
@@ -887,7 +909,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="additionalImages" className="text-base font-semibold uppercase tracking-wide">
+                    <Label htmlFor="additionalImages" className="text-base font-medium uppercase tracking-wide">
                       Additional Images
                     </Label>
                     <Input
@@ -897,7 +919,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                       onChange={handleAdditionalImagesChange}
                       ref={additionalImagesInputRef}
                       multiple
-                      className="border-input"
+                      className="border-input dark:border-opacity-50 focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                     <p className="text-xs text-muted-foreground mt-1">Select multiple files (max 5 images, 2MB each)</p>
 
@@ -954,7 +976,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
                 <SubmitButton
                   isLoading={isPending || isUploading}
                   loadingText={isUploading ? "Uploading..." : "Saving..."}
-                  className="min-w-[140px] h-14 text-md font-bold tracking-wide uppercase">
+                  className="min-w-[140px] h-12 px-6 text-md font-semibold uppercase">
                   Add Product
                 </SubmitButton>
               </CardFooter>

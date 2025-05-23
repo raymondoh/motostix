@@ -1,27 +1,3 @@
-// import { auth } from "@/auth";
-// import { redirect } from "next/navigation";
-
-// import { Separator } from "@/components/ui/separator";
-// import { DashboardShell, DashboardHeader } from "@/components";
-// import { DataExport } from "@/components/dashboard/user/data-privacy/DataExport";
-// import { AccountDeletion } from "@/components/dashboard/user/data-privacy/AccountDeletion";
-
-// export default async function DataPrivacyPage() {
-//   const session = await auth();
-//   if (!session?.user) redirect("/login");
-
-//   return (
-//     <DashboardShell>
-//       <DashboardHeader heading="Data & Privacy" text="Manage your personal data and privacy settings" />
-//       <Separator className="mb-8" />
-
-//       <div className="w-full grid gap-4 md:gap-8 md:grid-cols-2">
-//         <DataExport />
-//         <AccountDeletion />
-//       </div>
-//     </DashboardShell>
-//   );
-// }
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 

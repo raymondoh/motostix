@@ -6,8 +6,8 @@ import { serverTimestamp } from "@/utils/date-server";
 import { logActivity } from "@/firebase/actions";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
-import type { UpdateEmailVerificationInput, UpdateEmailVerificationResponse } from "@/types/auth/email-verification";
-
+//import type { UpdateEmailVerificationInput, UpdateEmailVerificationResponse } from "@/types/auth/email-verification";
+import type { Auth } from "@/types";
 // ================= Update Email Verification Status =================
 
 /**
@@ -17,7 +17,7 @@ import type { UpdateEmailVerificationInput, UpdateEmailVerificationResponse } fr
 export async function updateEmailVerificationStatus({
   userId,
   verified
-}: UpdateEmailVerificationInput): Promise<UpdateEmailVerificationResponse> {
+}: Auth.UpdateEmailVerificationInput): Promise<Auth.UpdateEmailVerificationResponse> {
   logger({
     type: "info",
     message: "Starting updateEmailVerificationStatus",
