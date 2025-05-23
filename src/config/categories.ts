@@ -185,3 +185,60 @@ export const featuredCategoryMappings: Record<
     designThemes: ["Vintage"]
   }
 };
+// src/config/categories.ts
+// Keep all your existing code, and add these new functions:
+
+// URL parameter to database value mappings
+export function normalizeCategory(categoryParam: string | undefined): Category | undefined {
+  if (!categoryParam) return undefined;
+
+  // Convert to lowercase for case-insensitive comparison
+  const lowercaseParam = categoryParam.toLowerCase();
+
+  // Find the matching category (case-insensitive)
+  const matchedCategory = categories.find(category => category.toLowerCase() === lowercaseParam);
+
+  // Special case for "EVs" which might come as "evs"
+  if (lowercaseParam === "evs") return "EVs";
+
+  return matchedCategory;
+}
+
+export function normalizeSubcategory(subcategoryParam: string | undefined, category?: Category): string | undefined {
+  if (!subcategoryParam) return undefined;
+  if (!category) return undefined;
+
+  // Convert kebab-case to lowercase for comparison
+  const normalizedParam = subcategoryParam.toLowerCase();
+
+  // Get the subcategories for this category
+  const categorySubcategories = subcategories[category] || [];
+
+  // Find the matching subcategory (case-insensitive)
+  const matchedSubcategory = categorySubcategories.find(
+    subcategory => subcategory.toLowerCase().replace(/\s+/g, "-") === normalizedParam
+  );
+
+  return matchedSubcategory;
+}
+
+// Database value to URL parameter mappings (for generating URLs)
+export function categoryToUrlParam(category: Category | undefined): string | undefined {
+  if (!category) return undefined;
+  return category.toLowerCase();
+}
+
+export function subcategoryToUrlParam(subcategory: string | undefined): string | undefined {
+  if (!subcategory) return undefined;
+  return subcategory.toLowerCase().replace(/\s+/g, "-");
+}
+
+// Helper function to get all subcategories for a category by its URL parameter
+export function getSubcategoriesByUrlParam(categoryParam: string | undefined): string[] {
+  if (!categoryParam) return [];
+
+  const category = normalizeCategory(categoryParam);
+  if (!category) return [];
+
+  return subcategories[category] || [];
+}

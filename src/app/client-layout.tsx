@@ -4,9 +4,9 @@
 import { Suspense } from "react";
 import { Header, FooterWrapper } from "@/components";
 import { Providers } from "@/providers/SessionProvider";
+import { CartSidebar } from "@/components/cart/cart-sidebar";
 import { CartProvider } from "@/contexts/CartContext";
 import { LikesProvider } from "@/contexts/LikesContext";
-import { CartSidebar } from "@/components/cart/cart-sidebar";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { SearchDataLoader } from "@/components/search/search-data-loader";
 import { SearchModal } from "@/components/search/search-modal";

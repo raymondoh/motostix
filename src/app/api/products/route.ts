@@ -10,19 +10,50 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
+    // Helper to get boolean from search params
+    const getBooleanParam = (param: string | null): boolean | undefined => {
+      if (param === null) return undefined;
+      return param === "true";
+    };
+
+    // Helper to get array from comma-separated search params
+    const getArrayParam = (param: string | null): string[] | undefined => {
+      if (param === null) return undefined;
+      return param
+        .split(",")
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    };
+
     const filters: Product.ProductFilterOptions = {
+      // Existing filters
       category: searchParams.get("category") || undefined,
-      subcategory: searchParams.get("subcategory") || undefined, // ✅ Added
+      subcategory: searchParams.get("subcategory") || undefined,
       material: searchParams.get("material") || undefined,
       priceRange: searchParams.get("priceRange") || undefined,
-      isFeatured:
-        searchParams.get("isFeatured") === "true"
-          ? true
-          : searchParams.get("isFeatured") === "false"
-          ? false
-          : undefined,
-      stickySide: searchParams.get("stickySide") || undefined
+      isFeatured: getBooleanParam(searchParams.get("isFeatured")),
+      stickySide: searchParams.get("stickySide") || undefined,
+
+      // Newly added filters from ProductFilterOptions
+      designThemes: getArrayParam(searchParams.get("designThemes")),
+      productType: searchParams.get("productType") || undefined,
+      finish: searchParams.get("finish") || undefined,
+      placements: getArrayParam(searchParams.get("placements")),
+      isCustomizable: getBooleanParam(searchParams.get("isCustomizable")),
+      brand: searchParams.get("brand") || undefined,
+      tags: getArrayParam(searchParams.get("tags")),
+      onSale: getBooleanParam(searchParams.get("onSale")),
+      isNewArrival: getBooleanParam(searchParams.get("isNewArrival")),
+      inStock: getBooleanParam(searchParams.get("inStock")),
+      baseColor: searchParams.get("baseColor") || undefined
     };
+
+    // Remove undefined keys to keep the filter object clean
+    Object.keys(filters).forEach(key => {
+      if (filters[key as keyof Product.ProductFilterOptions] === undefined) {
+        delete filters[key as keyof Product.ProductFilterOptions];
+      }
+    });
 
     const result = await getAllProducts(filters);
     return NextResponse.json(result);
@@ -31,6 +62,34 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to fetch products" }, { status: 500 });
   }
 }
+
+// POST handler remains the same
+// ... (your existing POST handler)
+// export async function GET(req: NextRequest) {
+//   try {
+//     const { searchParams } = new URL(req.url);
+
+//     const filters: Product.ProductFilterOptions = {
+//       category: searchParams.get("category") || undefined,
+//       subcategory: searchParams.get("subcategory") || undefined, // ✅ Added
+//       material: searchParams.get("material") || undefined,
+//       priceRange: searchParams.get("priceRange") || undefined,
+//       isFeatured:
+//         searchParams.get("isFeatured") === "true"
+//           ? true
+//           : searchParams.get("isFeatured") === "false"
+//           ? false
+//           : undefined,
+//       stickySide: searchParams.get("stickySide") || undefined
+//     };
+
+//     const result = await getAllProducts(filters);
+//     return NextResponse.json(result);
+//   } catch (error) {
+//     console.error("Error in /api/products:", error);
+//     return NextResponse.json({ success: false, error: "Failed to fetch products" }, { status: 500 });
+//   }
+// }
 
 export async function POST(request: NextRequest) {
   try {

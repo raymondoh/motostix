@@ -3,13 +3,21 @@
 export type ProductFilterOptions = {
   category?: string;
   subcategory?: string;
-  designThemes?: string[]; // NEW: Array of design themes
-  productType?: string; // NEW: Type of product
+  designThemes?: string[];
+  productType?: string;
   material?: string;
-  finish?: string; // NEW: Finish type
-  placements?: string[]; // NEW: Where the sticker can be placed
+  finish?: string;
+  placements?: string[];
   priceRange?: string; // e.g. "10-20"
   isFeatured?: boolean;
-  isCustomizable?: boolean; // NEW: Flag for customizable products
+  isCustomizable?: boolean;
   stickySide?: string;
+
+  // Added filters:
+  brand?: string;
+  tags?: string[];
+  onSale?: boolean;
+  isNewArrival?: boolean;
+  inStock?: boolean;
+  baseColor?: string; // To explicitly filter by the base color
 };
