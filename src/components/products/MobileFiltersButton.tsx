@@ -16,7 +16,10 @@ export function MobileFiltersButton() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full flex items-center justify-center relative">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full flex items-center justify-center rounded-lg relative min-h-[48px]">
           <SlidersHorizontal className="h-4 w-4 mr-2" />
           Filters
           <AnimatePresence>

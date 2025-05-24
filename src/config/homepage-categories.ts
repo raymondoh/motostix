@@ -28,7 +28,7 @@ export const homepageFeaturedCategories: CategoryData[] = [
     id: "bicycles",
     name: "Bicycles",
     count: 120,
-    image: "/images/categories/bicycles-featured.jpg",
+    image: "/images/categories/bike-featured.jpg",
     icon: "bike"
   }
 ];

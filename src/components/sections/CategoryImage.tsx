@@ -1,30 +1,56 @@
+// "use client";
+
+// import { useState } from "react";
+// import Image from "next/image";
+
+// interface CategoryImageProps {
+//   src: string;
+//   alt: string;
+//   fallbackSrc?: string;
+//   className?: string;
+// }
+
+// export function CategoryImage({
+//   src,
+//   alt,
+//   fallbackSrc = "/motorcycle-sticker-category.png",
+//   className
+// }: CategoryImageProps) {
+//   const [imgSrc, setImgSrc] = useState(src);
+
+//   return (
+//     <Image
+//       src={imgSrc || "/placeholder.svg"}
+//       alt={alt}
+//       fill
+//       className={className}
+//       onError={() => setImgSrc(fallbackSrc)}
+//     />
+//   );
+// }
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface CategoryImageProps {
   src: string;
   alt: string;
-  fallbackSrc?: string;
   className?: string;
+  priority?: boolean;
 }
 
-export function CategoryImage({
-  src,
-  alt,
-  fallbackSrc = "/motorcycle-sticker-category.png",
-  className
-}: CategoryImageProps) {
-  const [imgSrc, setImgSrc] = useState(src);
-
+export function CategoryImage({ src, alt, className, priority = false }: CategoryImageProps) {
   return (
     <Image
-      src={imgSrc || "/placeholder.svg"}
+      src={src || "/placeholder.svg"}
       alt={alt}
       fill
-      className={className}
-      onError={() => setImgSrc(fallbackSrc)}
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      className={cn("object-cover", className)}
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+      priority={priority}
     />
   );
 }

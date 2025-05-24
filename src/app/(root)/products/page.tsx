@@ -294,7 +294,7 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
           </div>
         </section>
 
-        <section className="py-16 w-full bg-secondary/5 border-y border-border/40">
+        <section className="py-10 w-full bg-secondary/5 border-y border-border/40">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
               <aside className="hidden lg:block h-fit">

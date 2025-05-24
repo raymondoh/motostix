@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CategoryImage } from "@/components/sections/CategoryImage";
+import { SectionHeader } from "@/components/sections/SectionHeader";
 import { stickerGridSections } from "@/config/homepage-categories";
 
 export default function StickerGridSectionsStatic() {
@@ -10,13 +11,13 @@ export default function StickerGridSectionsStatic() {
       <div className="container mx-auto px-4 space-y-24">
         {/* First Grid Section - Style Your Ride */}
         <div>
-          <div className="flex flex-col items-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Style Your Ride</h2>
-            <div className="w-12 h-0.5 bg-primary mb-6"></div>
-            <p className="text-muted-foreground text-center max-w-2xl">
-              Express your personality with our premium quality stickers designed for cars and bikes.
-            </p>
-          </div>
+          <SectionHeader
+            title="Style Your Ride"
+            description="Express your personality with our premium quality stickers designed for cars and bikes."
+            viewAllUrl="/products?category=cars,motorbikes"
+            viewAllText="Shop Vehicle Stickers"
+            centered={false}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Car with sticker image */}
@@ -66,13 +67,13 @@ export default function StickerGridSectionsStatic() {
 
         {/* Second Grid Section - Express Yourself */}
         <div>
-          <div className="flex flex-col items-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Express Yourself</h2>
-            <div className="w-12 h-0.5 bg-primary mb-6"></div>
-            <p className="text-muted-foreground text-center max-w-2xl">
-              Find the perfect design to showcase your unique style and personality.
-            </p>
-          </div>
+          <SectionHeader
+            title="Express Yourself"
+            description="Find the perfect design to showcase your unique style and personality."
+            viewAllUrl="/products?designThemes=Custom,Vintage,Graffiti"
+            viewAllText="Browse All Designs"
+            centered={false}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Sticker-like div */}
