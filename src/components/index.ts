@@ -3,7 +3,7 @@ export { FooterWrapper } from "./footer/FooterWrapper";
 export { Navbar } from "./header/Navbar";
 export { ModeToggle } from "./header/ModeToggle";
 //export { HeroCarousel } from "./hero-carousel";
-export { ProductCarousel } from "./sections/ProductCarousel";
+export { TrendingStickersCarousel } from "./sections/TrendingStickersCarousel";
 //export { FeaturedProductsCarousel } from "./sections/FeaturedProductsCarousel";
 
 export * from "./auth";

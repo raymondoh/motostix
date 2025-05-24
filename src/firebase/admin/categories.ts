@@ -10,6 +10,7 @@ import {
   featuredCategoryMappings,
   type CategoryData as Category
 } from "@/config/categories";
+import { normalizeCategory } from "@/config/categories";
 
 // Define the return type for getCategories
 export interface GetCategoriesResult {
@@ -19,32 +20,78 @@ export interface GetCategoriesResult {
 }
 
 // ===================
-// GET ALL CATEGORIES WITH COUNTS
+// GET ALL CATEGORIES
 // ===================
 export async function getCategories(): Promise<GetCategoriesResult> {
   try {
-    // Get all products to calculate counts
-    const snapshot = await adminDb.collection("products").get();
-    const products = snapshot.docs.map(doc => doc.data());
+    // Create category objects using predefined categories from config
+    // This removes the expensive "fetch all products" operation
+    const categoryData: Category[] = categories.map(category => ({
+      id: category.toLowerCase().replace(/\s+/g, "-"),
+      name: category,
+      count: 0, // Placeholder - will implement efficient counting later
+      // Use predefined images or undefined for now
+      image: getCategoryImage(category) // Helper function for predefined images
+    }));
 
-    // Calculate counts for each category
+    console.log(`getCategories - Returning ${categoryData.length} categories without product scan`);
+
+    return { success: true, data: categoryData };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : (error as Error)?.message || "Unknown error fetching categories";
+    return { success: false, error: message };
+  }
+}
+// ===================
+// GET ALL CATEGORY IMAGE
+// ===================
+// Helper function to get predefined category images
+// You can customize these paths based on your actual image assets
+function getCategoryImage(category: string): string | undefined {
+  const categoryImages: Record<string, string> = {
+    Cars: "/images/categories/cars.jpg",
+    Motorbikes: "/images/categories/motorbikes.jpg",
+    EVs: "/images/categories/evs.jpg",
+    Trucks: "/images/categories/trucks.jpg",
+    Boats: "/images/categories/boats.jpg",
+    Planes: "/images/categories/planes.jpg"
+    // Add more categories as needed
+  };
+
+  return categoryImages[category];
+}
+// ===================
+// GET ALL CATEGORIES WITH COUNT
+// ===================
+// Alternative: If you want to keep some dynamic behavior but make it more efficient,
+// you could create a hybrid approach that only fetches category counts without full product data:
+
+export async function getCategoriesWithCounts(): Promise<GetCategoriesResult> {
+  try {
+    // This is more efficient than fetching all product data
+    // We only get the category field from each document
+    const snapshot = await adminDb.collection("products").select("category").get();
+
+    // Calculate counts efficiently
     const categoryCounts: Record<string, number> = {};
-
-    products.forEach(product => {
-      const category = product.category;
+    snapshot.docs.forEach(doc => {
+      const category = doc.data().category;
       if (category) {
         categoryCounts[category] = (categoryCounts[category] || 0) + 1;
       }
     });
 
-    // Create category objects with counts
+    // Create category objects with real counts but predefined images
     const categoryData: Category[] = categories.map(category => ({
       id: category.toLowerCase().replace(/\s+/g, "-"),
       name: category,
       count: categoryCounts[category] || 0,
-      // Find a product image to use for the category
-      image: products.find(p => p.category === category && p.image)?.image || undefined
+      image: getCategoryImage(category)
     }));
+
+    console.log(`getCategoriesWithCounts - Returning ${categoryData.length} categories with efficient counting`);
 
     return { success: true, data: categoryData };
   } catch (error) {
@@ -58,33 +105,46 @@ export async function getCategories(): Promise<GetCategoriesResult> {
 // ===================
 // GET SUBCATEGORIES FOR A CATEGORY
 // ===================
-export async function getSubcategories(category: string): Promise<{
+
+export async function getSubcategories(categoryParam: string): Promise<{
   success: boolean;
-  data?: string[];
+  data?: string[]; // Array of subcategory display names
   error?: string;
 }> {
   try {
-    // Check if the category exists in our predefined subcategories
-    if (category in subcategories) {
+    const normalizedParentCategoryName = normalizeCategory(categoryParam); // From src/config/categories.ts
+
+    if (!normalizedParentCategoryName) {
+      // If normalizeCategory returns undefined, the categoryParam was not a valid slug/name
+      return { success: true, data: [] }; // Or success: false, error: "Invalid parent category"
+    }
+
+    // Check if the normalized category exists in our predefined subcategories
+    // Note: subcategories keys are 'Cars', 'Motorbikes' etc.
+    const subcategoryList = subcategories[normalizedParentCategoryName as keyof typeof subcategories];
+
+    if (subcategoryList) {
       return {
         success: true,
-        data: subcategories[category as keyof typeof subcategories]
+        data: subcategoryList
       };
     }
 
-    // If category not found in predefined list, query the database
-    const snapshot = await adminDb.collection("products").where("category", "==", category).get();
+    // Optional: If category not found in predefined list, you might still query the database
+    // if products can have subcategories not strictly defined in your config (less likely)
+    // For now, assuming subcategories config is the source of truth if normalizedParentCategoryName is valid.
+    // If you still want to query products:
+    // const snapshot = await adminDb.collection("products").where("category", "==", normalizedParentCategoryName).get();
+    // const uniqueSubcategories = new Set<string>();
+    // snapshot.docs.forEach(doc => {
+    //   const subcategory = doc.data().subcategory;
+    //   if (subcategory) {
+    //     uniqueSubcategories.add(subcategory as string);
+    //   }
+    // });
+    // return { success: true, data: Array.from(uniqueSubcategories) };
 
-    const uniqueSubcategories = new Set<string>();
-
-    snapshot.docs.forEach(doc => {
-      const subcategory = doc.data().subcategory;
-      if (subcategory) {
-        uniqueSubcategories.add(subcategory);
-      }
-    });
-
-    return { success: true, data: Array.from(uniqueSubcategories) };
+    return { success: true, data: [] }; // No subcategories defined for this valid category
   } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)

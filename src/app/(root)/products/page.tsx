@@ -1,117 +1,52 @@
-// //src/app/(root)/products/page.tsx
-// import React from "react";
-// import { getAllProducts } from "@/actions/products/get-all-products";
-// import { extractCategoriesFromProducts } from "@/utils/product-utils";
+// // src/app/(root)/products/page.tsx
+
+// import { ProductsProvider } from "@/components/products/ProductsProvider";
 // import { ProductsHeader } from "@/components/products/ProductsHeader";
+// import { ProductsGrid } from "@/components/products/ProductsGrid";
+// import { ProductFilters } from "@/components/products/filters/ProductFilters";
 // import { CategoryCardsWrapper } from "@/components/products/category-carousel/CategoryCardsWrapper";
 // import { SubcategoryCardsWrapper } from "@/components/products/subcategory-carousel/SubcategoryCardsWrapper";
-// import { ProductsGrid } from "@/components/products/ProductsGrid";
-// import { ProductsProvider } from "@/components/products/ProductsProvider";
-// import { ProductFilters } from "@/components/products/filters/ProductFilters";
+// import { getAllProducts, getCategories } from "@/firebase/actions"; // Removed getSubcategories as it's not used here
+// import {
+//   CategoryData,
+//   categoriesToData as convertCategoryNamesToData,
+//   Category as CategoryNameType
+// } from "@/config/categories";
+// //PUT BACK AFTER TESTING
+// // export const dynamic = "force-dynamic";
 
-// import type { Metadata } from "next";
+// // Define the correct type for Next.js App Router searchParams
+// type SearchParams = Promise<{
+//   [key: string]: string | string[] | undefined;
+// }>;
 
-// export const metadata: Metadata = {
-//   title: "Products | MotoStix",
-//   description: "Browse our collection of premium motorcycle decals and stickers"
-// };
-
+// // Update the page props interface to match Next.js 15 conventions
 // interface ProductsPageProps {
-//   params: Promise<{}>;
-//   searchParams: Promise<{ category?: string; subcategory?: string }>;
+//   params: Promise<{ slug?: string }>;
+//   searchParams: SearchParams;
 // }
 
-// export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-//   // Await the searchParams object before accessing its properties
-//   const params = await searchParams;
+// const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
+//   // Await searchParams before accessing properties (Next.js 15 requirement)
+//   const resolvedSearchParams = await searchParams;
 
-//   // Now safely access the category and subcategory properties
-//   const selectedCategory = params?.category || null;
-//   const selectedSubcategory = params?.subcategory || null;
+//   // Extract and normalize category and subcategory from searchParams
+//   const currentCategory =
+//     typeof resolvedSearchParams?.category === "string" ? resolvedSearchParams.category.toLowerCase() : undefined;
 
-//   // Fetch products
-//   const productsResult = await getAllProducts();
-//   const products = productsResult.success ? productsResult.data : [];
+//   const currentSubcategory =
+//     typeof resolvedSearchParams?.subcategory === "string" ? resolvedSearchParams.subcategory.toLowerCase() : undefined;
 
-//   // Extract categories from products
-//   const categories = extractCategoriesFromProducts(products);
-
-//   // Filter products by category and subcategory
-//   const categoryFilteredProducts = products.filter(product => {
-//     // If no category is selected, show all products
-//     if (!selectedCategory || selectedCategory === "all") {
-//       return true;
-//     }
-
-//     // Check if product matches the selected category
-//     const categoryMatches = product.category?.toLowerCase().replace(/\s+/g, "-") === selectedCategory;
-
-//     // If no subcategory is selected, just check the category
-//     if (!selectedSubcategory) {
-//       return categoryMatches;
-//     }
-
-//     // Check if product matches both category and subcategory
-//     return categoryMatches && product.subcategory?.toLowerCase().replace(/\s+/g, "-") === selectedSubcategory;
-//   });
-
-//   return (
-//     <ProductsProvider products={categoryFilteredProducts}>
-//       <main className="min-h-screen">
-//         {/* Header section with standardized padding */}
-//         <section className="py-16 w-full bg-background">
-//           <div className="container mx-auto px-4">
-//             <ProductsHeader />
-//             <CategoryCardsWrapper categories={categories} selectedCategory={selectedCategory} />
-//             <SubcategoryCardsWrapper parentCategory={selectedCategory} />
-//           </div>
-//         </section>
-
-//         {/* Products section with standardized padding */}
-//         <section className="py-16 w-full bg-secondary/5 border-y border-border/40">
-//           <div className="container mx-auto px-4">
-//             <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-//               {/* Sticky sidebar for filters */}
-//               <aside className="hidden lg:block h-fit">
-//                 <div className="bg-background rounded-xl p-6 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto shadow-sm border border-border/40">
-//                   <ProductFilters />
-//                 </div>
-//               </aside>
-//               <div>
-//                 <ProductsGrid />
-//               </div>
-//             </div>
-//           </div>
-//         </section>
-//       </main>
-//     </ProductsProvider>
+//   console.log(
+//     "ProductsPage - Render. currentCategory from URL:",
+//     currentCategory,
+//     "currentSubcategory from URL:",
+//     currentSubcategory
 //   );
-// }
-// src/app/(root)/products/page.tsx
-// import { ProductsProvider } from "@/components/products/ProductsProvider";
-// import { ProductsHeader } from "@/components/products/ProductsHeader"; // Will be the new "dumb" version
-// import { ProductsGrid } from "@/components/products/ProductsGrid";
-// import { ProductFilters } from "@/components/products/filters/ProductFilters";
-// import { CategoryCardsWrapper } from "@/components/products/category-carousel/CategoryCardsWrapper";
-// import { SubcategoryCardsWrapper } from "@/components/products/subcategory-carousel/SubcategoryCardsWrapper";
-// import { getAllProducts, getCategories, getSubcategories } from "@/firebase/actions";
-// import type {Category as CategoryData } from "@/types/category";
-
-// export const dynamic = 'force-dynamic';
-
-// export default async function ProductsPage({
-//   searchParams,
-// }: {
-//   searchParams: { [key: string]: string | string[] | undefined };
-// }) {
-//   const currentCategory = typeof searchParams?.category === "string" ? searchParams.category : undefined;
-//   const currentSubcategory = typeof searchParams?.subcategory === "string" ? searchParams.subcategory : undefined;
-
-//   console.log("ProductsPage - Render. currentCategory from URL:", currentCategory, "currentSubcategory from URL:", currentSubcategory);
 
 //   const { data: initialProductsData, error: initialProductsError } = await getAllProducts({
 //     category: currentCategory,
-//     subcategory: currentSubcategory,
+//     subcategory: currentSubcategory
 //   });
 
 //   if (initialProductsError) {
@@ -120,62 +55,94 @@
 //   const initialProducts = initialProductsData || [];
 //   console.log("ProductsPage - initialProducts count after getAllProducts:", initialProducts.length);
 //   if (initialProducts.length === 0 && (currentCategory || currentSubcategory)) {
-//     console.warn("ProductsPage - WARNING: getAllProducts returned no items for the selected category/subcategory:", {category: currentCategory, subcategory: currentSubcategory });
+//     console.warn("ProductsPage - WARNING: getAllProducts returned no items for the selected category/subcategory:", {
+//       category: currentCategory,
+//       subcategory: currentSubcategory
+//     });
 //   }
 
 //   let categoriesToShow: CategoryData[] = [];
 //   try {
-//     const categoriesResult = await getCategories();
-//     if (categoriesResult?.success && Array.isArray(categoriesResult.data)) {
-//       categoriesToShow = categoriesResult.data;
-//     } else if (categoriesResult?.success && Array.isArray(categoriesResult.data?.categories)) {
-//         categoriesToShow = categoriesResult.data.categories;
-//     } else if (Array.isArray(categoriesResult)) {
-//         categoriesToShow = categoriesResult;
-//     } else {
-//       // console.warn("ProductsPage - Could not parse categories from getCategories. Check return structure. Received:", categoriesResult);
-//     }
-//   } catch (error) {
-//     console.error("ProductsPage - Error fetching categories:", error);
-//   }
-//   // console.log("ProductsPage - categoriesToShow for CategoryCardsWrapper:", categoriesToShow);
+//     const categoriesResult = await getCategories(); // raw result from getCategories
 
-//   let subcategoriesToShowForHeader: CategoryData[] = []; // For potentially passing to a header/breadcrumbs if needed later
-//   try {
-//     if (currentCategory) {
-//       const subcategoriesResult = await getSubcategories(currentCategory);
-//       if (subcategoriesResult?.success && Array.isArray(subcategoriesResult.data)) {
-//         subcategoriesToShowForHeader = subcategoriesResult.data;
-//       } else if (subcategoriesResult?.success && Array.isArray(subcategoriesResult.data?.subcategories)) {
-//           subcategoriesToShowForHeader = subcategoriesResult.data.subcategories;
-//       } else if (Array.isArray(subcategoriesResult)) {
-//           subcategoriesToShowForHeader = subcategoriesResult;
+//     if (categoriesResult && typeof categoriesResult === "object" && "success" in categoriesResult) {
+//       // Handles { success: true, data: ... } or { success: false, error: ... }
+//       if (categoriesResult.success === true) {
+//         // Type assertion for the success case
+//         const successResult = categoriesResult as { success: true; data: any };
+//         const data = successResult.data;
+
+//         if (Array.isArray(data)) {
+//           if (data.length > 0 && typeof data[0] === "string") {
+//             // data is string[] (e.g., ["Cars", "Motorbikes"])
+//             categoriesToShow = convertCategoryNamesToData(data as CategoryNameType[]);
+//           } else if (data.every(item => typeof item === "object" && item !== null && "id" in item && "name" in item)) {
+//             // data is likely CategoryData[] or compatible array of objects
+//             categoriesToShow = data as CategoryData[];
+//           } else if (data.length === 0) {
+//             categoriesToShow = []; // Data is an empty array
+//           } else {
+//             console.warn(
+//               "ProductsPage - getCategories successful, but 'data' array contains unexpected item types:",
+//               data
+//             );
+//           }
+//         } else if (data && typeof data === "object" && Array.isArray((data as { categories?: any }).categories)) {
+//           // data is { categories: CategoryData[] }
+//           // Ensure 'categories' property exists and is an array
+//           const categoryList = (data as { categories: CategoryData[] }).categories;
+//           if (categoryList.every(item => typeof item === "object" && item !== null && "id" in item && "name" in item)) {
+//             categoriesToShow = categoryList;
+//           } else {
+//             console.warn(
+//               "ProductsPage - getCategories successful, but 'data.categories' array contains unexpected item types:",
+//               categoryList
+//             );
+//           }
+//         } else {
+//           console.warn("ProductsPage - getCategories successful but 'data' format not recognized or empty:", data);
+//         }
 //       } else {
-//         // console.warn("ProductsPage - Could not parse subcategories from getSubcategories. Check return structure. Received:", subcategoriesResult);
+//         // success is false
+//         const errorResult = categoriesResult as { success: false; error: string };
+//         console.error("ProductsPage - Error from getCategories:", errorResult.error);
 //       }
+//     } else if (Array.isArray(categoriesResult)) {
+//       // Handles direct array return: CategoryData[] or string[]
+//       if (categoriesResult.length > 0 && typeof categoriesResult[0] === "string") {
+//         categoriesToShow = convertCategoryNamesToData(categoriesResult as CategoryNameType[]);
+//       } else if (
+//         categoriesResult.every(item => typeof item === "object" && item !== null && "id" in item && "name" in item)
+//       ) {
+//         categoriesToShow = categoriesResult as CategoryData[];
+//       } else if (categoriesResult.length === 0) {
+//         categoriesToShow = [];
+//       } else {
+//         console.warn("ProductsPage - getCategories returned an array with unexpected item types:", categoriesResult);
+//       }
+//     } else {
+//       console.warn(
+//         "ProductsPage - Could not parse categories from getCategories. Received unexpected format:",
+//         categoriesResult
+//       );
 //     }
 //   } catch (error) {
-//     console.error("ProductsPage - Error fetching subcategories:", error);
+//     console.error("ProductsPage - Exception fetching/processing categories:", error);
 //   }
+
+//   // Removed subcategoriesToShowForHeader declaration and fetching logic as it's unused
 
 //   return (
 //     <ProductsProvider
 //       initialProducts={initialProducts}
 //       currentCategory={currentCategory}
-//       currentSubcategory={currentSubcategory}
-//     >
+//       currentSubcategory={currentSubcategory}>
 //       <main className="min-h-screen">
 //         <section className="py-16 w-full bg-background">
 //           <div className="container mx-auto px-4">
-//             {/* ProductsHeader is now the simplified version without data props */}
 //             <ProductsHeader />
-//             <CategoryCardsWrapper
-//               categories={categoriesToShow} // This prop is used by CategoryCardsWrapper
-//               selectedCategory={currentCategory ?? null} // Pass currentCategory as selectedCategory
-//             />
-//             <SubcategoryCardsWrapper
-//               parentCategory={currentCategory ?? null} // This prop is used by SubcategoryCardsWrapper
-//             />
+//             <CategoryCardsWrapper categories={categoriesToShow} selectedCategory={currentCategory ?? null} />
+//             <SubcategoryCardsWrapper parentCategory={currentCategory ?? null} />
 //           </div>
 //         </section>
 
@@ -196,36 +163,60 @@
 //       </main>
 //     </ProductsProvider>
 //   );
-// }
-//////////////////////////////////////
-// src/app/(root)/products/page.tsx
+// };
+
+// export default ProductsPage;
 import { ProductsProvider } from "@/components/products/ProductsProvider";
 import { ProductsHeader } from "@/components/products/ProductsHeader";
 import { ProductsGrid } from "@/components/products/ProductsGrid";
 import { ProductFilters } from "@/components/products/filters/ProductFilters";
 import { CategoryCardsWrapper } from "@/components/products/category-carousel/CategoryCardsWrapper";
 import { SubcategoryCardsWrapper } from "@/components/products/subcategory-carousel/SubcategoryCardsWrapper";
-import { getAllProducts, getCategories, getSubcategories } from "@/firebase/actions";
-import type { CategoryData } from "@/config/categories";
-import type { Metadata } from "next";
+import { getAllProducts, getCategories } from "@/firebase/actions";
+import {
+  type CategoryData,
+  categoriesToData as convertCategoryNamesToData,
+  type Category as CategoryNameType
+} from "@/config/categories";
 
-export const metadata: Metadata = {
-  title: "Products | MotoStix",
-  description: "Browse our collection of premium motorcycle decals and stickers"
-};
+// Define the correct type for Next.js App Router searchParams
+type SearchParams = Promise<{
+  [key: string]: string | string[] | undefined;
+}>;
 
-export const dynamic = "force-dynamic";
+// Update the page props interface to match Next.js 15 conventions
+interface ProductsPageProps {
+  params: Promise<{ slug?: string }>;
+  searchParams: SearchParams;
+}
 
-export default async function ProductsPage({
-  searchParams
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  // Extract and normalize category and subcategory from URL
-  const currentCategory = typeof searchParams?.category === "string" ? searchParams.category.toLowerCase() : undefined;
+// Type guard to check if an item is a CategoryData object
+function isCategoryData(item: unknown): item is CategoryData {
+  return (
+    typeof item === "object" &&
+    item !== null &&
+    "id" in item &&
+    "name" in item &&
+    typeof (item as CategoryData).id === "string" &&
+    typeof (item as CategoryData).name === "string"
+  );
+}
+
+// Type guard to check if an item is a category name string
+function isCategoryName(item: unknown): item is CategoryNameType {
+  return typeof item === "string";
+}
+
+const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
+  // Await searchParams before accessing properties (Next.js 15 requirement)
+  const resolvedSearchParams = await searchParams;
+
+  // Extract and normalize category and subcategory from searchParams
+  const currentCategory =
+    typeof resolvedSearchParams?.category === "string" ? resolvedSearchParams.category.toLowerCase() : undefined;
 
   const currentSubcategory =
-    typeof searchParams?.subcategory === "string" ? searchParams.subcategory.toLowerCase() : undefined;
+    typeof resolvedSearchParams?.subcategory === "string" ? resolvedSearchParams.subcategory.toLowerCase() : undefined;
 
   console.log(
     "ProductsPage - Render. currentCategory from URL:",
@@ -234,12 +225,7 @@ export default async function ProductsPage({
     currentSubcategory
   );
 
-  // Fetch products with normalized category/subcategory parameters
-  console.log("ProductsPage - About to call getAllProducts with filters:", {
-    category: currentCategory,
-    subcategory: currentSubcategory
-  });
-
+  // Fetch initial products
   const { data: initialProductsData, error: initialProductsError } = await getAllProducts({
     category: currentCategory,
     subcategory: currentSubcategory
@@ -254,54 +240,45 @@ export default async function ProductsPage({
 
   if (initialProducts.length === 0 && (currentCategory || currentSubcategory)) {
     console.warn("ProductsPage - WARNING: getAllProducts returned no items for the selected category/subcategory:", {
-      categorySlug: currentCategory,
-      subcategorySlug: currentSubcategory
+      category: currentCategory,
+      subcategory: currentSubcategory
     });
   }
 
-  // Fetch categories for the category carousel
+  // Fetch and process categories with simplified logic
   let categoriesToShow: CategoryData[] = [];
+
   try {
     const categoriesResult = await getCategories();
-    if (categoriesResult?.success && Array.isArray(categoriesResult.data)) {
-      categoriesToShow = categoriesResult.data;
-    } else if (categoriesResult?.success && Array.isArray(categoriesResult.data?.categories)) {
-      categoriesToShow = categoriesResult.data.categories;
-    } else if (Array.isArray(categoriesResult)) {
-      categoriesToShow = categoriesResult;
-    } else {
-      console.warn(
-        "ProductsPage - Could not parse categories from getCategories. Check return structure. Received:",
-        categoriesResult
-      );
-    }
-  } catch (error) {
-    console.error("ProductsPage - Error fetching categories:", error);
-  }
-  console.log("ProductsPage - categoriesToShow for CategoryCardsWrapper:", categoriesToShow);
 
-  // Fetch subcategories for the selected category (if any)
-  let subcategoriesToShowForHeader: CategoryData[] = [];
-  try {
-    if (currentCategory) {
-      const subcategoriesResult = await getSubcategories(currentCategory);
-      if (subcategoriesResult?.success && Array.isArray(subcategoriesResult.data)) {
-        subcategoriesToShowForHeader = subcategoriesResult.data;
-      } else if (subcategoriesResult?.success && Array.isArray(subcategoriesResult.data?.subcategories)) {
-        subcategoriesToShowForHeader = subcategoriesResult.data.subcategories;
-      } else if (Array.isArray(subcategoriesResult)) {
-        subcategoriesToShowForHeader = subcategoriesResult;
+    if (categoriesResult?.success && categoriesResult.data) {
+      const data = categoriesResult.data;
+
+      if (Array.isArray(data)) {
+        if (data.length === 0) {
+          categoriesToShow = [];
+        } else if (data.every(isCategoryData)) {
+          // data is CategoryData[]
+          categoriesToShow = data;
+        } else if (data.every(isCategoryName)) {
+          // data is string[] (category names)
+          categoriesToShow = convertCategoryNamesToData(data);
+        } else {
+          console.warn("ProductsPage - getCategories returned mixed or unexpected array types:", data);
+          categoriesToShow = [];
+        }
       } else {
-        console.warn(
-          "ProductsPage - Could not parse subcategories from getSubcategories. Check return structure. Received:",
-          subcategoriesResult
-        );
+        console.warn("ProductsPage - getCategories data is not an array:", data);
+        categoriesToShow = [];
       }
+    } else {
+      console.error("ProductsPage - Error from getCategories:", categoriesResult?.error || "Unknown error");
+      categoriesToShow = [];
     }
   } catch (error) {
-    console.error("ProductsPage - Error fetching subcategories:", error);
+    console.error("ProductsPage - Exception fetching/processing categories:", error);
+    categoriesToShow = [];
   }
-  console.log("ProductsPage - subcategoriesToShowForHeader:", subcategoriesToShowForHeader);
 
   return (
     <ProductsProvider
@@ -313,10 +290,7 @@ export default async function ProductsPage({
           <div className="container mx-auto px-4">
             <ProductsHeader />
             <CategoryCardsWrapper categories={categoriesToShow} selectedCategory={currentCategory ?? null} />
-            <SubcategoryCardsWrapper
-              parentCategory={currentCategory ?? null}
-              subcategories={subcategoriesToShowForHeader}
-            />
+            <SubcategoryCardsWrapper parentCategory={currentCategory ?? null} />
           </div>
         </section>
 
@@ -337,4 +311,6 @@ export default async function ProductsPage({
       </main>
     </ProductsProvider>
   );
-}
+};
+
+export default ProductsPage;

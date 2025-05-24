@@ -67,7 +67,7 @@ export interface ProductCarouselProps {
   description?: string;
 }
 
-export function ProductCarousel({
+export function TrendingStickersCarousel({
   products = [],
   title = "Trending Stickers",
   showTitle = true,
@@ -226,7 +226,7 @@ export function ProductCarousel({
           <Link
             href={viewAllUrl}
             className="inline-block rounded-full bg-black text-white dark:bg-white dark:text-black px-10 py-4 text-lg font-medium hover:bg-black/90 dark:hover:bg-white/90 transition-colors">
-            View All Stickers
+            View Popular Stickers
           </Link>
         </div>
       </div>

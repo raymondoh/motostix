@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { getAllProducts } from "@/firebase/actions";
-import { getCategories } from "@/actions/categories/get-categories";
-import { ProductCarousel } from "@/components/sections/ProductCarousel";
 import { HeroBanner } from "@/components/hero/HeroBanner";
 import { siteConfig } from "@/config/siteConfig";
-import { FeaturedCategories } from "@/components/sections/FeaturedCategories";
+import { FeaturedCategoriesStatic } from "@/components/sections/FeaturedCategoriesStatic";
 import { TestimonialSection } from "@/components/sections/TestimonialSection";
 import { PromoSection } from "@/components/sections/PromoSection";
-import StickerGridSections from "@/components/sections/StickerGridSections";
+import StickerGridSectionsStatic from "@/components/sections/StickerGridSectionStatic";
+import { TrendingStickersCarousel } from "@/components/sections/TrendingStickersCarousel";
+import { getAllProducts } from "@/firebase/actions";
 
 export const metadata: Metadata = {
   title: `${siteConfig.name} - Main Value Proposition`,
@@ -19,31 +18,22 @@ export const metadata: Metadata = {
   }
 };
 
+// Helper function to get a small sample of products for carousels
+async function getFeaturedProducts(limit = 8) {
+  try {
+    // This could be optimized further by creating a specific "featured products" query
+    // For now, we'll get a small sample instead of ALL products
+    const result = await getAllProducts({ limit }); // You'd need to add limit support to getAllProducts
+    return result.success ? result.data?.slice(0, limit) || [] : [];
+  } catch (error) {
+    console.error("Error fetching featured products:", error);
+    return [];
+  }
+}
+
 export default async function HomePage() {
-  // Fetch all products
-  const result = await getAllProducts();
-  const allProducts = result.success ? result.data : [];
-
-  // Fetch categories
-  const categoriesResult = await getCategories();
-  const categories = categoriesResult.success ? categoriesResult.data : [];
-
-  // Get featured products (products marked as featured or new arrivals)
-  const featuredProducts = allProducts.filter(product => product.isFeatured || product.isNewArrival);
-
-  // Get trending products (could be based on sales, views, or just a selection)
-  // For now, we'll just use the most recent products as "trending"
-  const trendingProducts = [...allProducts]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 10);
-
-  // Find specific category products if needed
-  const bikeCategory = categories?.find(
-    cat => cat.name.toLowerCase().includes("bike") || cat.name.toLowerCase().includes("motorcycle")
-    // Removed the slug reference since it doesn't exist in CategoryData
-  );
-
-  const bikeProducts = bikeCategory ? allProducts.filter(product => product.category === bikeCategory.name) : [];
+  // Only fetch a small number of products for the carousel instead of ALL products
+  const featuredProducts = await getFeaturedProducts(8);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -51,40 +41,26 @@ export default async function HomePage() {
         {/* Hero Banner - Full width, outside of container */}
         <HeroBanner />
 
-        {/* Featured Categories - Light background */}
-        <FeaturedCategories />
+        {/* Featured Categories - Now static, no Firebase calls */}
+        <FeaturedCategoriesStatic />
 
-        {/* Trending Products - Subtle background */}
-        <ProductCarousel products={trendingProducts} title="Trending Stickers" showTitle viewAllUrl="/products" />
-
-        {/* Sticker Grid Sections - Light background */}
-        <StickerGridSections />
-
-        {/* Bike Products - If we have a bike category */}
-        {bikeProducts.length > 0 && (
-          <ProductCarousel
-            products={bikeProducts}
-            title={`${bikeCategory?.name || "Bike"} Collection`}
-            description="Premium stickers designed specifically for motorcycle enthusiasts."
-            viewAllUrl={bikeCategory ? `/products?category=${bikeCategory.id}` : "/products?type=bike"}
-            className="bg-background"
-          />
-        )}
-
-        {/* Featured Products - If we have any */}
+        {/* Trending Products - Small targeted query instead of filtering all products */}
         {featuredProducts.length > 0 && (
-          <ProductCarousel
+          <TrendingStickersCarousel
             products={featuredProducts}
-            title="Featured Products"
-            description="Our hand-picked selection of premium stickers and decals."
-            viewAllUrl="/products?featured=true"
+            title="Trending Stickers"
+            showTitle
+            viewAllUrl="/products"
           />
         )}
 
-        {/* Testimonials - Subtle background */}
+        {/* Sticker Grid Sections - Now static, no Firebase calls */}
+        <StickerGridSectionsStatic />
+
+        {/* Testimonials - Already static */}
         <TestimonialSection />
 
-        {/* Promo Section - Light background */}
+        {/* Promo Section - Already static */}
         <PromoSection />
       </main>
     </div>
