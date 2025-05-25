@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { CategoryImage } from "@/components/sections/CategoryImage";
-import { SectionHeader } from "@/components/sections/SectionHeader";
+import { CategoryImage } from "./CategoryImage";
+import { SectionHeader } from "./SectionHeader";
 import { homepageFeaturedCategories } from "@/config/homepage-categories";
 
 export function CategoriesStatic() {

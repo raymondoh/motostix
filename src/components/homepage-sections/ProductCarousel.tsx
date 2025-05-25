@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Product } from "@/types/product";
 import { formatPriceWithCode } from "@/lib/utils";
-import { SectionHeader } from "@/components/sections/SectionHeader";
+import { SectionHeader } from "./SectionHeader";
 
 interface ProductCarouselProps {
   products: Product[];

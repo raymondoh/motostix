@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { type UpdateProductInput, updateProductSchema } from "@/schemas/product"; // ✅ fix import path
+import { type UpdateProductInput, productUpdateSchema as updateProductSchema } from "@/schemas/product";
 import { updateProduct as updateProductInDb } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logger } from "@/utils/logger";

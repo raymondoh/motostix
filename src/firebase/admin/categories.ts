@@ -1,3 +1,4 @@
+//src/firebase/admin/categories.ts
 import { adminDb } from "@/firebase/admin/firebase-admin-init";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import {
