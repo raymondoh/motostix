@@ -1,7 +1,6 @@
 // "use client";
 
 // import type React from "react";
-
 // import { useState, useTransition, useRef, useEffect } from "react";
 // import { useRouter } from "next/navigation";
 // import Image from "next/image";
@@ -98,12 +97,12 @@
 //   );
 //   const [productType, setProductType] = useState(product.productType || "");
 
-//   // Product Status
+//   // Product Status - FIX: Read from product data instead of hardcoding
 //   const [inStock, setInStock] = useState(product.inStock !== false);
 //   const [isFeatured, setIsFeatured] = useState(product.isFeatured === true);
 //   const [isHero, setIsHero] = useState(product.isHero === true);
-//   const [isNewArrival, setIsNewArrival] = useState(true);
-//   const [onSale, setOnSale] = useState(false);
+//   const [isNewArrival, setIsNewArrival] = useState(product.isNewArrival === true); // FIX: Read from product
+//   const [onSale, setOnSale] = useState(product.onSale === true); // FIX: Read from product instead of hardcoding false
 //   const [salePrice, setSalePrice] = useState(product.salePrice?.toString() || "");
 
 //   // Shipping & Inventory
@@ -138,54 +137,6 @@
 //       }
 //     }
 //   }, [product]);
-
-//   // function resetForm() {
-//   //   // Reset all form fields to original product values
-//   //   setProductName(product.name);
-//   //   setPrice(product.price.toString());
-//   //   setDescription(product.description || "");
-//   //   setBadge(product.badge || "");
-//   //   setDetails(product.details || "");
-//   //   setDimensions(product.dimensions || "");
-//   //   setMaterial(product.material || "");
-//   //   setBaseColor(product.baseColor || "");
-//   //   setColorDisplayName(product.colorDisplayName || product.color || "");
-//   //   setStickySide(product.stickySide || "");
-//   //   setWeight(product.weight || "");
-//   //   setSize(product.size || "");
-//   //   setSku(product.sku || "");
-//   //   setBarcode(product.barcode || "");
-//   //   setTags(Array.isArray(product.tags) ? product.tags.join(", ") : "");
-//   //   setBrand(product.brand || "");
-//   //   setManufacturer(product.manufacturer || "");
-//   //   setCategory(product.category || "");
-//   //   setSubcategory(product.subcategory || "");
-//   //   setDesignThemesStr(Array.isArray(product.designThemes) ? product.designThemes.join(", ") : "");
-//   //   setProductType(product.productType || "");
-//   //   setInStock(product.inStock !== false);
-//   //   setIsFeatured(product.isFeatured === true);
-//   //   setIsHero(product.isHero === true);
-//   //   setIsNewArrival(product.isNewArrival === true);
-//   //   setOnSale(product.onSale === true);
-//   //   setSalePrice(product.salePrice?.toString() || "");
-//   //   setStockQuantity(product.stockQuantity?.toString() || "100");
-//   //   setLowStockThreshold(product.lowStockThreshold?.toString() || "10");
-//   //   setShippingWeight(product.shippingWeight || "");
-//   //   setShippingClass(product.shippingClass || "standard");
-//   //   setPreviewUrl(product.image || null);
-//   //   setNewImageFile(null);
-//   //   setAdditionalImages([]);
-//   //   setAdditionalImagePreviews(Array.isArray(product.additionalImages) ? product.additionalImages : []);
-//   //   setNameError(null);
-//   //   setFormError(null);
-
-//   //   // Reset file inputs
-//   //   if (imageInputRef.current) imageInputRef.current.value = "";
-//   //   if (additionalImagesInputRef.current) additionalImagesInputRef.current.value = "";
-
-//   //   // Reset to first tab
-//   //   setActiveTab("basic");
-//   // }
 
 //   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
 //     const file = e.target.files?.[0];

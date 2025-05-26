@@ -1,4 +1,4 @@
-// // src/app/(root)/products/page.tsx
+// // // src/app/(root)/products/page.tsx
 
 // import { ProductsProvider } from "@/components/products/ProductsProvider";
 // import { ProductsHeader } from "@/components/products/ProductsHeader";
@@ -6,14 +6,12 @@
 // import { ProductFilters } from "@/components/products/filters/ProductFilters";
 // import { CategoryCardsWrapper } from "@/components/products/category-carousel/CategoryCardsWrapper";
 // import { SubcategoryCardsWrapper } from "@/components/products/subcategory-carousel/SubcategoryCardsWrapper";
-// import { getAllProducts, getCategories } from "@/firebase/actions"; // Removed getSubcategories as it's not used here
+// import { getAllProducts, getCategories } from "@/firebase/actions";
 // import {
-//   CategoryData,
+//   type CategoryData,
 //   categoriesToData as convertCategoryNamesToData,
-//   Category as CategoryNameType
+//   type Category as CategoryNameType
 // } from "@/config/categories";
-// //PUT BACK AFTER TESTING
-// // export const dynamic = "force-dynamic";
 
 // // Define the correct type for Next.js App Router searchParams
 // type SearchParams = Promise<{
@@ -24,6 +22,23 @@
 // interface ProductsPageProps {
 //   params: Promise<{ slug?: string }>;
 //   searchParams: SearchParams;
+// }
+
+// // Type guard to check if an item is a CategoryData object
+// function isCategoryData(item: unknown): item is CategoryData {
+//   return (
+//     typeof item === "object" &&
+//     item !== null &&
+//     "id" in item &&
+//     "name" in item &&
+//     typeof (item as CategoryData).id === "string" &&
+//     typeof (item as CategoryData).name === "string"
+//   );
+// }
+
+// // Type guard to check if an item is a category name string
+// function isCategoryName(item: unknown): item is CategoryNameType {
+//   return typeof item === "string";
 // }
 
 // const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
@@ -44,6 +59,7 @@
 //     currentSubcategory
 //   );
 
+//   // Fetch initial products
 //   const { data: initialProductsData, error: initialProductsError } = await getAllProducts({
 //     category: currentCategory,
 //     subcategory: currentSubcategory
@@ -52,8 +68,10 @@
 //   if (initialProductsError) {
 //     console.error("ProductsPage - Error fetching initial products:", initialProductsError);
 //   }
+
 //   const initialProducts = initialProductsData || [];
 //   console.log("ProductsPage - initialProducts count after getAllProducts:", initialProducts.length);
+
 //   if (initialProducts.length === 0 && (currentCategory || currentSubcategory)) {
 //     console.warn("ProductsPage - WARNING: getAllProducts returned no items for the selected category/subcategory:", {
 //       category: currentCategory,
@@ -61,76 +79,40 @@
 //     });
 //   }
 
+//   // Fetch and process categories with simplified logic
 //   let categoriesToShow: CategoryData[] = [];
+
 //   try {
-//     const categoriesResult = await getCategories(); // raw result from getCategories
+//     const categoriesResult = await getCategories();
 
-//     if (categoriesResult && typeof categoriesResult === "object" && "success" in categoriesResult) {
-//       // Handles { success: true, data: ... } or { success: false, error: ... }
-//       if (categoriesResult.success === true) {
-//         // Type assertion for the success case
-//         const successResult = categoriesResult as { success: true; data: any };
-//         const data = successResult.data;
+//     if (categoriesResult?.success && categoriesResult.data) {
+//       const data = categoriesResult.data;
 
-//         if (Array.isArray(data)) {
-//           if (data.length > 0 && typeof data[0] === "string") {
-//             // data is string[] (e.g., ["Cars", "Motorbikes"])
-//             categoriesToShow = convertCategoryNamesToData(data as CategoryNameType[]);
-//           } else if (data.every(item => typeof item === "object" && item !== null && "id" in item && "name" in item)) {
-//             // data is likely CategoryData[] or compatible array of objects
-//             categoriesToShow = data as CategoryData[];
-//           } else if (data.length === 0) {
-//             categoriesToShow = []; // Data is an empty array
-//           } else {
-//             console.warn(
-//               "ProductsPage - getCategories successful, but 'data' array contains unexpected item types:",
-//               data
-//             );
-//           }
-//         } else if (data && typeof data === "object" && Array.isArray((data as { categories?: any }).categories)) {
-//           // data is { categories: CategoryData[] }
-//           // Ensure 'categories' property exists and is an array
-//           const categoryList = (data as { categories: CategoryData[] }).categories;
-//           if (categoryList.every(item => typeof item === "object" && item !== null && "id" in item && "name" in item)) {
-//             categoriesToShow = categoryList;
-//           } else {
-//             console.warn(
-//               "ProductsPage - getCategories successful, but 'data.categories' array contains unexpected item types:",
-//               categoryList
-//             );
-//           }
+//       if (Array.isArray(data)) {
+//         if (data.length === 0) {
+//           categoriesToShow = [];
+//         } else if (data.every(isCategoryData)) {
+//           // data is CategoryData[]
+//           categoriesToShow = data;
+//         } else if (data.every(isCategoryName)) {
+//           // data is string[] (category names)
+//           categoriesToShow = convertCategoryNamesToData(data);
 //         } else {
-//           console.warn("ProductsPage - getCategories successful but 'data' format not recognized or empty:", data);
+//           console.warn("ProductsPage - getCategories returned mixed or unexpected array types:", data);
+//           categoriesToShow = [];
 //         }
 //       } else {
-//         // success is false
-//         const errorResult = categoriesResult as { success: false; error: string };
-//         console.error("ProductsPage - Error from getCategories:", errorResult.error);
-//       }
-//     } else if (Array.isArray(categoriesResult)) {
-//       // Handles direct array return: CategoryData[] or string[]
-//       if (categoriesResult.length > 0 && typeof categoriesResult[0] === "string") {
-//         categoriesToShow = convertCategoryNamesToData(categoriesResult as CategoryNameType[]);
-//       } else if (
-//         categoriesResult.every(item => typeof item === "object" && item !== null && "id" in item && "name" in item)
-//       ) {
-//         categoriesToShow = categoriesResult as CategoryData[];
-//       } else if (categoriesResult.length === 0) {
+//         console.warn("ProductsPage - getCategories data is not an array:", data);
 //         categoriesToShow = [];
-//       } else {
-//         console.warn("ProductsPage - getCategories returned an array with unexpected item types:", categoriesResult);
 //       }
 //     } else {
-//       console.warn(
-//         "ProductsPage - Could not parse categories from getCategories. Received unexpected format:",
-//         categoriesResult
-//       );
+//       console.error("ProductsPage - Error from getCategories:", categoriesResult?.error || "Unknown error");
+//       categoriesToShow = [];
 //     }
 //   } catch (error) {
 //     console.error("ProductsPage - Exception fetching/processing categories:", error);
+//     categoriesToShow = [];
 //   }
-
-//   // Removed subcategoriesToShowForHeader declaration and fetching logic as it's unused
 
 //   return (
 //     <ProductsProvider
@@ -146,7 +128,7 @@
 //           </div>
 //         </section>
 
-//         <section className="py-16 w-full bg-secondary/5 border-y border-border/40">
+//         <section className="py-10 w-full bg-secondary/5 border-y border-border/40">
 //           <div className="container mx-auto px-4">
 //             <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
 //               <aside className="hidden lg:block h-fit">
@@ -166,6 +148,8 @@
 // };
 
 // export default ProductsPage;
+// src/app/(root)/products/page.tsx
+
 import { ProductsProvider } from "@/components/products/ProductsProvider";
 import { ProductsHeader } from "@/components/products/ProductsHeader";
 import { ProductsGrid } from "@/components/products/ProductsGrid";
@@ -204,7 +188,47 @@ function isCategoryData(item: unknown): item is CategoryData {
 
 // Type guard to check if an item is a category name string
 function isCategoryName(item: unknown): item is CategoryNameType {
-  return typeof item === "string";
+  return typeof item === "string" && ["Cars", "Motorbikes", "Bicycles", "EVs", "Other"].includes(item as string);
+}
+
+// Helper function to safely process categories data
+function processCategoriesData(data: unknown[]): CategoryData[] {
+  if (data.length === 0) {
+    return [];
+  }
+
+  // Check if all items are CategoryData objects
+  const allAreCategoryData = data.every(isCategoryData);
+  if (allAreCategoryData) {
+    return data as CategoryData[];
+  }
+
+  // Check if all items are category name strings
+  const allAreCategoryNames = data.every(isCategoryName);
+  if (allAreCategoryNames) {
+    return convertCategoryNamesToData(data as CategoryNameType[]);
+  }
+
+  // Handle mixed array - filter and process separately
+  const categoryDataItems = data.filter(isCategoryData);
+  const categoryNameItems = data.filter(isCategoryName);
+
+  if (categoryDataItems.length > 0 && categoryNameItems.length === 0) {
+    // Only CategoryData items found
+    return categoryDataItems;
+  } else if (categoryDataItems.length === 0 && categoryNameItems.length > 0) {
+    // Only category name strings found
+    return convertCategoryNamesToData(categoryNameItems);
+  } else if (categoryDataItems.length > 0 && categoryNameItems.length > 0) {
+    // Mixed types - prefer CategoryData objects, but convert names too
+    console.warn("Mixed category types found, combining both types");
+    const convertedNames = convertCategoryNamesToData(categoryNameItems);
+    return [...categoryDataItems, ...convertedNames];
+  } else {
+    // No valid items found
+    console.warn("No valid category items found in data:", data);
+    return [];
+  }
 }
 
 const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
@@ -245,7 +269,7 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
     });
   }
 
-  // Fetch and process categories with simplified logic
+  // Fetch and process categories with improved type handling
   let categoriesToShow: CategoryData[] = [];
 
   try {
@@ -255,18 +279,7 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
       const data = categoriesResult.data;
 
       if (Array.isArray(data)) {
-        if (data.length === 0) {
-          categoriesToShow = [];
-        } else if (data.every(isCategoryData)) {
-          // data is CategoryData[]
-          categoriesToShow = data;
-        } else if (data.every(isCategoryName)) {
-          // data is string[] (category names)
-          categoriesToShow = convertCategoryNamesToData(data);
-        } else {
-          console.warn("ProductsPage - getCategories returned mixed or unexpected array types:", data);
-          categoriesToShow = [];
-        }
+        categoriesToShow = processCategoriesData(data);
       } else {
         console.warn("ProductsPage - getCategories data is not an array:", data);
         categoriesToShow = [];

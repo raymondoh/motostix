@@ -1,4 +1,4 @@
-// src/schemas/product.ts (or wherever this schema is defined)
+// src/schemas/product/product.ts
 import { z } from "zod";
 
 export const productSchema = z.object({

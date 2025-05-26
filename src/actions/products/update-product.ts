@@ -59,8 +59,9 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
         message: "Product updated successfully",
         metadata: {
           productId,
-          updatedName: result.product?.name || validated.data.name,
-          updatedPrice: result.product?.price || validated.data.price
+          updatedName: validated.data.name,
+          updatedPrice: validated.data.price,
+          updatedFields: Object.keys(validated.data)
         },
         context: "products"
       });
@@ -75,6 +76,11 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
       // Force revalidation of dynamic routes that might show this product
       revalidatePath("/products/category/[slug]", "page");
       revalidatePath("/search", "page");
+
+      // Return success without the full product object
+      return {
+        success: true
+      };
     } else {
       logger({
         type: "error",
@@ -86,9 +92,12 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
         },
         context: "products"
       });
-    }
 
-    return result;
+      return {
+        success: false,
+        error: result.error
+      };
+    }
   } catch (error: unknown) {
     const message = isFirebaseError(error)
       ? firebaseError(error)

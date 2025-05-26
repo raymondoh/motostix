@@ -43,9 +43,13 @@ async function fixMissingOnSaleField() {
     };
   } catch (error) {
     console.error("Error fixing onSale field:", error);
+
+    // Handle unknown error type properly
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+
     return {
       success: false,
-      error: error.message
+      error: errorMessage
     };
   }
 }

@@ -1,4 +1,3 @@
-// src/actions/products/add-product.ts
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -6,7 +5,6 @@ import { type CreateProductInput, createProductSchema } from "@/schemas/product"
 import { addProduct as addProductToDb } from "@/firebase/actions";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logger } from "@/utils/logger";
-//import type { AddProductResult } from "@/types/product/result";
 import type { Product } from "@/types";
 
 export async function addProduct(data: CreateProductInput): Promise<Product.AddProductResult> {
@@ -31,36 +29,50 @@ export async function addProduct(data: CreateProductInput): Promise<Product.AddP
     const productData = {
       ...validated.data,
 
-      // map new-schema fields to legacy model
-      image: validated.data.images[0], // primary image
-      additionalImages: validated.data.images.slice(1), // remaining images
-
-      stockQuantity: validated.data.stock, // numeric
-      inStock: validated.data.stock > 0 // boolean for UI
+      // Handle stock quantity properly
+      stockQuantity: validated.data.stockQuantity || 0,
+      inStock: (validated.data.stockQuantity || 0) > 0 // boolean for UI
     };
 
     /* ── 3) Persist to Firestore ─────────────────────────────── */
-    const result: Product.AddProductResult = await addProductToDb(productData);
+    const result = await addProductToDb(productData);
 
-    /* ── 4) Side-effects & logging ───────────────────────────── */
-    if (result.success) {
-      revalidatePath("/dev/products");
-      logger({
-        type: "info",
-        message: "Product added successfully",
-        metadata: { productName: validated.data.name },
-        context: "products"
-      });
-    } else {
+    /* ── 4) Handle the result and map to correct type ─────────── */
+    if (!result.success) {
       logger({
         type: "error",
         message: "Failed to add product",
         metadata: { error: result.error },
         context: "products"
       });
+      return {
+        success: false,
+        error: result.error
+      };
     }
 
-    return result;
+    // Map the result to match AddProductResult type
+    const addProductResult: Product.AddProductResult = {
+      success: true,
+      id: result.data // Map 'data' to 'id' since data contains the product ID
+    };
+
+    /* ── 5) Side-effects & logging ───────────────────────────── */
+    revalidatePath("/dev/products");
+    revalidatePath("/admin/products");
+    revalidatePath("/products");
+
+    logger({
+      type: "info",
+      message: "Product added successfully",
+      metadata: {
+        productName: validated.data.name,
+        productId: result.data
+      },
+      context: "products"
+    });
+
+    return addProductResult;
   } catch (error: unknown) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
