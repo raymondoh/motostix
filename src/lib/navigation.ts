@@ -43,6 +43,25 @@ interface NavItemOld {
   icon: any;
 }
 
+// User-specific navigation items (for regular users)
+export const userNavItems: NavItemOld[] = [
+  {
+    title: "Dashboard",
+    href: "/user",
+    icon: LayoutDashboard
+  },
+  {
+    title: "My Orders",
+    href: "/user/orders",
+    icon: Receipt
+  },
+  {
+    title: "Profile",
+    href: "/user/profile",
+    icon: UserCircle
+  }
+];
+
 // Admin-specific navigation items
 export const adminNavItems: NavItemOld[] = [
   {

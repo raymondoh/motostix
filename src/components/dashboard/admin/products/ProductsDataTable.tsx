@@ -20,11 +20,6 @@ import { ProductDialog } from "./ProductDialog";
 import type { Product } from "@/types/product";
 import type { Category } from "@/types/category";
 
-// interface ProductsDataTableProps {
-//   data: Product[];
-//   columns: ColumnDef<Product>[];
-//   onRefresh?: () => Promise<void>; // optional
-// }
 interface ProductsDataTableProps {
   data: Product[];
   columns: ColumnDef<Product>[];
