@@ -47,6 +47,9 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Add header height variable for consistent spacing */
+    --app-header-height: 4rem; /* 64px - adjust to match your header height */
   }
   .dark {
     --separator: 0 0% 30%;
@@ -81,9 +84,9 @@ body {
 
     --chart-1: 48 100% 50%;
     --chart-2: 0 0% 80%;
-    --chart-3: 0 0% 60%;
-    --chart-4: 0 0% 40%;
-    --chart-5: 48 70% 60%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
 
     --sidebar-background: 0 0% 12%;
     --sidebar-foreground: 0 0% 95.9%;
@@ -103,4 +106,225 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ===== Z-INDEX MANAGEMENT ===== */
+/* Main app header - highest z-index */
+.main-header {
+  @apply z-50 relative;
+}
+
+/* Footer - much higher z-index to sit above sidebar borders */
+.main-footer {
+  position: relative;
+  z-index: 30 !important;
+}
+
+/* Sidebar z-index - below header and footer */
+[data-sidebar="sidebar"] {
+  z-index: 40 !important;
+}
+
+/* ===== REMOVE SIDEBAR BORDERS ===== */
+/* Remove right border from sidebar on desktop */
+@media (min-width: 768px) {
+  [data-sidebar="sidebar"]:not([data-mobile="true"]) {
+    border-right: none !important;
+  }
+
+  /* Remove border from the inner sidebar container */
+  [data-sidebar="sidebar"]:not([data-mobile="true"]) > div {
+    border-right: none !important;
+  }
+
+  /* Remove any group borders that might show */
+  [data-sidebar="sidebar"]:not([data-mobile="true"]) [data-sidebar="group"] {
+    border-right: none !important;
+  }
+
+  /* Override shadcn default sidebar border styles */
+  .group-data-\[side\=left\]\:border-r {
+    border-right: none !important;
+  }
+
+  /* Target the specific shadcn sidebar border class */
+  [data-side="left"] {
+    border-right: none !important;
+  }
+}
+
+/* ===== SIDEBAR SPACING FOR HEADER ===== */
+/* Add top padding to sidebar content to account for fixed header */
+@media (min-width: 768px) {
+  [data-sidebar="content"] {
+    padding-top: var(--app-header-height) !important;
+  }
+
+  /* Ensure the first menu item has proper spacing from top */
+  [data-sidebar="content"] [data-sidebar="menu"]:first-child [data-sidebar="menu-item"]:first-child {
+    margin-top: 0.5rem !important;
+  }
+}
+
+/* ===== DASHBOARD LAYOUT ADJUSTMENTS ===== */
+/* Ensure dashboard main content accounts for header and doesn't overlap footer */
+.dashboard-layout {
+  padding-top: var(--app-header-height);
+  min-height: calc(100vh - var(--app-header-height));
+}
+
+/* Adjust sidebar inset for header and ensure it doesn't extend into footer */
+[data-sidebar="inset"] {
+  margin-top: var(--app-header-height) !important;
+  min-height: calc(100vh - var(--app-header-height)) !important;
+  position: relative;
+  z-index: 30; /* Below footer */
+}
+
+/* ===== COLLAPSED SIDEBAR STYLING ===== */
+[data-collapsible="icon"] [data-sidebar="menu-button"] {
+  width: 100% !important;
+  height: 3rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.5rem !important;
+}
+
+/* Show ONLY icons when collapsed - hide all text */
+[data-collapsible="icon"] [data-sidebar="menu-button"] span {
+  display: none !important;
+}
+
+/* Ensure icons are visible and properly sized when collapsed */
+[data-collapsible="icon"] [data-sidebar="menu-button"] svg {
+  display: block !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ===== EXPANDED STATE STYLING ===== */
+/* Show both icons and text when expanded */
+[data-state="expanded"] [data-sidebar="menu-button"] {
+  height: 3rem !important;
+  padding: 0.75rem 1rem !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+[data-state="expanded"] [data-sidebar="menu-button"] svg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin-right: 0.75rem !important;
+  flex-shrink: 0 !important;
+}
+
+[data-state="expanded"] [data-sidebar="menu-button"] span {
+  display: inline !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+}
+
+/* ===== HOVER EFFECTS FOR BOTH STATES ===== */
+[data-sidebar="menu-button"]:hover > svg {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+/* ===== ACTIVE STATE STYLING ===== */
+[data-sidebar="menu-button"][data-active="true"] > svg {
+  color: hsl(var(--primary)) !important;
+}
+
+[data-sidebar="menu-button"][data-active="true"] > span {
+  color: hsl(var(--primary)) !important;
+  font-weight: 600 !important;
+}
+
+/* ===== MOBILE SIDEBAR STYLING ===== */
+/* Mobile sidebar should be above header */
+[data-sidebar="sidebar"][data-mobile="true"] {
+  z-index: 60 !important;
+  background: hsl(var(--sidebar-background)) !important;
+}
+
+/* Ensure mobile sidebar content has proper background */
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="content"] {
+  background: hsl(var(--sidebar-background)) !important;
+}
+
+/* Fix Sheet content background for mobile sidebar */
+.sheet-content[data-sidebar="sidebar"] {
+  background: hsl(var(--sidebar-background)) !important;
+}
+
+/* Ensure the inner sidebar div has proper background */
+[data-sidebar="sidebar"][data-mobile="true"] > div {
+  background: hsl(var(--sidebar-background)) !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"],
+.sheet-content [data-sidebar="menu-button"] {
+  height: 3.5rem !important;
+  padding: 0.75rem 1.25rem !important;
+  align-items: center !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"] > svg,
+.sheet-content [data-sidebar="menu-button"] > svg {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  margin-right: 1rem !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-button"] > span,
+.sheet-content [data-sidebar="menu-button"] > span {
+  font-size: 1.125rem !important;
+  font-weight: 500 !important;
+  display: inline !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-sub-button"],
+.sheet-content [data-sidebar="menu-sub-button"] {
+  height: 3rem !important;
+  padding: 0.75rem 1.25rem !important;
+  font-size: 1rem !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="menu-item"],
+.sheet-content [data-sidebar="menu-item"] {
+  margin-bottom: 0.5rem !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="header"],
+.sheet-content [data-sidebar="header"] {
+  padding: 1.25rem !important;
+  background: hsl(var(--sidebar-background)) !important;
+}
+
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="group-label"],
+.sheet-content [data-sidebar="group-label"] {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.25rem !important;
+}
+
+/* ===== ADDITIONAL MOBILE SIDEBAR FIXES ===== */
+/* Target the Sheet component specifically for sidebar */
+[data-radix-dialog-content][data-sidebar="sidebar"] {
+  background: hsl(var(--sidebar-background)) !important;
+}
+
+/* Ensure all nested elements inherit the sidebar background */
+[data-sidebar="sidebar"][data-mobile="true"] * {
+  background-color: inherit;
+}
+
+/* Override any transparent backgrounds in mobile sidebar */
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="group"],
+[data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="group-content"] {
+  background: transparent !important;
 }

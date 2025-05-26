@@ -14,6 +14,8 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+  const displayPrice = product.salePrice || product.price;
+  const isOnSale = product.onSale && product.salePrice && product.salePrice < product.price;
   return (
     <div className="flex flex-col space-y-6">
       {/* Category / Subcategory breadcrumbs */}
@@ -51,7 +53,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Price */}
       <div>
-        <p className="text-2xl font-semibold">{formatPriceWithCode(product.price, "GB")}</p>
+        {isOnSale ? (
+          <div className="flex items-center gap-3">
+            <span className="text-primary text-2xl font-semibold">{formatPriceWithCode(displayPrice, "GB")}</span>
+            <span className="text-sm text-muted-foreground line-through">
+              {formatPriceWithCode(product.price, "GB")}
+            </span>
+          </div>
+        ) : (
+          <span className="font-bold">{formatPriceWithCode(displayPrice, "GB")}</span>
+        )}
       </div>
 
       {/* Quick‑glance attributes */}

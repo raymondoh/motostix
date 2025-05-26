@@ -7,6 +7,7 @@
 // import type { Product } from "@/types/product";
 // import { ProductLikeButton } from "./ProductLikeButton";
 // import { ProductCardButton } from "./ProductCardButton";
+// import { formatPriceWithCode } from "@/lib/utils";
 
 // interface ProductCardProps {
 //   product: Product;
@@ -51,15 +52,21 @@
 //           </h3>
 //         </Link>
 
+//         {product.description && (
+//           <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{product.description}</p>
+//         )}
+
 //         <div className="flex items-center justify-between">
 //           <div className="flex items-center gap-2">
 //             {isOnSale ? (
 //               <>
-//                 <span className="font-bold text-primary">${displayPrice}</span>
-//                 <span className="text-sm text-muted-foreground line-through">${product.price}</span>
+//                 <span className="font-bold text-primary">{formatPriceWithCode(displayPrice, "GB")}</span>
+//                 <span className="text-sm text-muted-foreground line-through">
+//                   {formatPriceWithCode(product.price, "GB")}
+//                 </span>
 //               </>
 //             ) : (
-//               <span className="font-bold">${displayPrice}</span>
+//               <span className="font-bold">{formatPriceWithCode(displayPrice, "GB")}</span>
 //             )}
 //           </div>
 
@@ -102,6 +109,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/types/product";
 import { ProductLikeButton } from "./ProductLikeButton";
 import { ProductCardButton } from "./ProductCardButton";
+import { formatPriceWithCode } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -112,7 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isOnSale = product.onSale && product.salePrice && product.salePrice < product.price;
 
   return (
-    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-primary/20">
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-primary/20 h-full flex flex-col">
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         {/* Optimized product image */}
         <Image
@@ -139,26 +147,30 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      <CardContent className="p-4">
+      <CardContent className="p-4 flex flex-col flex-1">
         <Link href={`/products/${product.id}`} className="block">
-          <h3 className="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-sm mb-2 truncate group-hover:text-primary transition-colors">
             {product.name}
           </h3>
         </Link>
 
-        {product.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{product.description}</p>
-        )}
+        {/* Description with fixed height */}
+        <div className="min-h-[2.5rem] mb-2">
+          {product.description && <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>}
+        </div>
 
-        <div className="flex items-center justify-between">
+        {/* Price and stock section */}
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             {isOnSale ? (
               <>
-                <span className="font-bold text-primary">${displayPrice}</span>
-                <span className="text-sm text-muted-foreground line-through">${product.price}</span>
+                <span className="font-bold text-primary">{formatPriceWithCode(displayPrice, "GB")}</span>
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPriceWithCode(product.price, "GB")}
+                </span>
               </>
             ) : (
-              <span className="font-bold">${displayPrice}</span>
+              <span className="font-bold">{formatPriceWithCode(displayPrice, "GB")}</span>
             )}
           </div>
 
@@ -173,21 +185,25 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Design themes */}
-        {product.designThemes && product.designThemes.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {product.designThemes.slice(0, 2).map(theme => (
-              <Badge key={theme} variant="outline" className="text-xs">
-                {theme}
-              </Badge>
-            ))}
-            {product.designThemes.length > 2 && (
-              <Badge variant="outline" className="text-xs">
-                +{product.designThemes.length - 2}
-              </Badge>
+        {/* Design themes with fixed height - pushes to bottom */}
+        <div className="mt-auto">
+          <div className="min-h-[1.75rem]">
+            {product.designThemes && product.designThemes.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {product.designThemes.slice(0, 2).map(theme => (
+                  <Badge key={theme} variant="outline" className="text-xs">
+                    {theme}
+                  </Badge>
+                ))}
+                {product.designThemes.length > 2 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{product.designThemes.length - 2}
+                  </Badge>
+                )}
+              </div>
             )}
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

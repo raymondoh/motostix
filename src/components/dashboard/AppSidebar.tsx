@@ -1,11 +1,9 @@
-// src/components/dashboard/AppSidebar.tsx
 "use client";
 
 import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ArrowLeft } from "lucide-react";
 
 import {
   Sidebar,
@@ -18,16 +16,32 @@ import {
   SidebarMenuSubButton,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarSeparator,
   useSidebar
 } from "@/components/ui/sidebar";
 import { userNavItems, adminNavItems, type NavItem } from "@/lib/navigation";
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { isMobile, setOpenMobile } = useSidebar();
-  const navItems: NavItem[] = session?.user?.role === "admin" ? adminNavItems : userNavItems;
+
+  // Determine navigation items based on route and session
+  const getNavItems = (): NavItem[] => {
+    // If we're on an admin route, default to admin nav items
+    if (pathname.startsWith("/admin")) {
+      return adminNavItems;
+    }
+
+    // If session is still loading, return empty array to prevent flashing
+    if (status === "loading") {
+      return [];
+    }
+
+    // Use session role to determine nav items
+    return session?.user?.role === "admin" ? adminNavItems : userNavItems;
+  };
+
+  const navItems = getNavItems();
 
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (isMobile) {
@@ -35,25 +49,29 @@ export function AppSidebar() {
     }
   };
 
+  // Show loading state while session is loading
+  if (status === "loading") {
+    return (
+      <Sidebar className="pt-6" collapsible="icon">
+        <SidebarContent className="pt-5">
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <div className="flex items-center justify-center p-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    );
+  }
+
   return (
-    <Sidebar className="pt-6" collapsible="icon">
-      <SidebarContent className="pt-5">
+    <Sidebar collapsible="icon">
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Back to Home button */}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/" onClick={handleLinkClick}>
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Back to Home</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              {/* Separator between back button and nav items */}
-              <SidebarSeparator className="my-2" />
-
               {/* Navigation Items */}
               {navItems.map(item => (
                 <SidebarMenuItem key={item.title}>

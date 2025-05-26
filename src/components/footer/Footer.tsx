@@ -7,10 +7,10 @@ import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer className="py-16 w-full bg-secondary/5 border-t border-border/40">
+    <footer className="main-footer py-8 md:py-12 lg:py-16 w-full bg-secondary/10 border-t border-border/40">
       {/* Main Footer Content */}
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 md:gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Column 1: Logo and About */}
           <div className="space-y-4">
             <div className="flex items-center">

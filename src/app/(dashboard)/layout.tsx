@@ -1,4 +1,3 @@
-//src/(dashboard)/layoutCombedText.tsx
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -77,8 +76,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
             {/* Main content area */}
             <SidebarInset className="flex-1 flex flex-col w-full">
-              {/* Enhanced header with trigger button */}
-              <header className="flex h-16 items-center justify-between border-b px-6 sticky top-0 bg-background/95 backdrop-blur-sm z-10 shadow-sm">
+              {/* Enhanced header with darker border and shadow */}
+              <header className="flex h-16 items-center justify-between px-6 sticky top-0 bg-muted backdrop-blur-sm z-10 shadow-lg">
                 <div className="flex items-center gap-4">
                   <SidebarTrigger className="rounded-full hover:bg-muted p-2 transition-colors" />
                   <h1 className="font-semibold text-lg hidden sm:block">

@@ -99,7 +99,7 @@ export const Navbar = () => {
   if (isMediaQueryLoading) return <NavbarSkeleton />;
 
   return (
-    <nav className="container max-w-8xl mx-auto flex items-center justify-between py-4 px-0">
+    <nav className="container max-w-8xl mx-auto flex items-center justify-between py-4 px-0 z-50">
       <div className="flex items-center">
         {isMobile ? (
           <div className="flex items-center">

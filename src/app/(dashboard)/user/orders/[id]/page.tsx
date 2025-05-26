@@ -1,3 +1,4 @@
+//src/app/(dashboard)/user/orders/[id]/page.tsx
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getOrderById } from "@/firebase/admin/orders";
