@@ -1,5 +1,18 @@
 import type React from "react";
-import { Home, Info, Mail, LayoutDashboard, UserCircle, Activity, Users, Receipt, ShoppingBag } from "lucide-react";
+import {
+  Home,
+  Info,
+  Mail,
+  LayoutDashboard,
+  UserCircle,
+  Activity,
+  Users,
+  Receipt,
+  ShoppingBag,
+  Heart,
+  Settings,
+  Shield
+} from "lucide-react";
 
 export type NavItem = {
   title: string;
@@ -56,9 +69,30 @@ export const userNavItems: NavItemOld[] = [
     icon: Receipt
   },
   {
+    title: "My Likes",
+    href: "/user/likes",
+    icon: Heart
+  },
+  {
     title: "Profile",
     href: "/user/profile",
     icon: UserCircle
+  },
+  {
+    title: "Settings",
+    href: "/user/settings",
+    icon: Settings
+  },
+  {
+    title: "Activity",
+    href: "/user/activity",
+    icon: Activity
+  },
+
+  {
+    title: "Data & Privacy",
+    href: "/user/data-privacy",
+    icon: Shield
   }
 ];
 
@@ -93,5 +127,10 @@ export const adminNavItems: NavItemOld[] = [
     title: "Admin Profile",
     href: "/admin/profile",
     icon: UserCircle
+  },
+  {
+    title: "Settings",
+    href: "/admin/settings",
+    icon: Settings
   }
 ];
