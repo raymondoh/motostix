@@ -375,17 +375,84 @@ export async function addProduct(data: any) {
 // ===================
 // GET PRODUCT BY ID
 // ===================
-export async function getProductById(id: string) {
-  try {
-    const doc = await adminDb.collection("products").doc(id).get();
-    if (!doc.exists) return { success: false as const, error: "Product not found" };
+// export async function getProductById(id: string) {
+//   try {
+//     const doc = await adminDb.collection("products").doc(id).get();
+//     if (!doc.exists) return { success: false as const, error: "Product not found" };
 
-    const product = mapDocToProduct(doc);
-    return { success: true as const, product: serializeProduct(product) };
+//     const product = mapDocToProduct(doc);
+//     return { success: true as const, product: serializeProduct(product) };
+//   } catch (error) {
+//     const message = isFirebaseError(error)
+//       ? firebaseError(error)
+//       : (error as Error)?.message || "Unknown error fetching product by ID";
+//     return { success: false as const, error: message };
+//   }
+// }
+// Assuming adminDb is imported somewhat like this at the top of the file:
+// import { adminDb } from '../admin/firebase-admin-init'; // ADJUST PATH TO YOUR INIT FILE
+// And your helper functions are also available:
+// import { mapDocToProduct, serializeProduct } from './mappers'; // Example path
+// import { isFirebaseError, firebaseError } from './errorUtils'; // Example path
+
+export async function getProductById(id: string) {
+  console.log(`[getProductById] Called for product ID: ${id}`);
+
+  // Critical check: Is adminDb and its app property available?
+  if (!adminDb || !adminDb.app) {
+    console.error(
+      `[getProductById] CRITICAL: adminDb or adminDb.app is NOT INITIALIZED when called for ID: ${id}! This implies a serious issue with Firebase Admin setup.`
+    );
+    return {
+      success: false as const,
+      error: "Firebase Admin (adminDb.app) not properly initialized for getProductById"
+    };
+  }
+
+  // Log the app name to ensure we're using the initialized instance
+  console.log(`[getProductById] Using adminDb.app.name: '${adminDb.app.name}' for product ID: ${id}`);
+  // This should log '[DEFAULT]' if your initialization was successful and is correctly referenced.
+
+  try {
+    console.log(`[getProductById] Attempting Firestore operation: adminDb.collection('products').doc('${id}').get()`);
+    const doc = await adminDb.collection("products").doc(id).get();
+
+    if (!doc.exists) {
+      console.warn(`[getProductById] Product with ID: '${id}' not found in Firestore.`);
+      return { success: false as const, error: "Product not found" };
+    }
+
+    console.log(`[getProductById] Successfully fetched document for product ID: '${id}'. Exists: true.`);
+    // Assuming mapDocToProduct and serializeProduct are synchronous or you handle their async nature appropriately
+    const product = mapDocToProduct(doc); // Ensure mapDocToProduct is defined
+    const serialized = serializeProduct(product); // Ensure serializeProduct is defined
+
+    console.log(`[getProductById] Product mapped and serialized for ID: '${id}'.`);
+    return { success: true as const, product: serialized };
   } catch (error) {
+    console.error(`[getProductById] Firebase error occurred while fetching product ID '${id}':`, error);
+
+    // Attempt to log adminDb.app.name again in case of an error to see if it was available then
+    try {
+      console.error(
+        `[getProductById] State of adminDb.app.name at time of error: '${
+          adminDb.app?.name || "adminDb.app NOT DEFINED"
+        }'`
+      );
+    } catch (appError) {
+      console.error(
+        `[getProductById] Could not access adminDb.app.name at time of error. adminDb might be undefined or app property inaccessible.`
+      );
+    }
+
+    // Assuming isFirebaseError and firebaseError are defined
     const message = isFirebaseError(error)
       ? firebaseError(error)
-      : (error as Error)?.message || "Unknown error fetching product by ID";
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching product by ID";
+
+    console.error(`[getProductById] Processed error message for ID '${id}': ${message}`);
     return { success: false as const, error: message };
   }
 }
