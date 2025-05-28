@@ -16,6 +16,7 @@ function initializeAdminApp(): App {
   if (!privateKey) {
     throw new Error("FIREBASE_PRIVATE_KEY is not set in the environment variables");
   }
+  console.log(process.env.FIREBASE_PRIVATE_KEY);
 
   return initializeApp({
     credential: cert({
