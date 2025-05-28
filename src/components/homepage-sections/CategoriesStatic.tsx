@@ -19,7 +19,7 @@ export function CategoriesStatic() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {homepageFeaturedCategories.map(category => (
             <Link href={`/products?category=${category.id}`} key={category.id}>
-              <Card className="overflow-hidden transition-all duration-300 hover:shadow-sm hover:border-primary/20 group h-full">
+              <Card className="border-none overflow-hidden transition-all duration-300 hover:shadow-sm hover:border-primary/20 group h-full">
                 <div className="relative h-48 w-full overflow-hidden">
                   <CategoryImage
                     src={category.image || `/placeholder.svg?height=400&width=600&query=${category.name}+sticker`}
