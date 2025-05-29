@@ -73,7 +73,7 @@ export async function getCategoriesWithCounts(): Promise<GetCategoriesResult> {
   try {
     // This is more efficient than fetching all product data
     // We only get the category field from each document
-    const snapshot = await adminDb.collection("products").select("category").get();
+    const snapshot = await adminDb().collection("products").select("category").get();
 
     // Calculate counts efficiently
     const categoryCounts: Record<string, number> = {};
@@ -269,7 +269,7 @@ export async function getFeaturedCategories() {
     ];
 
     // Calculate counts for each featured category
-    const snapshot = await adminDb.collection("products").get();
+    const snapshot = await adminDb().collection("products").get();
 
     // Use a more specific type for the products
     const products = snapshot.docs.map(doc => {

@@ -36,7 +36,7 @@ export async function updateEmailVerificationStatus({
 
   try {
     // 1. Check Firebase Auth user record
-    const userRecord = await adminAuth.getUser(userId);
+    const userRecord = await adminAuth().getUser(userId);
 
     if (verified && !userRecord.emailVerified) {
       logger({
@@ -48,7 +48,7 @@ export async function updateEmailVerificationStatus({
     }
 
     // 2. Update Firestore user document
-    await adminDb.collection("users").doc(userId).update({
+    await adminDb().collection("users").doc(userId).update({
       emailVerified: verified,
       updatedAt: serverTimestamp()
     });

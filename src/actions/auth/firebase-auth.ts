@@ -22,7 +22,7 @@ export async function signInWithFirebase({
 
   try {
     // 1. Verify Firebase ID token
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    const decodedToken = await adminAuth().verifyIdToken(idToken);
     uid = decodedToken.uid;
 
     logger({

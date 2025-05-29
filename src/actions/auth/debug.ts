@@ -19,8 +19,8 @@ export async function debugPasswordVerification(email: string, password: string)
   }
 
   try {
-    const userRecord: UserRecord = await adminAuth.getUserByEmail(email);
-    const userDoc: DocumentSnapshot = await adminDb.collection("users").doc(userRecord.uid).get();
+    const userRecord: UserRecord = await adminAuth().getUserByEmail(email);
+    const userDoc: DocumentSnapshot = await adminDb().collection("users").doc(userRecord.uid).get();
     const userData = userDoc.data() as { passwordHash?: string } | undefined;
 
     if (!userData?.passwordHash) {

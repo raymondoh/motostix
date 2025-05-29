@@ -29,7 +29,7 @@ export interface GetCategoriesResult {
 export async function getCategories(): Promise<GetCategoriesResult> {
   try {
     // Get all products to calculate counts
-    const snapshot = await adminDb.collection("products").get();
+    const snapshot = await adminDb().collection("products").get();
     const products = snapshot.docs.map(doc => doc.data());
 
     // Calculate counts for each category
@@ -78,7 +78,7 @@ export async function getSubcategories(category: string): Promise<{
     }
 
     // If category not found in predefined list, query the database
-    const snapshot = await adminDb.collection("products").where("category", "==", category).get();
+    const snapshot = await adminDb().collection("products").where("category", "==", category).get();
 
     const uniqueSubcategories = new Set<string>();
 
@@ -289,7 +289,7 @@ export async function getFeaturedCategories() {
     ];
 
     // Calculate counts for each featured category
-    const snapshot = await adminDb.collection("products").get();
+    const snapshot = await adminDb().collection("products").get();
 
     // Use a more specific type for the products
     const products = snapshot.docs.map(doc => {

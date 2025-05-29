@@ -41,7 +41,7 @@ export default async function AdminDashboardOverviewPage() {
 
   try {
     // Fetch the user document from Firestore to check admin status
-    const userDoc = await adminDb.collection("users").doc(userId).get();
+    const userDoc = await adminDb().collection("users").doc(userId).get();
 
     if (userDoc.exists) {
       const userData = userDoc.data();
@@ -68,14 +68,14 @@ export default async function AdminDashboardOverviewPage() {
 
   try {
     // Get total users count
-    const usersSnapshot = await adminDb.collection("users").count().get();
+    const usersSnapshot = await adminDb().collection("users").count().get();
     systemStats.totalUsers = usersSnapshot.data().count;
 
     // Get active users (logged in within last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const activeUsersSnapshot = await adminDb
+    const activeUsersSnapshot = await adminDb()
       .collection("users")
       .where("lastLoginAt", ">=", sevenDaysAgo)
       .count()
@@ -86,11 +86,11 @@ export default async function AdminDashboardOverviewPage() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const newUsersSnapshot = await adminDb.collection("users").where("createdAt", ">=", today).count().get();
+    const newUsersSnapshot = await adminDb().collection("users").where("createdAt", ">=", today).count().get();
     systemStats.newUsersToday = newUsersSnapshot.data().count;
 
     // Get total activities
-    const activitiesSnapshot = await adminDb.collection("activities").count().get();
+    const activitiesSnapshot = await adminDb().collection("activities").count().get();
     systemStats.totalActivities = activitiesSnapshot.data().count;
     console.log("ACTIVITIES:", activitiesSnapshot.data().count);
   } catch (error) {

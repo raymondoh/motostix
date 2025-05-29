@@ -18,15 +18,15 @@ import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 export async function processAccountDeletion(userId: string): Promise<boolean> {
   try {
     // Delete Firestore user document
-    await adminDb.collection("users").doc(userId).delete();
+    await adminDb().collection("users").doc(userId).delete();
     logger({ type: "info", message: `Deleted Firestore user document for ${userId}`, context: "deletion" });
 
     // Delete Firebase Auth user
-    await adminAuth.deleteUser(userId);
+    await adminAuth().deleteUser(userId);
     logger({ type: "info", message: `Deleted Firebase Auth user ${userId}`, context: "deletion" });
 
     // Delete profile image from Firebase Storage
-    const storageRef = adminStorage.bucket().file(`users/${userId}/profile.jpg`);
+    const storageRef = adminStorage().bucket().file(`users/${userId}/profile.jpg`);
     try {
       await storageRef.delete();
       logger({ type: "info", message: `Deleted profile image for ${userId}`, context: "deletion" });
@@ -44,7 +44,7 @@ export async function processAccountDeletion(userId: string): Promise<boolean> {
     }
 
     // Mark deletion as completed
-    await adminDb.collection("deletionRequests").doc(userId).update({
+    await adminDb().collection("deletionRequests").doc(userId).update({
       status: "completed",
       completedAt: serverTimestamp()
     });
@@ -72,7 +72,7 @@ export async function processAccountDeletion(userId: string): Promise<boolean> {
       context: "deletion"
     });
 
-    await adminDb.collection("deletionRequests").doc(userId).update({
+    await adminDb().collection("deletionRequests").doc(userId).update({
       status: "failed",
       completedAt: serverTimestamp()
     });
@@ -114,7 +114,7 @@ export async function requestAccountDeletion(
     const immediateDelete = formData.get("immediateDelete") === "true";
     const validated = accountDeletionSchema.parse({ immediateDelete });
 
-    await adminDb.collection("deletionRequests").doc(session.user.id).set({
+    await adminDb().collection("deletionRequests").doc(session.user.id).set({
       userId: session.user.id,
       email: session.user.email,
       requestedAt: serverTimestamp(),

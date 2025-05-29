@@ -24,7 +24,7 @@ export default async function AdminUserTabsPage({ params }: { params: Promise<{ 
   const currentUserId = session.user.id;
   let isAdmin = false;
   try {
-    const currentUserDoc = await adminDb.collection("users").doc(currentUserId).get();
+    const currentUserDoc = await adminDb().collection("users").doc(currentUserId).get();
     if (currentUserDoc.exists && currentUserDoc.data()?.role === "admin") {
       isAdmin = true;
     }
@@ -37,7 +37,7 @@ export default async function AdminUserTabsPage({ params }: { params: Promise<{ 
   }
 
   // 3) Fetch the target user
-  const userDoc = await adminDb.collection("users").doc(userId).get();
+  const userDoc = await adminDb().collection("users").doc(userId).get();
   if (!userDoc.exists) {
     redirect("/admin/users");
   }

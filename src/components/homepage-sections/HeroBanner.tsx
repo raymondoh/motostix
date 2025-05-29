@@ -31,7 +31,7 @@ export function HeroBanner({ className }: HeroBannerProps) {
       {/* Background image using next/image */}
       <div className="absolute inset-0">
         <Image
-          src="/hero-banner.jpg"
+          src="/images/hero-bg.jpg"
           alt="MotoStix - Premium Vehicle Stickers and Decals"
           fill
           priority

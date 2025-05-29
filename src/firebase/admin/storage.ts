@@ -7,7 +7,7 @@ import { adminStorage } from "./firebase-admin-init";
  * @param filePath - The path to the file
  */
 export async function getFileRef(filePath: string) {
-  const bucket = adminStorage.bucket();
+  const bucket = adminStorage().bucket();
   return bucket.file(filePath);
 }
 
@@ -39,7 +39,7 @@ export async function deleteFile(filePath: string): Promise<void> {
  * @param prefix - The prefix to filter by
  */
 export async function getFilesByPrefix(prefix: string) {
-  const bucket = adminStorage.bucket();
+  const bucket = adminStorage().bucket();
   const [files] = await bucket.getFiles({ prefix });
   return files;
 }

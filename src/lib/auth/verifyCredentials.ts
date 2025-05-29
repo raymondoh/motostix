@@ -3,7 +3,7 @@ import { adminAuth } from "@/firebase/admin/firebase-admin-init";
 import { syncUserWithFirebase } from "./syncUserWithFirebase";
 
 export async function verifyFirebaseCredentials(idToken: string) {
-  const decodedToken = await adminAuth.verifyIdToken(idToken);
+  const decodedToken = await adminAuth().verifyIdToken(idToken);
   const uid = decodedToken.uid;
   const email = decodedToken.email;
 
@@ -13,7 +13,7 @@ export async function verifyFirebaseCredentials(idToken: string) {
 
   console.log("Firebase ID token verified for user:", uid);
 
-  const userRecord = await adminAuth.getUser(uid);
+  const userRecord = await adminAuth().getUser(uid);
 
   const provider = decodedToken.firebase?.sign_in_provider || "unknown";
 

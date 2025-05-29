@@ -19,7 +19,7 @@ export default async function AdminUsersPage() {
   if (!session?.user) redirect("/login");
 
   const userId = session.user.id;
-  const userDoc = await adminDb.collection("users").doc(userId).get();
+  const userDoc = await adminDb().collection("users").doc(userId).get();
   const isAdmin = userDoc.exists && userDoc.data()?.role === "admin";
 
   if (!isAdmin) redirect("/not-authorized");

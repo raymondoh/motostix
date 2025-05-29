@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage().bucket();
     const fileExtension = file.name.split(".").pop();
     const isAdmin = session.user.role === "admin";
     const isProfileImage = file.name.startsWith("profile-");

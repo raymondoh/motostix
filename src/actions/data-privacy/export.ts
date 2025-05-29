@@ -41,7 +41,7 @@ export async function exportUserData(
       return { success: false, error: "Invalid export format" };
     }
 
-    const userDoc = await adminDb.collection("users").doc(session.user.id).get();
+    const userDoc = await adminDb().collection("users").doc(session.user.id).get();
     if (!userDoc.exists) {
       logger({
         type: "warn",
@@ -54,7 +54,7 @@ export async function exportUserData(
     let activityLogs: DataPrivacy.ExportedActivityLog[] = [];
 
     try {
-      const snapshot = await adminDb
+      const snapshot = await adminDb()
         .collection("activityLogs")
         .where("userId", "==", session.user.id)
         .orderBy("timestamp", "desc")
@@ -105,7 +105,7 @@ export async function exportUserData(
     }
 
     const fileName = `data-exports/${session.user.id}/user-data-${Date.now()}.${fileExtension}`;
-    const file = adminStorage.bucket().file(fileName);
+    const file = adminStorage().bucket().file(fileName);
 
     await file.save(fileContent, {
       metadata: { contentType }

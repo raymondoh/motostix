@@ -3,7 +3,7 @@ import { adminDb } from "@/firebase/admin/firebase-admin-init";
 async function fixMissingOnSaleField() {
   try {
     // Get all products
-    const snapshot = await adminDb.collection("products").get();
+    const snapshot = await adminDb().collection("products").get();
 
     const updates: Promise<any>[] = [];
     let fixedCount = 0;

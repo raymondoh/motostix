@@ -29,7 +29,7 @@ export async function logPasswordResetActivity({
   }
 
   try {
-    const userRecord = await adminAuth.getUserByEmail(email);
+    const userRecord = await adminAuth().getUserByEmail(email);
 
     if (userRecord) {
       await logActivity({
@@ -75,7 +75,7 @@ export async function getUserIdByEmail({ email }: Auth.GetUserIdByEmailInput): P
   }
 
   try {
-    const userRecord = await adminAuth.getUserByEmail(email);
+    const userRecord = await adminAuth().getUserByEmail(email);
 
     logger({ type: "info", message: `Found UID for ${email}`, metadata: { uid: userRecord.uid }, context: "auth" });
 
@@ -120,7 +120,7 @@ export async function updatePasswordHash({
   try {
     const passwordHash = await hashPassword(newPassword);
 
-    await adminDb.collection("users").doc(userId).update({
+    await adminDb().collection("users").doc(userId).update({
       passwordHash,
       updatedAt: serverTimestamp()
     });

@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
         description: `Created product: ${data.name}`,
         status: "success",
         metadata: {
-          productId: result.data, // Changed from result.id to result.data
+          productId: result.id,
           productName: data.name,
           price: data.price
         }

@@ -25,8 +25,8 @@ export async function getProfile(): Promise<GetProfileResponse> {
 
   try {
     const [authUser, userDoc] = await Promise.all([
-      adminAuth.getUser(session.user.id),
-      adminDb.collection("users").doc(session.user.id).get()
+      adminAuth().getUser(session.user.id),
+      adminDb().collection("users").doc(session.user.id).get()
     ]);
 
     const userData = userDoc.data();
@@ -93,7 +93,7 @@ export async function updateUserProfile(_: unknown, formData: FormData): Promise
 
     if (Object.keys(authUpdate).length > 0) {
       try {
-        await adminAuth.updateUser(session.user.id, authUpdate);
+        await adminAuth().updateUser(session.user.id, authUpdate);
       } catch (error) {
         const message = isFirebaseError(error) ? firebaseError(error) : "Failed to update auth profile";
         logger({
@@ -112,7 +112,7 @@ export async function updateUserProfile(_: unknown, formData: FormData): Promise
     if (bio !== undefined) updateData.bio = bio;
     if (imageUrl) updateData.picture = imageUrl;
 
-    await adminDb.collection("users").doc(session.user.id).update(updateData);
+    await adminDb().collection("users").doc(session.user.id).update(updateData);
 
     // Log activity
     await logActivity({

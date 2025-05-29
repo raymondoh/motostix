@@ -47,7 +47,7 @@ export async function requestPasswordReset(
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`;
     const actionCodeSettings = { url: resetUrl };
 
-    await adminAuth.generatePasswordResetLink(email, actionCodeSettings);
+    await adminAuth().generatePasswordResetLink(email, actionCodeSettings);
 
     try {
       await logPasswordResetActivity({ email });
@@ -94,10 +94,10 @@ export async function requestPasswordReset(
  */
 export async function syncPasswordWithFirestore(email: string, password: string): Promise<Common.ActionResponse> {
   try {
-    const userRecord = await adminAuth.getUserByEmail(email);
+    const userRecord = await adminAuth().getUserByEmail(email);
     const hashedPassword = await hashPassword(password);
 
-    await adminDb.collection("users").doc(userRecord.uid).update({
+    await adminDb().collection("users").doc(userRecord.uid).update({
       passwordHash: hashedPassword,
       updatedAt: serverTimestamp()
     });
@@ -156,7 +156,7 @@ export async function updatePassword(
   }
 
   try {
-    const userDoc = await adminDb.collection("users").doc(session.user.id).get();
+    const userDoc = await adminDb().collection("users").doc(session.user.id).get();
     const userData = userDoc.exists ? (userDoc.data() as User.UserData | undefined) : undefined;
 
     if (!userData?.passwordHash) {
@@ -172,9 +172,9 @@ export async function updatePassword(
 
     const newPasswordHash = await hashPassword(newPassword);
 
-    await adminAuth.updateUser(session.user.id, { password: newPassword });
+    await adminAuth().updateUser(session.user.id, { password: newPassword });
 
-    await adminDb.collection("users").doc(session.user.id).update({
+    await adminDb().collection("users").doc(session.user.id).update({
       passwordHash: newPasswordHash,
       updatedAt: serverTimestamp()
     });

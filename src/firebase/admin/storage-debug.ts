@@ -9,7 +9,7 @@ export async function debugStorageAccess(): Promise<{
   details?: any;
 }> {
   try {
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage().bucket();
 
     // Check if bucket exists
     const [exists] = await bucket.exists();
@@ -54,7 +54,7 @@ export async function checkUserStorageFolder(userId: string): Promise<{
   files?: string[];
 }> {
   try {
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage().bucket();
     const folderPath = `users/${userId}`;
 
     // List files in the user's folder

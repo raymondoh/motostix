@@ -7,15 +7,16 @@ import { Timestamp } from "firebase-admin/firestore";
 import { createUserDocument } from "./user";
 import bcryptjs from "bcryptjs";
 import { logActivity } from "@/firebase/admin/activity";
+import { ActivityLogData, ActivityType } from "@/types/firebase";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { getUserImage } from "@/utils/get-user-image";
 import type { User } from "@/types/user";
 
 // ================= Firebase User Management =================
 
-/**
- * Create a user in Firebase Auth and Firestore
- */
+// ============================================
+// CREATE A USER IN FIREBASE AUTH AND FIRESTORE
+// ============================================
 export async function createUserInFirebase({
   email,
   password,
@@ -35,7 +36,7 @@ export async function createUserInFirebase({
     }
 
     // 1. Create user in Firebase Auth (hashes password internally)
-    const userRecord = await adminAuth.createUser({
+    const userRecord = await adminAuth().createUser({
       email,
       password,
       displayName
@@ -44,14 +45,14 @@ export async function createUserInFirebase({
     const uid = userRecord.uid;
 
     // 2. Mark email as verified
-    await adminAuth.updateUser(uid, { emailVerified: true });
+    await adminAuth().updateUser(uid, { emailVerified: true });
 
     // 3. Hash password manually for our custom login flow
     const hashedPassword = await bcryptjs.hash(password, 10);
 
     // 4. Add metadata to Firestore
     const now = Timestamp.now();
-    await adminDb
+    await adminDb()
       .collection("users")
       .doc(uid)
       .set({
@@ -90,65 +91,155 @@ export async function createUserInFirebase({
   }
 }
 
+// ===================
+// DELETE USER AS ADMIN
+// ===================
 export async function deleteUserAsAdmin(
   userId: string,
-  adminId?: string
+  adminId?: string // Consider if adminId should be mandatory for audit logging
 ): Promise<{ success: true } | { success: false; error: string }> {
+  const performingAdminId = adminId || "SYSTEM"; // Use a fallback if adminId is not always provided
+  console.log(`[deleteUserAsAdmin] Initiating deletion for user: ${userId}, by admin: ${performingAdminId}`);
+
+  // Get service instances by calling the lazy getters at the start
+  const db = adminDb();
+  const storage = adminStorage();
+  const authAdmin = adminAuth(); // Renamed to avoid conflict if 'auth' is imported from NextAuth
+
+  // Validate that all admin services were initialized correctly by the getters
+  if (!db || typeof db.collection !== "function") {
+    const errorMsg = "[deleteUserAsAdmin] CRITICAL: Firestore instance (db) is not valid or not initialized.";
+    console.error(errorMsg);
+    // Optionally log this critical failure using logActivity if adminId is available and logging is set up to handle init failures
+    return { success: false as const, error: errorMsg };
+  }
+  if (!storage || typeof storage.bucket !== "function") {
+    const errorMsg = "[deleteUserAsAdmin] CRITICAL: Storage instance (storage) is not valid or not initialized.";
+    console.error(errorMsg);
+    return { success: false as const, error: errorMsg };
+  }
+  if (!authAdmin || typeof authAdmin.deleteUser !== "function") {
+    const errorMsg = "[deleteUserAsAdmin] CRITICAL: Admin Auth instance (authAdmin) is not valid or not initialized.";
+    console.error(errorMsg);
+    return { success: false as const, error: errorMsg };
+  }
+
+  const userRef = db.collection("users").doc(userId);
+
   try {
-    const userRef = adminDb.collection("users").doc(userId);
+    // Step 1: Clear image field in Firestore (Consider this non-critical, log warning on failure)
+    try {
+      await userRef.update({ image: null });
+      console.log(`[deleteUserAsAdmin] Successfully cleared 'image' field for user: ${userId}`);
+    } catch (updateError: unknown) {
+      const message = updateError instanceof Error ? updateError.message : String(updateError);
+      console.warn(
+        `[deleteUserAsAdmin] Non-critical: Failed to clear 'image' field for user ${userId}. Error: ${message}`
+      );
+    }
 
-    // 1. Clear image field before deleting the document
-    await userRef.update({ image: null });
-
-    // 2. Attempt to delete profile image from Firebase Storage
-    const fileRef = adminStorage.bucket().file(`users/${userId}/profile.jpg`);
+    // Step 2: Attempt to delete profile image from Firebase Storage
+    const filePath = `users/${userId}/profile.jpg`;
+    const fileRef = storage.bucket().file(filePath);
     try {
       await fileRef.delete();
-      console.log(`✅ Deleted profile image for user ${userId}`);
-    } catch (error) {
-      if (typeof error === "object" && error !== null && "code" in error && (error as any).code === 404) {
-        console.log("ℹ️ Profile image not found, skipping delete.");
+      console.log(`[deleteUserAsAdmin] ✅ Deleted profile image '${filePath}' for user ${userId} from Storage.`);
+    } catch (storageError: unknown) {
+      interface ErrorWithCode {
+        code: string | number;
+        message?: string;
+      }
+      const isErrorWithCode = (err: unknown): err is ErrorWithCode => {
+        return typeof err === "object" && err !== null && "code" in err;
+      };
+
+      if (isErrorWithCode(storageError)) {
+        if (storageError.code === "storage/object-not-found" || storageError.code === 404) {
+          console.log(
+            `[deleteUserAsAdmin] ℹ️ Profile image '${filePath}' not found in Storage for user ${userId}. Skipping delete.`
+          );
+        } else {
+          console.warn(
+            `[deleteUserAsAdmin] ⚠️ Warning: Error deleting profile image '${filePath}' for user ${userId} (Code: ${
+              storageError.code
+            }). Error: ${storageError.message || String(storageError)}`
+          );
+        }
       } else {
-        console.error("⚠️ Error deleting profile image:", error);
+        console.warn(
+          `[deleteUserAsAdmin] ⚠️ Warning: An unexpected error type occurred while deleting profile image '${filePath}' for user ${userId}:`,
+          storageError
+        );
       }
     }
 
-    // 3. Delete Firestore user document
+    // Step 3: Delete Firestore user document (This is a critical step)
+    console.log(`[deleteUserAsAdmin] Attempting to delete Firestore document for user: ${userId}`);
     await userRef.delete();
+    console.log(`[deleteUserAsAdmin] ✅ Successfully deleted Firestore document for user ${userId}.`);
 
-    // 4. Delete Firebase Auth user
-    await adminAuth.deleteUser(userId);
+    // Step 4: Delete Firebase Auth user (This is also a critical step)
+    console.log(`[deleteUserAsAdmin] Attempting to delete Firebase Auth user: ${userId}`);
+    await authAdmin.deleteUser(userId);
+    console.log(`[deleteUserAsAdmin] ✅ Successfully deleted Firebase Auth user: ${userId}.`);
 
-    // 5. Log activity (if adminId is provided)
-    if (adminId) {
-      await logActivity({
-        userId: adminId,
-        type: "admin_deleted_user",
-        description: `Admin deleted user (${userId})`,
-        status: "success",
-        metadata: { deletedUserId: userId }
-      });
+    // Step 5: Log activity
+    // Prepare data for logActivity, ensuring it matches ActivityLogData (excluding timestamp)
+    const activityDataForLog: Omit<ActivityLogData, "timestamp"> = {
+      userId: performingAdminId, // The admin performing the action
+      type: "deletion_completed" as ActivityType, // Use a valid ActivityType or string
+      description: `Admin (ID: ${performingAdminId}) successfully deleted user (ID: ${userId})`,
+      status: "success", // Ensure this is a valid status string for your ActivityLogData
+      metadata: { deletedUserId: userId, adminPerformingAction: performingAdminId }
+      // userEmail, ipAddress, location, device, deviceType can be added if available and relevant
+    };
+    try {
+      await logActivity(activityDataForLog);
+      console.log(`[deleteUserAsAdmin] Successfully logged admin activity for deletion of user: ${userId}`);
+    } catch (logError: unknown) {
+      const logErrorMessage = logError instanceof Error ? logError.message : String(logError);
+      console.error(`[deleteUserAsAdmin] Failed to log admin activity for user ${userId}. Error: ${logErrorMessage}`);
     }
 
-    console.log(`✅ Fully deleted user: ${userId}`);
-    return { success: true };
-  } catch (error: unknown) {
-    const message = isFirebaseError(error)
-      ? firebaseError(error)
-      : error instanceof Error
-      ? error.message
-      : "Unknown error during user deletion";
+    console.log(`[deleteUserAsAdmin] ✅✅ Successfully and fully deleted user: ${userId}`);
+    return { success: true as const };
+  } catch (mainError: unknown) {
+    const errorMessage = isFirebaseError(mainError)
+      ? firebaseError(mainError)
+      : mainError instanceof Error
+      ? mainError.message
+      : "Unknown error occurred during the user deletion process.";
 
-    console.error("❌ Error in deleteUserAsAdmin:", message);
-    return { success: false, error: message };
+    console.error(
+      `[deleteUserAsAdmin] ❌ CRITICAL FAILURE in overall deleteUserAsAdmin process for user ${userId}: ${errorMessage}. Full error:`,
+      mainError
+    );
+
+    // Log critical failure activity
+    const errorActivityData: Omit<ActivityLogData, "timestamp"> = {
+      userId: performingAdminId,
+      type: "error", // Or a specific error ActivityType e.g., "deletion_failed"
+      description: `Failed attempt by admin (ID: ${performingAdminId}) to delete user (${userId}). Error: ${errorMessage}`,
+      status: "failure", // Ensure this is a valid status string
+      metadata: { deletedUserId: userId, errorDetails: String(mainError), adminPerformingAction: performingAdminId }
+    };
+    try {
+      await logActivity(errorActivityData);
+    } catch (activityLogError: unknown) {
+      console.error(`[deleteUserAsAdmin] Also failed to log the error activity:`, activityLogError);
+    }
+    return { success: false as const, error: errorMessage };
   }
 }
-// Delete a user image using its URL (similar to deleteProductImage)
+
+// ==============================================================
+// DELETE USER IMAGE USING ITS URL )SIMILAR TO deleteProductImage)
+// ==============================================================
 export async function deleteUserImage(
   imageUrl: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage().bucket();
 
     const url = new URL(imageUrl);
     const fullPath = url.pathname.slice(1); // remove leading slash
@@ -169,12 +260,12 @@ export async function deleteUserImage(
   }
 }
 
-/**
- * Delete a user from Firebase Auth and Firestore
- */
+// ==============================================
+// DELETE A USER FROM FIREBASE AUTH AND FIRESTORE
+// ==============================================
 export async function deleteUser(uid: string) {
   try {
-    await adminAuth.deleteUser(uid);
+    await adminAuth().deleteUser(uid);
     return { success: true };
   } catch (error) {
     const message = isFirebaseError(error)
@@ -186,16 +277,16 @@ export async function deleteUser(uid: string) {
   }
 }
 
-/**
- * Get a Firebase user by UID
- */
+// ==========================
+// GET A FIREBASE USER BY UID
+// ==========================
 export async function getUser(uid: string): Promise<{ success: true; data: User } | { success: false; error: string }> {
   try {
     // Get auth user
-    const userRecord = await adminAuth.getUser(uid);
+    const userRecord = await adminAuth().getUser(uid);
 
     // Get Firestore user doc
-    const userDoc = await adminDb.collection("users").doc(uid).get();
+    const userDoc = await adminDb().collection("users").doc(uid).get();
     const userData = userDoc.data();
 
     if (!userData) {
@@ -237,12 +328,12 @@ export async function getUser(uid: string): Promise<{ success: true; data: User 
   }
 }
 
-/**
- * Get a Firebase user by email
- */
+// ==========================
+// GET A FIREBASE USER BY EMAIL
+// ==========================
 export async function getUserByEmail(email: string) {
   try {
-    const user = await adminAuth.getUserByEmail(email);
+    const user = await adminAuth().getUserByEmail(email);
     return { success: true, data: user };
   } catch (error) {
     const message = isFirebaseError(error)
@@ -254,15 +345,15 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-/**
- * Update a user's properties in Firebase Auth
- */
+// ===========================================
+// UPDATE A USER'S PROPERTIES IN FIREBASE AUTH
+// ===========================================
 export async function updateUser(
   uid: string,
   properties: { displayName?: string; photoURL?: string; password?: string }
 ) {
   try {
-    const user = await adminAuth.updateUser(uid, properties);
+    const user = await adminAuth().updateUser(uid, properties);
     await logActivity({
       userId: uid,
       type: "user_updated_profile",
@@ -291,7 +382,7 @@ export async function isEmailVerified(
   userId: string
 ): Promise<{ success: boolean; verified?: boolean; error?: string }> {
   try {
-    const userRecord = await adminAuth.getUser(userId);
+    const userRecord = await adminAuth().getUser(userId);
     return { success: true, verified: userRecord.emailVerified };
   } catch (error) {
     const message = isFirebaseError(error)
@@ -313,7 +404,7 @@ export async function sendResetPasswordEmail(email: string): Promise<SendResetPa
       handleCodeInApp: true
     };
 
-    await adminAuth.generatePasswordResetLink(email, actionCodeSettings);
+    await adminAuth().generatePasswordResetLink(email, actionCodeSettings);
     await logActivity({
       userId: email,
       type: "password_reset_requested",
@@ -342,7 +433,7 @@ export async function sendResetPasswordEmail(email: string): Promise<SendResetPa
  */
 export async function getUserFromToken(token: string): Promise<GetUserFromTokenResult> {
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const decodedToken = await adminAuth().verifyIdToken(token);
     return { success: true, user: decodedToken };
   } catch (error) {
     const message = isFirebaseError(error)
@@ -359,7 +450,7 @@ export async function getUserFromToken(token: string): Promise<GetUserFromTokenR
  */
 export async function verifyIdToken(token: string) {
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const decodedToken = await adminAuth().verifyIdToken(token);
     return { success: true, data: decodedToken };
   } catch (error) {
     const message = isFirebaseError(error)
@@ -378,7 +469,7 @@ export async function verifyIdToken(token: string) {
  */
 export async function setCustomClaims(uid: string, claims: CustomClaims): Promise<SetCustomClaimsResult> {
   try {
-    await adminAuth.setCustomUserClaims(uid, claims);
+    await adminAuth().setCustomUserClaims(uid, claims);
     await logActivity({
       userId: uid,
       type: "admin_updated_permissions",
@@ -399,7 +490,7 @@ export async function setCustomClaims(uid: string, claims: CustomClaims): Promis
 }
 export async function verifyAndCreateUser(token: string): Promise<VerifyAndCreateUserResult> {
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const decodedToken = await adminAuth().verifyIdToken(token);
 
     await createUserDocument(decodedToken.uid, {
       id: decodedToken.uid,

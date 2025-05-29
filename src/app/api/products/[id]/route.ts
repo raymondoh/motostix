@@ -279,19 +279,23 @@
 // }
 import { NextResponse, type NextRequest } from "next/server";
 import { updateProduct, deleteProduct } from "@/actions";
+import { getProductById } from "@/firebase/actions";
 import { productUpdateSchema } from "@/schemas/product";
 import { revalidatePath } from "next/cache";
 import { logActivity } from "@/firebase/actions";
 import { auth } from "@/auth";
 
-// GET - Fetch a single product by ID
+/// GET - Fetch a single product by ID
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  console.log("[GET /api/products/[id]] Handler invoked."); // Add this
   try {
     // Await params for Next.js 15 compatibility
     const { id } = await params;
+    console.log(`[GET /api/products/[id]] Processing for ID: ${id}`);
 
-    const { getProductById } = await import("@/firebase/admin/products");
+    // getProductById is now available directly due to static import
     const result = await getProductById(id);
+    console.log(`[GET /api/products/[id]] Result from getProductById for ID ${id}:`, result);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error || "Product not found" }, { status: 404 });
@@ -299,7 +303,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("[GET /api/products/[id]]", error);
+    console.error("[GET /api/products/[id]] Uncaught error in GET handler:", error);
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Failed to fetch product"

@@ -71,17 +71,19 @@ export async function createOrder(orderData: OrderData) {
     const total = subtotal + tax + shipping;
 
     // ✅ Create the order document in Firestore
-    const orderRef = await adminDb.collection("orders").add({
-      ...validatedData,
-      userId: session.user.id,
-      status: validatedData.status || "processing",
-      amount: subtotal, // 💸 Base amount (subtotal)
-      tax,
-      shipping,
-      total, // ✅ Final total saved separately
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+    const orderRef = await adminDb()
+      .collection("orders")
+      .add({
+        ...validatedData,
+        userId: session.user.id,
+        status: validatedData.status || "processing",
+        amount: subtotal, // 💸 Base amount (subtotal)
+        tax,
+        shipping,
+        total, // ✅ Final total saved separately
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
 
     return {
       success: true,
@@ -115,7 +117,7 @@ export async function createOrder(orderData: OrderData) {
  */
 export async function getUserOrders(userId: string) {
   try {
-    const snapshot = await adminDb
+    const snapshot = await adminDb()
       .collection("orders")
       .where("userId", "==", userId)
       .orderBy("createdAt", "desc")
@@ -140,7 +142,7 @@ export async function getUserOrders(userId: string) {
  */
 export async function getAllOrders() {
   try {
-    const snapshot = await adminDb.collection("orders").orderBy("createdAt", "desc").get();
+    const snapshot = await adminDb().collection("orders").orderBy("createdAt", "desc").get();
 
     const orders = snapshot.docs.map(mapDocToOrder);
 
@@ -170,7 +172,7 @@ export async function getAllOrders() {
  */
 export async function getOrderById(id: string) {
   try {
-    const doc = await adminDb.collection("orders").doc(id).get();
+    const doc = await adminDb().collection("orders").doc(id).get();
 
     if (!doc.exists) {
       return null;
@@ -200,7 +202,7 @@ export async function getOrderById(id: string) {
  */
 export async function updateOrderStatus(orderId: string, status: Order["status"]) {
   try {
-    await adminDb.collection("orders").doc(orderId).update({
+    await adminDb().collection("orders").doc(orderId).update({
       status,
       updatedAt: serverTimestamp()
     });

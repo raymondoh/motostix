@@ -41,7 +41,7 @@ export default async function UserDashboardOverviewPage() {
   };
 
   try {
-    const doc = await adminDb.collection("users").doc(userId).get();
+    const doc = await adminDb().collection("users").doc(userId).get();
 
     if (doc.exists) {
       const firestoreData = doc.data() as Partial<User>;

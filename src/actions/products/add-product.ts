@@ -54,7 +54,7 @@ export async function addProduct(data: CreateProductInput): Promise<Product.AddP
     // Map the result to match AddProductResult type
     const addProductResult: Product.AddProductResult = {
       success: true,
-      id: result.data // Map 'data' to 'id' since data contains the product ID
+      id: result.id
     };
 
     /* ── 5) Side-effects & logging ───────────────────────────── */
@@ -67,7 +67,7 @@ export async function addProduct(data: CreateProductInput): Promise<Product.AddP
       message: "Product added successfully",
       metadata: {
         productName: validated.data.name,
-        productId: result.data
+        productId: result.id
       },
       context: "products"
     });

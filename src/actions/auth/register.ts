@@ -35,7 +35,7 @@ export async function registerUser(
 
     let userRecord;
     try {
-      userRecord = await adminAuth.createUser({
+      userRecord = await adminAuth().createUser({
         email,
         password,
         displayName: name || email.split("@")[0],
@@ -63,16 +63,16 @@ export async function registerUser(
       };
     }
 
-    const usersSnapshot = await adminDb.collection("users").count().get();
+    const usersSnapshot = await adminDb().collection("users").count().get();
     const isFirstUser = usersSnapshot.data().count === 0;
     const role = isFirstUser ? "admin" : "user";
 
     if (isFirstUser) {
-      await adminAuth.setCustomUserClaims(userRecord.uid, { role: "admin" });
+      await adminAuth().setCustomUserClaims(userRecord.uid, { role: "admin" });
       logger({ type: "info", message: `First user promoted to admin: ${email}`, context: "auth" });
     }
 
-    await adminDb
+    await adminDb()
       .collection("users")
       .doc(userRecord.uid)
       .set({

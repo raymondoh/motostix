@@ -1,5 +1,4 @@
 // src/firebase/client/next-auth.ts
-
 "use client";
 
 import { signIn } from "next-auth/react";

@@ -1,180 +1,312 @@
 // import "server-only";
 // // src/firebase/admin/firebase-admin-init.ts
-// // Note: No "use server" directive here
 // import { initializeApp, getApps, cert, type App } from "firebase-admin/app";
-// import { getAuth } from "firebase-admin/auth";
-// import { getFirestore } from "firebase-admin/firestore";
-// import { getStorage } from "firebase-admin/storage";
+// import { getAuth, type Auth } from "firebase-admin/auth";
+// import { getFirestore, type Firestore } from "firebase-admin/firestore";
+// import { getStorage, type Storage } from "firebase-admin/storage";
+
+// const safeLog = (label: string, value: string | undefined, length = 70): void => {
+//   if (!value) {
+//     console.log(`${label}: [UNDEFINED/NULL]`);
+//     return;
+//   }
+//   const truncated = value.length > length ? `${value.substring(0, length)}...` : value;
+//   console.log(`${label}: ${truncated}`);
+// };
 
 // function initializeAdminApp(): App {
+//   console.log("[FB Admin Init Func] Attempting to initialize admin app...");
 //   const apps = getApps();
 //   if (apps.length > 0) {
+//     console.log("[FB Admin Init Func] Admin app already initialized. Returning existing app:", apps[0].name);
 //     return apps[0];
 //   }
 
-//   const privateKey = process.env.FIREBASE_PRIVATE_KEY;
-//   if (!privateKey) {
-//     throw new Error("FIREBASE_PRIVATE_KEY is not set in the environment variables");
-//   }
-//   //console.log(process.env.FIREBASE_PRIVATE_KEY);
+//   const projectId = process.env.FIREBASE_PROJECT_ID!;
+//   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL!;
+//   const privateKeyEnv = process.env.FIREBASE_PRIVATE_KEY!;
+//   const storageBucket = process.env.FIREBASE_STORAGE_BUCKET!;
 
-//   return initializeApp({
-//     credential: cert({
-//       projectId: process.env.FIREBASE_PROJECT_ID,
-//       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-//       privateKey: privateKey.replace(/\\n/g, "\n")
-//     }),
-//     storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-//   });
+//   // Ensure all required env vars are present before proceeding
+//   if (!projectId || !clientEmail || !privateKeyEnv || !storageBucket) {
+//     console.error(
+//       "[FB Admin Init Func] CRITICAL FAILURE: One or more required Firebase environment variables are missing."
+//     );
+//     const missing = [
+//       !projectId && "FIREBASE_PROJECT_ID",
+//       !clientEmail && "FIREBASE_CLIENT_EMAIL",
+//       !privateKeyEnv && "FIREBASE_PRIVATE_KEY",
+//       !storageBucket && "FIREBASE_STORAGE_BUCKET"
+//     ]
+//       .filter(Boolean)
+//       .join(", ");
+//     throw new Error(`Missing Firebase Admin credentials: ${missing}`);
+//   }
+
+//   safeLog("[FB Admin Init Func] Raw FIREBASE_PRIVATE_KEY from env", privateKeyEnv, 100);
+//   const formattedPrivateKey = privateKeyEnv.replace(/\\n/g, "\n");
+//   safeLog("[FB Admin Init Func] Formatted privateKey for SDK", formattedPrivateKey, 100);
+
+//   const credentialConfig = {
+//     projectId: projectId,
+//     clientEmail: clientEmail,
+//     privateKey: formattedPrivateKey
+//   };
+
+//   try {
+//     console.log("[FB Admin Init Func] Calling initializeApp with cert()...");
+//     const appInstance = initializeApp({
+//       credential: cert(credentialConfig),
+//       storageBucket: storageBucket
+//     });
+//     console.log(`[FB Admin Init Func] Firebase Admin SDK initialized successfully. App name: ${appInstance.name}`);
+//     return appInstance;
+//   } catch (error: any) {
+//     console.error("[FB Admin Init Func] CRITICAL FAILURE: Error during initializeApp call:", error.message);
+//     console.error("[FB Admin Init Func] Full error object during initializeApp:", error);
+//     throw error;
+//   }
 // }
 
-// const firebaseAdmin = initializeAdminApp();
+// console.log("[FB Admin Init Module] Top-level: Initializing firebaseAdminApp constant...");
+// const firebaseAdminApp: App = initializeAdminApp();
 
-// export const adminAuth = getAuth(firebaseAdmin);
-// export const adminDb = getFirestore(firebaseAdmin);
-// export const adminStorage = getStorage(firebaseAdmin);
-// // This is good, keep it as is
+// // Log the firebaseAdminApp object itself to see its structure
+// console.log("[FB Admin Init Module] Inspecting firebaseAdminApp object structure:", firebaseAdminApp);
+// if (firebaseAdminApp && firebaseAdminApp.name && typeof firebaseAdminApp.options === "object") {
+//   console.log(
+//     `[FB Admin Init Module] firebaseAdminApp instance appears VALID. Name: ${firebaseAdminApp.name}, Options:`,
+//     firebaseAdminApp.options
+//   );
+// } else {
+//   console.error(
+//     "[FB Admin Init Module] CRITICAL: firebaseAdminApp instance is NULL, has no name, or no options AFTER initializeAdminApp() call!"
+//   );
+// }
+
+// // --- LAZY SERVICE GETTERS (This is the key fix!) ---
+// let _adminDb: Firestore | null = null;
+// let _adminAuth: Auth | null = null;
+// let _adminStorage: Storage | null = null;
+
+// // Inside firebase-admin-init.ts
+
+// export function adminDb(): Firestore {
+//   if (!_adminDb) {
+//     try {
+//       console.log("[FB Admin Init Module] Lazy-initializing Firestore...");
+//       _adminDb = getFirestore(firebaseAdminApp);
+
+//       // CORRECTED VALIDATION for Firestore:
+//       if (_adminDb && typeof _adminDb.collection === "function") {
+//         console.log(
+//           "[FB Admin Init Module] Firestore service lazy-initialized successfully and appears VALID (has .collection method)."
+//         );
+//       } else {
+//         console.error(
+//           "[FB Admin Init Module] CRITICAL for Firestore: Lazy-initialized _adminDb is NULL or not a valid Firestore client object (missing .collection method)!"
+//         );
+//         // If this error occurs, _adminDb did not initialize correctly from getFirestore().
+//         // You might want to throw an error here to prevent further execution with a bad db client.
+//         // For example: throw new Error("Failed to initialize a functional Firestore client.");
+//       }
+//     } catch (e: any) {
+//       console.error("[FB Admin Init Module] ERROR during lazy getFirestore() call:", e.message, e);
+//       throw e; // Re-throw to make the failure visible
+//     }
+//   }
+//   if (!_adminDb) {
+//     // This check is good for ensuring _adminDb was actually assigned
+//     console.error("[FB Admin Init Module] Returning NULL _adminDb after initialization attempt!");
+//     throw new Error("Firestore service could not be initialized and is null.");
+//   }
+//   return _adminDb;
+// }
+
+// // Similarly for adminAuth, checking its specific methods is more robust than .app.name
+// export function adminAuth(): Auth {
+//   if (!_adminAuth) {
+//     try {
+//       console.log("[FB Admin Init Module] Lazy-initializing Auth...");
+//       _adminAuth = getAuth(firebaseAdminApp);
+//       // CORRECTED VALIDATION for Auth:
+//       if (_adminAuth && typeof _adminAuth.getUser === "function") {
+//         console.log(
+//           "[FB Admin Init Module] Auth service lazy-initialized successfully and appears VALID (has .getUser method)."
+//         );
+//         // Optionally, log the app reference if you know its structure (e.g., _adminAuth.app_ )
+//         // const authApp = (_adminAuth as any).app || (_adminAuth as any).app_;
+//         // if (authApp && authApp.name) {
+//         //   console.log(`[FB Admin Init Module] Auth service linked to app: ${authApp.name}`);
+//         // }
+//       } else {
+//         console.error(
+//           "[FB Admin Init Module] CRITICAL for Auth: Lazy-initialized _adminAuth is NULL or not a valid Auth client object (missing .getUser method)!"
+//         );
+//       }
+//     } catch (e: any) {
+//       /* ... */ throw e;
+//     }
+//   }
+//   if (!_adminAuth) {
+//     throw new Error("Auth service could not be initialized.");
+//   }
+//   return _adminAuth;
+// }
+
+// // And for adminStorage
+// export function adminStorage(): Storage {
+//   if (!_adminStorage) {
+//     try {
+//       console.log("[FB Admin Init Module] Lazy-initializing Storage...");
+//       _adminStorage = getStorage(firebaseAdminApp);
+//       // CORRECTED VALIDATION for Storage:
+//       if (_adminStorage && typeof _adminStorage.bucket === "function") {
+//         console.log(
+//           "[FB Admin Init Module] Storage service lazy-initialized successfully and appears VALID (has .bucket method)."
+//         );
+//       } else {
+//         console.error(
+//           "[FB Admin Init Module] CRITICAL for Storage: Lazy-initialized _adminStorage is NULL or not a valid Storage client object (missing .bucket method)!"
+//         );
+//       }
+//     } catch (e: any) {
+//       /* ... */ throw e;
+//     }
+//   }
+//   if (!_adminStorage) {
+//     throw new Error("Storage service could not be initialized.");
+//   }
+//   return _adminStorage;
+// }
+
+// console.log("[FB Admin Init Module] Exports (adminAuth, adminDb, adminStorage) functions are now defined.");
+
+// // Global ProcessEnv type definition
 // declare global {
 //   namespace NodeJS {
 //     interface ProcessEnv {
 //       FIREBASE_PROJECT_ID: string;
 //       FIREBASE_CLIENT_EMAIL: string;
 //       FIREBASE_PRIVATE_KEY: string;
+//       FIREBASE_STORAGE_BUCKET: string;
 //     }
 //   }
 // }
 import "server-only";
 // src/firebase/admin/firebase-admin-init.ts
 import { initializeApp, getApps, cert, type App } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage";
-
-// Helper function to safely log parts of potentially sensitive strings
-const safeLog = (label: string, value: string | undefined, length: number = 70): void => {
-  if (value) {
-    // For private key, we might want to be even more careful or just confirm its structure
-    if (label.includes("PRIVATE_KEY") && value.length > length) {
-      console.log(
-        `${label} (exists, first ${length} chars): ${value.substring(0, length)}... [ENDS WITH] ...${value.substring(
-          value.length - length / 2
-        )}`
-      );
-    } else if (value.length > length) {
-      console.log(`${label} (exists, first ${length} chars): ${value.substring(0, length)}...`);
-    } else {
-      console.log(`${label} (exists): ${value}`);
-    }
-  } else {
-    console.log(`${label}: NOT SET or empty`);
-  }
-};
+import { getAuth, type Auth } from "firebase-admin/auth";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import { getStorage, type Storage } from "firebase-admin/storage";
 
 function initializeAdminApp(): App {
-  console.log("[FB Admin Init] Attempting to initialize admin app...");
   const apps = getApps();
   if (apps.length > 0) {
-    console.log("[FB Admin Init] Admin app already initialized. Returning existing app.");
+    console.log("[Firebase Admin] Using existing app:", apps[0].name);
     return apps[0];
   }
 
-  console.log("[FB Admin Init] Checking environment variables...");
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKeyEnv = process.env.FIREBASE_PRIVATE_KEY; // This is the one that Vercel logs showed
-  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
+  const projectId = process.env.FIREBASE_PROJECT_ID!;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL!;
+  const privateKeyEnv = process.env.FIREBASE_PRIVATE_KEY!;
+  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET!;
 
-  safeLog("[FB Admin Init] Value for FIREBASE_PROJECT_ID", projectId);
-  safeLog("[FB Admin Init] Value for FIREBASE_CLIENT_EMAIL", clientEmail);
-  safeLog("[FB Admin Init] Value for FIREBASE_STORAGE_BUCKET", storageBucket);
-
-  if (!privateKeyEnv) {
-    console.error("[FB Admin Init] CRITICAL FAILURE: FIREBASE_PRIVATE_KEY is not set in the environment variables.");
-    throw new Error(
-      "FIREBASE_PRIVATE_KEY is not set in the environment variables. This is a fatal error for Firebase Admin initialization."
-    );
-  }
-  // Log a portion of the raw private key as it comes from the environment
-  safeLog("[FB Admin Init] Raw FIREBASE_PRIVATE_KEY from env", privateKeyEnv, 100); // Log more to see structure
-
-  if (!projectId) {
-    console.error("[FB Admin Init] CRITICAL FAILURE: FIREBASE_PROJECT_ID is not set.");
-    throw new Error("FIREBASE_PROJECT_ID is not set. This is a fatal error for Firebase Admin initialization.");
-  }
-  if (!clientEmail) {
-    console.error("[FB Admin Init] CRITICAL FAILURE: FIREBASE_CLIENT_EMAIL is not set.");
-    throw new Error("FIREBASE_CLIENT_EMAIL is not set. This is a fatal error for Firebase Admin initialization.");
-  }
-  if (!storageBucket) {
-    // Depending on usage, this might not be critical for all Firebase services but is for storage.
-    // Your code uses getStorage(), so it IS critical.
-    console.error(
-      "[FB Admin Init] CRITICAL FAILURE: FIREBASE_STORAGE_BUCKET is not set. Storage operations will fail."
-    );
-    throw new Error("FIREBASE_STORAGE_BUCKET is not set. This is a fatal error as adminStorage is initialized.");
+  // Ensure all required env vars are present
+  if (!projectId || !clientEmail || !privateKeyEnv || !storageBucket) {
+    const missing = [
+      !projectId && "FIREBASE_PROJECT_ID",
+      !clientEmail && "FIREBASE_CLIENT_EMAIL",
+      !privateKeyEnv && "FIREBASE_PRIVATE_KEY",
+      !storageBucket && "FIREBASE_STORAGE_BUCKET"
+    ]
+      .filter(Boolean)
+      .join(", ");
+    throw new Error(`Missing Firebase Admin credentials: ${missing}`);
   }
 
-  // This line is crucial: it replaces literal '\\n' strings with actual newline characters.
   const formattedPrivateKey = privateKeyEnv.replace(/\\n/g, "\n");
-  console.log("[FB Admin Init] Private key after .replace(/\\\\n/g, '\\n'):");
-  // Log a portion of the formatted private key to see the effect of replace
-  safeLog("[FB Admin Init] Formatted privateKey for SDK", formattedPrivateKey, 100);
-
-  const credentialConfig = {
-    projectId: projectId,
-    clientEmail: clientEmail,
-    privateKey: formattedPrivateKey // Use the processed key
-  };
 
   try {
-    console.log("[FB Admin Init] Calling initializeApp with cert()...");
-    console.log("[FB Admin Init] Using Project ID:", credentialConfig.projectId);
-    console.log("[FB Admin Init] Using Client Email:", credentialConfig.clientEmail);
-    // Avoid logging the full formattedPrivateKey again here if it's too verbose or a security concern in logs,
-    // but confirm it's being passed.
-    console.log(
-      "[FB Admin Init] Private key (structure check for SDK): First 30 chars: '",
-      formattedPrivateKey.substring(0, 30),
-      "', Last 20 chars: '",
-      formattedPrivateKey.substring(formattedPrivateKey.length - 20),
-      "'"
-    );
-
-    const app = initializeApp({
-      credential: cert(credentialConfig),
-      storageBucket: storageBucket
+    const appInstance = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey: formattedPrivateKey
+      }),
+      storageBucket
     });
-    console.log("[FB Admin Init] Firebase Admin SDK initialized successfully. App name:", app.name);
-    return app;
+    console.log(`[Firebase Admin] Initialized successfully: ${appInstance.name}`);
+    return appInstance;
   } catch (error: any) {
-    console.error("[FB Admin Init] CRITICAL FAILURE: Error during initializeApp call:", error.message);
-    console.error("[FB Admin Init] Full error object during initializeApp:", error);
-    console.error("[FB Admin Init] Credentials attempted (excluding private key for safety in this detailed log):", {
-      projectId: projectId,
-      clientEmail: clientEmail,
-      storageBucket: storageBucket,
-      privateKeyHint:
-        "Private key was processed via .replace(/\\\\n/g, '\\n') before being passed to cert(). Ensure the original FIREBASE_PRIVATE_KEY in Vercel has newlines correctly formatted (either actual newlines or as '\\\\n' strings)."
-    });
-    throw error; // Re-throw the error to ensure failure is propagated
+    console.error("[Firebase Admin] Initialization failed:", error.message);
+    throw error;
   }
 }
 
-const firebaseAdmin = initializeAdminApp(); // Initialize on import
+const firebaseAdminApp: App = initializeAdminApp();
 
-// Export the initialized services
-export const adminAuth = getAuth(firebaseAdmin);
-export const adminDb = getFirestore(firebaseAdmin);
-export const adminStorage = getStorage(firebaseAdmin);
+// Lazy service getters
+let _adminDb: Firestore | null = null;
+let _adminAuth: Auth | null = null;
+let _adminStorage: Storage | null = null;
 
-// This TypeScript declaration helps ensure you remember to set these in your .env or Vercel
+export function adminDb(): Firestore {
+  if (!_adminDb) {
+    try {
+      _adminDb = getFirestore(firebaseAdminApp);
+
+      if (!_adminDb || typeof _adminDb.collection !== "function") {
+        throw new Error("Failed to initialize Firestore service");
+      }
+    } catch (error: any) {
+      console.error("[Firebase Admin] Firestore initialization failed:", error.message);
+      throw error;
+    }
+  }
+  return _adminDb;
+}
+
+export function adminAuth(): Auth {
+  if (!_adminAuth) {
+    try {
+      _adminAuth = getAuth(firebaseAdminApp);
+
+      if (!_adminAuth || typeof _adminAuth.getUser !== "function") {
+        throw new Error("Failed to initialize Auth service");
+      }
+    } catch (error: any) {
+      console.error("[Firebase Admin] Auth initialization failed:", error.message);
+      throw error;
+    }
+  }
+  return _adminAuth;
+}
+
+export function adminStorage(): Storage {
+  if (!_adminStorage) {
+    try {
+      _adminStorage = getStorage(firebaseAdminApp);
+
+      if (!_adminStorage || typeof _adminStorage.bucket !== "function") {
+        throw new Error("Failed to initialize Storage service");
+      }
+    } catch (error: any) {
+      console.error("[Firebase Admin] Storage initialization failed:", error.message);
+      throw error;
+    }
+  }
+  return _adminStorage;
+}
+
+// Global ProcessEnv type definition
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
       FIREBASE_PROJECT_ID: string;
       FIREBASE_CLIENT_EMAIL: string;
       FIREBASE_PRIVATE_KEY: string;
-      FIREBASE_STORAGE_BUCKET: string; // Made it non-optional as your code uses it
+      FIREBASE_STORAGE_BUCKET: string;
     }
   }
 }

@@ -49,13 +49,13 @@ export const authOptions: NextAuthConfig = {
         }
 
         try {
-          const decodedToken = await adminAuth.verifyIdToken(credentials.idToken);
+          const decodedToken = await adminAuth().verifyIdToken(credentials.idToken);
           const uid = decodedToken.uid;
           const email = decodedToken.email;
 
           if (!email) throw new Error("No email in token");
 
-          const userRecord = await adminAuth.getUser(uid);
+          const userRecord = await adminAuth().getUser(uid);
           const provider = decodedToken.firebase?.sign_in_provider || "unknown";
 
           const { role } = await syncUserWithFirebase(uid, {
@@ -112,8 +112,8 @@ export const authOptions: NextAuthConfig = {
       if (token && session.user) {
         try {
           const [authUser, firestoreDoc] = await Promise.all([
-            adminAuth.getUser(token.uid as string),
-            adminDb
+            adminAuth().getUser(token.uid as string),
+            adminDb()
               .collection("users")
               .doc(token.uid as string)
               .get()
@@ -172,4 +172,3 @@ export const authOptions: NextAuthConfig = {
     }
   }
 };
-////////////////////////////////////////////////

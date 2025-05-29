@@ -28,7 +28,10 @@ export async function processPendingDeletions(): Promise<DataPrivacy.ProcessDele
   }
 
   try {
-    const pendingRequestsSnapshot = await adminDb.collection("deletionRequests").where("status", "==", "pending").get();
+    const pendingRequestsSnapshot = await adminDb()
+      .collection("deletionRequests")
+      .where("status", "==", "pending")
+      .get();
 
     if (pendingRequestsSnapshot.empty) {
       logger({
@@ -67,7 +70,7 @@ export async function processPendingDeletions(): Promise<DataPrivacy.ProcessDele
         if (success) {
           processed++;
 
-          await adminDb.collection("deletionRequests").doc(doc.id).update({
+          await adminDb().collection("deletionRequests").doc(doc.id).update({
             status: "processed",
             processedAt: serverTimestamp()
           });

@@ -3,7 +3,6 @@
 // ===============================
 
 // ================= Imports =================
-import { revalidatePath } from "next/cache";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb, adminStorage } from "@/firebase/admin/firebase-admin-init";
 import type { DocumentData } from "firebase-admin/firestore";
@@ -13,58 +12,9 @@ import { serializeProduct, serializeProductArray } from "@/utils/serializeProduc
 import { productSchema, productUpdateSchema } from "@/schemas/product";
 import { normalizeCategory, normalizeSubcategory } from "@/config/categories";
 import { updateProduct as updateProductFirebase } from "@/firebase/admin/products";
-import { FieldValue } from "firebase-admin/firestore";
-import { logActivity } from "./activity";
+//import { logActivity } from "./activity";
 //import type { FirebaseFirestore } from "@firebase/firestore";
 
-// Helper to map Firestore data to full Product type
-// function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
-//   const data = doc.data() ?? {};
-//   return {
-//     id: doc.id,
-//     name: data?.name || "",
-//     description: data?.description || "",
-//     details: data?.details || "",
-//     sku: data?.sku || "",
-//     barcode: data?.barcode || "",
-//     category: data.category || "",
-//     subcategory: data.subcategory || "",
-//     designThemes: data.designThemes || [],
-//     productType: data.productType || "",
-//     tags: data.tags || [],
-//     brand: data.brand || "",
-//     manufacturer: data.manufacturer || "",
-//     dimensions: data?.dimensions || "",
-//     weight: data?.weight || "",
-//     shippingWeight: data?.shippingWeight || "",
-//     material: data?.material || "",
-//     finish: data?.finish || undefined,
-//     color: data?.color || "",
-//     baseColor: data?.baseColor || "",
-//     colorDisplayName: data?.colorDisplayName || "",
-//     stickySide: data?.stickySide || undefined,
-//     size: data?.size || "",
-//     image: data?.image || "/placeholder.svg",
-//     additionalImages: data?.additionalImages || [],
-//     placements: data?.placements || [],
-//     price: data?.price || 0,
-//     salePrice: data?.salePrice || undefined,
-//     onSale: data?.onSale || false,
-//     costPrice: data?.costPrice || undefined,
-//     stockQuantity: data?.stockQuantity || undefined,
-//     lowStockThreshold: data?.lowStockThreshold || undefined,
-//     shippingClass: data?.shippingClass || "",
-//     inStock: data?.inStock ?? true,
-//     badge: data?.badge || "",
-//     isFeatured: data?.isFeatured ?? false,
-//     isHero: data?.isHero ?? false,
-//     isLiked: data?.isLiked ?? false,
-//     isCustomizable: data?.isCustomizable ?? false,
-//     isNewArrival: data?.isNewArrival ?? false,
-//     createdAt: data?.createdAt, // Keep as Timestamp or convert as needed before sending to client
-//     updatedAt: data?.updatedAt
-//   };
-// }
 function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
   const data = doc.data() ?? {};
   return {
@@ -138,7 +88,8 @@ export async function getAllProducts(filters?: {
   }
 
   try {
-    let query = adminDb.collection("products").orderBy("createdAt", "desc");
+    //let query = adminDb.collection("products").orderBy("createdAt", "desc");
+    let query = adminDb().collection("products").orderBy("createdAt", "desc");
 
     // Apply limit if provided
     if (filters?.limit && typeof filters.limit === "number" && filters.limit > 0) {
@@ -183,7 +134,8 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
       }
     }
 
-    let query = adminDb.collection("products").orderBy("createdAt", "desc");
+    //let query = adminDb.collection("products").orderBy("createdAt", "desc");
+    let query = adminDb().collection("products").orderBy("createdAt", "desc");
 
     // String equality filters
     if (filters.category) {
@@ -330,12 +282,65 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
 //     return { success: false as const, error: message };
 //   }
 // }
+
+//SKU!!!
+// export async function addProduct(data: any) {
+//   try {
+//     console.log("🚀 addProduct - Starting creation");
+//     console.log("📋 addProduct - Raw input data:", JSON.stringify(data, null, 2));
+
+//     // Validate using the full product schema for creation
+//     const validationResult = productSchema.safeParse(data);
+
+//     if (!validationResult.success) {
+//       console.error("❌ Schema validation failed:", validationResult.error.errors);
+//       const errorMessages = validationResult.error.errors
+//         .map(err => `${err.path.join(".")}: ${err.message}`)
+//         .join(", ");
+//       return { success: false as const, error: `Validation failed: ${errorMessages}` };
+//     }
+
+//     const validatedData = validationResult.data;
+//     console.log("✅ Schema validation passed. Validated data:", JSON.stringify(validatedData, null, 2));
+
+//     // Create the new product with timestamps
+//     const newProduct = {
+//       ...validatedData,
+//       createdAt: new Date(),
+//       updatedAt: new Date()
+//     };
+
+//     console.log("🔥 FINAL - Product data being sent to Firebase:", JSON.stringify(newProduct, null, 2));
+
+//     const docRef = await adminDb().collection("products").add(newProduct);
+
+//     console.log("✅ Firebase creation completed successfully with ID:", docRef.id);
+
+//     return { success: true as const, data: docRef.id };
+//   } catch (error) {
+//     console.error("❌ addProduct error:", error);
+//     const message = isFirebaseError(error)
+//       ? firebaseError(error)
+//       : (error as Error)?.message || "Unknown error adding product";
+//     return { success: false as const, error: message };
+//   }
+// }
+
+/**
+ * Accepts all Product fields.
+ * - Validates the incoming data against the product schema.
+ * - Generates a unique SKU if one is not provided.
+ * - Adds createdAt and updatedAt timestamps.
+ * - Creates the product in the "products" collection.
+ * - Returns the full product object, including the new ID and final SKU.
+ */
 export async function addProduct(data: any) {
+  // Consider using a stricter type like Omit<Product, "id" | "createdAt" | "updatedAt">
   try {
     console.log("🚀 addProduct - Starting creation");
     console.log("📋 addProduct - Raw input data:", JSON.stringify(data, null, 2));
 
-    // Validate using the full product schema for creation
+    // Validate using the full product schema
     const validationResult = productSchema.safeParse(data);
 
     if (!validationResult.success) {
@@ -349,20 +354,48 @@ export async function addProduct(data: any) {
     const validatedData = validationResult.data;
     console.log("✅ Schema validation passed. Validated data:", JSON.stringify(validatedData, null, 2));
 
-    // Create the new product with timestamps
-    const newProduct = {
+    const now = new Date(); // Or Timestamp.now() for native Firestore type
+
+    // Data to be added to Firestore, excluding the SKU for now if it's missing
+    const newProductData = {
       ...validatedData,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: now,
+      updatedAt: now
     };
 
-    console.log("🔥 FINAL - Product data being sent to Firebase:", JSON.stringify(newProduct, null, 2));
+    console.log("🔥 FINAL - Product data being sent to Firebase:", JSON.stringify(newProductData, null, 2));
 
-    const docRef = await adminDb.collection("products").add(newProduct);
-
+    // Add the document to get its generated ID
+    const docRef = await adminDb().collection("products").add(newProductData);
     console.log("✅ Firebase creation completed successfully with ID:", docRef.id);
 
-    return { success: true as const, data: docRef.id };
+    /* --- SKU Generation Logic --- */
+    // Use the provided SKU or generate a new one from the document ID
+    const finalSku = validatedData.sku ?? `SKU-${docRef.id.substring(0, 8).toUpperCase()}`;
+
+    // If a new SKU was generated, update the document in Firestore
+    if (!validatedData.sku) {
+      console.log(`📦 SKU not provided. Generating and updating with: ${finalSku}`);
+      await docRef.update({ sku: finalSku });
+      console.log("✅ SKU updated in Firebase.");
+    }
+
+    // Construct the complete product object to return to the caller
+    const fullProduct = {
+      id: docRef.id,
+      ...validatedData,
+      sku: finalSku, // Ensure the final SKU is included
+      createdAt: now,
+      updatedAt: now
+    };
+
+    // Note: The previous function had a `serializeProduct` step.
+    // You may want to apply a similar serialization here if needed.
+    return {
+      success: true as const,
+      id: docRef.id,
+      product: fullProduct
+    };
   } catch (error) {
     console.error("❌ addProduct error:", error);
     const message = isFirebaseError(error)
@@ -375,47 +408,31 @@ export async function addProduct(data: any) {
 // ===================
 // GET PRODUCT BY ID
 // ===================
-// export async function getProductById(id: string) {
-//   try {
-//     const doc = await adminDb.collection("products").doc(id).get();
-//     if (!doc.exists) return { success: false as const, error: "Product not found" };
-
-//     const product = mapDocToProduct(doc);
-//     return { success: true as const, product: serializeProduct(product) };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error fetching product by ID";
-//     return { success: false as const, error: message };
-//   }
-// }
-// Assuming adminDb is imported somewhat like this at the top of the file:
-// import { adminDb } from '../admin/firebase-admin-init'; // ADJUST PATH TO YOUR INIT FILE
-// And your helper functions are also available:
-// import { mapDocToProduct, serializeProduct } from './mappers'; // Example path
-// import { isFirebaseError, firebaseError } from './errorUtils'; // Example path
-
 export async function getProductById(id: string) {
   console.log(`[getProductById] Called for product ID: ${id}`);
 
-  // Critical check: Is adminDb and its app property available?
-  if (!adminDb || !adminDb.app) {
+  const dbInstance = adminDb(); // Call the getter function ONCE and store the instance
+
+  // CORRECTED VALIDATION: Check if dbInstance is a functional Firestore client
+  if (!dbInstance || typeof dbInstance.collection !== "function") {
     console.error(
-      `[getProductById] CRITICAL: adminDb or adminDb.app is NOT INITIALIZED when called for ID: ${id}! This implies a serious issue with Firebase Admin setup.`
+      `[getProductById] CRITICAL: Firestore client instance (from adminDb()) is NOT VALID or not initialized (missing .collection method) when called for ID: ${id}! Check firebase-admin-init.ts logs.`
     );
     return {
       success: false as const,
-      error: "Firebase Admin (adminDb.app) not properly initialized for getProductById"
+      error:
+        "Firebase Admin (dbInstance from adminDb()) not properly initialized or is not a valid Firestore client for getProductById"
     };
   }
-
-  // Log the app name to ensure we're using the initialized instance
-  console.log(`[getProductById] Using adminDb.app.name: '${adminDb.app.name}' for product ID: ${id}`);
-  // This should log '[DEFAULT]' if your initialization was successful and is correctly referenced.
+  // If you reach here, dbInstance is considered functional for Firestore operations.
+  console.log(`[getProductById] Using functional Firestore client for product ID: ${id}`);
 
   try {
-    console.log(`[getProductById] Attempting Firestore operation: adminDb.collection('products').doc('${id}').get()`);
-    const doc = await adminDb.collection("products").doc(id).get();
+    console.log(
+      `[getProductById] Attempting Firestore operation: dbInstance.collection('products').doc('${id}').get()`
+    );
+    // Use the dbInstance for Firestore operations
+    const doc = await dbInstance.collection("products").doc(id).get();
 
     if (!doc.exists) {
       console.warn(`[getProductById] Product with ID: '${id}' not found in Firestore.`);
@@ -423,7 +440,6 @@ export async function getProductById(id: string) {
     }
 
     console.log(`[getProductById] Successfully fetched document for product ID: '${id}'. Exists: true.`);
-    // Assuming mapDocToProduct and serializeProduct are synchronous or you handle their async nature appropriately
     const product = mapDocToProduct(doc); // Ensure mapDocToProduct is defined
     const serialized = serializeProduct(product); // Ensure serializeProduct is defined
 
@@ -431,19 +447,6 @@ export async function getProductById(id: string) {
     return { success: true as const, product: serialized };
   } catch (error) {
     console.error(`[getProductById] Firebase error occurred while fetching product ID '${id}':`, error);
-
-    // Attempt to log adminDb.app.name again in case of an error to see if it was available then
-    try {
-      console.error(
-        `[getProductById] State of adminDb.app.name at time of error: '${
-          adminDb.app?.name || "adminDb.app NOT DEFINED"
-        }'`
-      );
-    } catch (appError) {
-      console.error(
-        `[getProductById] Could not access adminDb.app.name at time of error. adminDb might be undefined or app property inaccessible.`
-      );
-    }
 
     // Assuming isFirebaseError and firebaseError are defined
     const message = isFirebaseError(error)
@@ -501,7 +504,7 @@ export async function updateProduct(id: string, data: any) {
     console.log("🔥 FINAL - Update data being sent to Firebase:", JSON.stringify(updateData, null, 2));
 
     // Perform the Firebase update
-    await adminDb.collection("products").doc(id).update(updateData);
+    await adminDb().collection("products").doc(id).update(updateData);
 
     console.log("✅ Firebase update completed successfully");
 
@@ -520,7 +523,7 @@ export async function updateProduct(id: string, data: any) {
 // ===================
 export async function deleteProduct(productId: string) {
   try {
-    const docRef = adminDb.collection("products").doc(productId);
+    const docRef = adminDb().collection("products").doc(productId);
     const docSnap = await docRef.get();
 
     if (!docSnap.exists) {
@@ -556,7 +559,7 @@ export async function deleteProduct(productId: string) {
 // ===================
 export async function deleteProductImage(imageUrl: string) {
   try {
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage().bucket();
     const url = new URL(imageUrl);
     const fullPath = url.pathname.slice(1);
     const storagePath = fullPath.replace(`${bucket.name}/`, "");
@@ -578,7 +581,7 @@ export async function deleteProductImage(imageUrl: string) {
 // ===================
 export async function getFeaturedProducts() {
   try {
-    const snapshot = await adminDb.collection("products").where("isFeatured", "==", true).get();
+    const snapshot = await adminDb().collection("products").where("isFeatured", "==", true).get();
     const products = snapshot.docs.map(mapDocToProduct);
     return { success: true as const, data: serializeProductArray(products) };
   } catch (error) {
@@ -599,7 +602,7 @@ export async function getOnSaleProducts(limit = 10) {
     // Try the direct query first
     let snapshot;
     try {
-      snapshot = await adminDb
+      snapshot = await adminDb()
         .collection("products")
         .where("onSale", "==", true)
         .orderBy("createdAt", "desc")
@@ -611,7 +614,7 @@ export async function getOnSaleProducts(limit = 10) {
       console.log("🏷️ getOnSaleProducts - Direct query failed, trying fallback approach");
 
       // Fallback: get all products and filter in memory
-      snapshot = await adminDb.collection("products").orderBy("createdAt", "desc").get();
+      snapshot = await adminDb().collection("products").orderBy("createdAt", "desc").get();
 
       console.log("🏷️ getOnSaleProducts - Fallback: got", snapshot.docs.length, "total products");
     }
@@ -652,7 +655,7 @@ export async function getOnSaleProducts(limit = 10) {
 // ===================
 export async function getNewArrivals(limit = 10) {
   try {
-    const snapshot = await adminDb
+    const snapshot = await adminDb()
       .collection("products")
       .where("isNewArrival", "==", true)
       .orderBy("createdAt", "desc")
@@ -674,7 +677,7 @@ export async function getNewArrivals(limit = 10) {
 // ===================
 export async function getHeroSlidesFromFirestore() {
   try {
-    const snapshot = await adminDb.collection("products").where("isHero", "==", true).get();
+    const snapshot = await adminDb().collection("products").where("isHero", "==", true).get();
     const slides: HeroSlide[] = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -720,7 +723,7 @@ export async function getRelatedProducts({
 }: GetRelatedProductsParams) {
   try {
     // Start with a collection reference
-    let query = adminDb.collection("products") as FirebaseFirestore.Query<DocumentData>;
+    let query = adminDb().collection("products") as FirebaseFirestore.Query<DocumentData>;
 
     // Apply category filter
     if (category) {
@@ -778,7 +781,7 @@ export async function getRelatedProducts({
 
     // If no products found with the filters, try a broader search
     if (related.length === 0) {
-      const fallbackQuery = adminDb.collection("products").orderBy("createdAt", "desc").limit(limit).get();
+      const fallbackQuery = adminDb().collection("products").orderBy("createdAt", "desc").limit(limit).get();
 
       const fallbackSnapshot = await fallbackQuery;
       const fallbackProducts = fallbackSnapshot.docs
@@ -804,7 +807,7 @@ export async function getRelatedProducts({
 export async function likeProduct(userId: string, productId: string) {
   try {
     const now = Timestamp.now();
-    const likeRef = adminDb.collection("users").doc(userId).collection("likes").doc(productId);
+    const likeRef = adminDb().collection("users").doc(userId).collection("likes").doc(productId);
 
     await likeRef.set({
       productId,
@@ -826,7 +829,7 @@ export async function likeProduct(userId: string, productId: string) {
 // // ===================
 export async function unlikeProduct(userId: string, productId: string) {
   try {
-    const likeRef = adminDb.collection("users").doc(userId).collection("likes").doc(productId);
+    const likeRef = adminDb().collection("users").doc(userId).collection("likes").doc(productId);
     await likeRef.delete();
     return { success: true as const };
   } catch (error) {
@@ -843,12 +846,12 @@ export async function unlikeProduct(userId: string, productId: string) {
 // // ===================
 export async function getUserLikedProducts(userId: string) {
   try {
-    const snapshot = await adminDb.collection("users").doc(userId).collection("likes").get();
+    const snapshot = await adminDb().collection("users").doc(userId).collection("likes").get();
     const likedProductIds = snapshot.docs.map(doc => doc.id);
 
     if (likedProductIds.length === 0) return { success: true as const, data: [] };
 
-    const productDocs = await Promise.all(likedProductIds.map(id => adminDb.collection("products").doc(id).get()));
+    const productDocs = await Promise.all(likedProductIds.map(id => adminDb().collection("products").doc(id).get()));
 
     const products = productDocs.filter(doc => doc.exists).map(doc => mapDocToProduct(doc));
 

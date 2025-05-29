@@ -3,7 +3,7 @@ import { adminDb } from "@/firebase/admin/firebase-admin-init";
 async function getProductSample() {
   try {
     // Use admin SDK methods instead of client SDK
-    const productsRef = adminDb.collection("products");
+    const productsRef = adminDb().collection("products");
     const querySnapshot = await productsRef.limit(5).get();
 
     const products: any[] = [];

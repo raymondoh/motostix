@@ -29,7 +29,7 @@ export async function deleteUserAsAdmin({ userId, adminId }: DeleteUserAsAdminIn
 
   try {
     // 1. Fetch Firestore user document
-    const userDocRef = adminDb.collection("users").doc(userId);
+    const userDocRef = adminDb().collection("users").doc(userId);
     const userDocSnap = await userDocRef.get();
 
     if (!userDocSnap.exists) {
@@ -60,7 +60,7 @@ export async function deleteUserAsAdmin({ userId, adminId }: DeleteUserAsAdminIn
     logger({ type: "info", message: `Deleted Firestore document for user ${userId}`, context: "users" });
 
     // 4. Delete user from Firebase Auth
-    await adminAuth.deleteUser(userId);
+    await adminAuth().deleteUser(userId);
     logger({ type: "info", message: `Deleted Firebase Auth user ${userId}`, context: "users" });
 
     // 5. Log admin deletion activity (non-blocking)

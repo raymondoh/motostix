@@ -34,7 +34,7 @@ export async function loginUser(_prevState: Auth.LoginState | null, formData: Fo
 
   try {
     // Step 2: Fetch user record from Firebase Auth
-    const userRecord = await adminAuth.getUserByEmail(email);
+    const userRecord = await adminAuth().getUserByEmail(email);
     const isEmailVerified = userRecord.emailVerified;
 
     // Step 3: Block login for unverified emails unless registering or skipping session
@@ -45,7 +45,7 @@ export async function loginUser(_prevState: Auth.LoginState | null, formData: Fo
     }
 
     // Step 4: Verify password
-    const userDoc = await adminDb.collection("users").doc(userRecord.uid).get();
+    const userDoc = await adminDb().collection("users").doc(userRecord.uid).get();
     const userData = userDoc.data();
 
     if (!userData?.passwordHash) {
@@ -60,7 +60,7 @@ export async function loginUser(_prevState: Auth.LoginState | null, formData: Fo
     }
 
     // Step 5: Create a custom Firebase token
-    const customToken = await adminAuth.createCustomToken(userRecord.uid);
+    const customToken = await adminAuth().createCustomToken(userRecord.uid);
 
     logger({ type: "info", message: `Login success for ${email}`, context: "auth" });
 

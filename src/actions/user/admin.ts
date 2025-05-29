@@ -70,14 +70,14 @@ export async function fetchUsers(limit = 10, offset = 0): Promise<FetchUsersResp
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const adminData = (await adminDb.collection("users").doc(session.user.id).get()).data();
+    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
     if (!adminData || adminData.role !== "admin") {
       return { success: false, error: "Unauthorized. Admin access required." };
     }
 
-    const usersQuery = adminDb.collection("users").limit(limit).offset(offset);
+    const usersQuery = adminDb().collection("users").limit(limit).offset(offset);
     const usersSnapshot = await usersQuery.get();
-    const totalSnapshot = await adminDb.collection("users").count().get();
+    const totalSnapshot = await adminDb().collection("users").count().get();
     const total = totalSnapshot.data().count;
 
     const users: SerializedUser[] = usersSnapshot.docs.map(doc => {
@@ -113,7 +113,7 @@ export async function searchUsers(_: SearchUsersResponse, formData: FormData): P
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const adminData = (await adminDb.collection("users").doc(session.user.id).get()).data();
+    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
     if (!adminData || adminData.role !== "admin") {
       return { success: false, error: "Unauthorized. Admin access required." };
     }
@@ -122,7 +122,7 @@ export async function searchUsers(_: SearchUsersResponse, formData: FormData): P
     const limit = parseInt(formData.get("limit") as string) || 10;
     const offset = parseInt(formData.get("offset") as string) || 0;
 
-    let usersQuery: CollectionReference<DocumentData> | Query<DocumentData> = adminDb.collection("users");
+    let usersQuery: CollectionReference<DocumentData> | Query<DocumentData> = adminDb().collection("users");
 
     if (query) {
       usersQuery = usersQuery
@@ -135,7 +135,7 @@ export async function searchUsers(_: SearchUsersResponse, formData: FormData): P
     }
 
     const usersSnapshot = await usersQuery.get();
-    const totalSnapshot = await adminDb.collection("users").count().get();
+    const totalSnapshot = await adminDb().collection("users").count().get();
     const total = totalSnapshot.data().count;
 
     const users: SerializedUser[] = await Promise.all(
@@ -154,7 +154,7 @@ export async function searchUsers(_: SearchUsersResponse, formData: FormData): P
           updatedAt: data.updatedAt
         };
         try {
-          const authUser = await adminAuth.getUser(doc.id);
+          const authUser = await adminAuth().getUser(doc.id);
           rawUser = {
             ...rawUser,
             name: authUser.displayName || rawUser.name,
@@ -184,7 +184,7 @@ export async function updateUserRole(_: UpdateUserRoleResponse, formData: FormDa
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const adminData = (await adminDb.collection("users").doc(session.user.id).get()).data();
+    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
     if (!adminData || adminData.role !== "admin") {
       return { success: false, error: "Unauthorized. Admin access required." };
     }
@@ -196,7 +196,7 @@ export async function updateUserRole(_: UpdateUserRoleResponse, formData: FormDa
     if (!["user", "admin"].includes(role)) return { success: false, error: "Role must be either 'user' or 'admin'" };
     if (userId === session.user.id) return { success: false, error: "You cannot change your own role" };
 
-    await adminDb.collection("users").doc(userId).update({ role, updatedAt: serverTimestamp() });
+    await adminDb().collection("users").doc(userId).update({ role, updatedAt: serverTimestamp() });
 
     logger({ type: "info", message: `Updated role for userId ${userId} to ${role}`, context: "admin-users" });
 
@@ -216,7 +216,7 @@ export async function updateUser(userId: string, userData: Partial<User>): Promi
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const adminData = (await adminDb.collection("users").doc(session.user.id).get()).data();
+    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
     if (!adminData || adminData.role !== "admin") {
       return { success: false, error: "Unauthorized. Admin access required." };
     }
@@ -228,7 +228,7 @@ export async function updateUser(userId: string, userData: Partial<User>): Promi
       }
     });
 
-    await adminDb.collection("users").doc(userId).update(updateData);
+    await adminDb().collection("users").doc(userId).update(updateData);
     revalidatePath("/admin/users");
 
     logger({ type: "info", message: `Updated user ${userId}`, context: "admin-users" });

@@ -24,7 +24,7 @@ export async function getAllActivityLogs(
   }
 
   try {
-    const collectionRef = adminDb.collection("activityLogs");
+    const collectionRef = adminDb().collection("activityLogs");
     let query: Query<DocumentData> = collectionRef;
 
     if (type) {
@@ -53,7 +53,7 @@ export async function getAllActivityLogs(
     await Promise.all(
       uniqueUserIds.map(async userId => {
         try {
-          const userDoc = await adminDb.collection("users").doc(userId).get();
+          const userDoc = await adminDb().collection("users").doc(userId).get();
           const userData = userDoc.exists ? userDoc.data() : null;
 
           userDataMap[userId] = {
@@ -108,7 +108,7 @@ export async function getUserActivityLogs(
   }
 
   try {
-    const collectionRef = adminDb.collection("activityLogs");
+    const collectionRef = adminDb().collection("activityLogs");
     let query: Query<DocumentData> = collectionRef.where("userId", "==", session.user.id);
 
     if (type) {
@@ -139,7 +139,7 @@ export async function getUserActivityLogs(
     let image: string | null = null;
 
     try {
-      const userDoc = await adminDb.collection("users").doc(session.user.id).get();
+      const userDoc = await adminDb().collection("users").doc(session.user.id).get();
       const userData = userDoc.exists ? userDoc.data() : null;
 
       userEmail = userData?.email || "";
@@ -183,7 +183,7 @@ export async function logActivity(data: Omit<ActivityLogData, "timestamp">): Pro
       timestamp: Timestamp.now()
     };
 
-    const docRef = await adminDb.collection("activityLogs").add(payload);
+    const docRef = await adminDb().collection("activityLogs").add(payload);
 
     return { success: true, activityId: docRef.id };
   } catch (error: unknown) {

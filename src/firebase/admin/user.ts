@@ -27,10 +27,10 @@ import { getUserImage } from "@/utils/get-user-image";
  */
 export async function getUsers(limit = 10, startAfter?: string): Promise<GetUsersResult> {
   try {
-    let query = adminDb.collection("users").orderBy("createdAt", "desc").limit(limit);
+    let query = adminDb().collection("users").orderBy("createdAt", "desc").limit(limit);
 
     if (startAfter) {
-      const lastDoc = await adminDb.collection("users").doc(startAfter).get();
+      const lastDoc = await adminDb().collection("users").doc(startAfter).get();
       if (lastDoc.exists) {
         query = query.startAfter(lastDoc);
       }
@@ -82,7 +82,7 @@ export async function createUserDocument(userId: string, userData: Partial<User>
       updatedAt: new Date()
     } as UserDocumentData;
 
-    await adminDb.collection("users").doc(userId).set(userDocData, { merge: true });
+    await adminDb().collection("users").doc(userId).set(userDocData, { merge: true });
 
     return { success: true };
   } catch (error: unknown) {
@@ -105,7 +105,7 @@ export async function createUserDocument(userId: string, userData: Partial<User>
  */
 export async function getUserRole(userId: string): Promise<UserRole> {
   try {
-    const userDoc: DocumentSnapshot = await adminDb.collection("users").doc(userId).get();
+    const userDoc: DocumentSnapshot = await adminDb().collection("users").doc(userId).get();
     const userData = userDoc.data() as UserDocumentData | undefined;
     return (userData?.role as UserRole) || "user";
   } catch (error: unknown) {
@@ -127,7 +127,7 @@ export async function getUserRole(userId: string): Promise<UserRole> {
  */
 export async function setUserRole(userId: string, role: UserRole): Promise<SetUserRoleResult> {
   try {
-    await adminDb.collection("users").doc(userId).update({
+    await adminDb().collection("users").doc(userId).update({
       role,
       updatedAt: new Date()
     });
@@ -156,7 +156,7 @@ export async function updateUserProfile(
   updateData: { name?: string; picture?: string }
 ): Promise<UpdateUserProfileResult> {
   try {
-    const userDocRef = adminDb.collection("users").doc(userId);
+    const userDocRef = adminDb().collection("users").doc(userId);
     const userDoc: DocumentSnapshot = await userDocRef.get();
 
     if (!userDoc.exists) {
@@ -172,7 +172,7 @@ export async function updateUserProfile(
 
     // Also update Firebase Auth profile if name is provided
     if (updateData.name) {
-      await adminAuth.updateUser(userId, { displayName: updateData.name });
+      await adminAuth().updateUser(userId, { displayName: updateData.name });
     }
 
     return { success: true };
@@ -194,7 +194,7 @@ export async function updateUserProfile(
  */
 export async function getUserProfile(userId: string): Promise<GetUserProfileResult> {
   try {
-    const userDoc: DocumentSnapshot = await adminDb.collection("users").doc(userId).get();
+    const userDoc: DocumentSnapshot = await adminDb().collection("users").doc(userId).get();
 
     if (!userDoc.exists) {
       return { success: false, error: "User not found" };
