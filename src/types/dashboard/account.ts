@@ -1,4 +1,3 @@
-// types/dashboard/account.ts
 import type { User, SerializedUser } from "../user/common";
 
 /**
@@ -13,6 +12,8 @@ export interface AccountSummaryProps {
 /**
  * Props for the AccountSummaryClient component
  * Uses SerializedUser to ensure dates are properly serialized for client components
+ *
+ * @deprecated This interface appears to be unused. If you're using it, please remove this comment.
  */
 export interface AccountSummaryClientProps {
   userData: SerializedUser;
@@ -20,6 +21,8 @@ export interface AccountSummaryClientProps {
 
 /**
  * Props for account settings related components
+ *
+ * @deprecated This interface appears to be unused. If you're using it, please remove this comment.
  */
 export interface AccountSettingsProps {
   user: User;
@@ -28,6 +31,8 @@ export interface AccountSettingsProps {
 
 /**
  * Props for user profile related components
+ *
+ * @deprecated This interface appears to be unused. If you're using it, please remove this comment.
  */
 export interface UserProfileProps {
   user: User;

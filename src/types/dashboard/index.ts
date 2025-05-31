@@ -5,15 +5,13 @@
  * Using this index file makes imports clearer and helps with IDE auto-imports.
  */
 
-// Account and user profile related types
-export type { AccountSummaryProps, AccountSummaryClientProps, AccountSettingsProps, UserProfileProps } from "./account";
+// Account related types
+export type { AccountSummaryProps } from "./account";
 
 // Activity log related types
 export type {
   ActivityLogProps,
   ActivityLogClientProps,
-  //ActivityLogWrapperProps,
-  //ActivityPageClientProps,
   AdminActivityLogWrapperProps,
   Activity,
   SystemStats,

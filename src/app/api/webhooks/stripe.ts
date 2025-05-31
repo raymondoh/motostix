@@ -8,7 +8,10 @@ import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import type { OrderData } from "@/firebase/admin/orders";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-03-31.basil"
+  // ① Either pin to a *valid* released version …
+  //apiVersion: "2024-02-15",              // <-- current GA as of May 2025
+  // ② … or simply remove the line entirely:
+  apiVersion: undefined
 });
 
 export async function POST(req: Request) {

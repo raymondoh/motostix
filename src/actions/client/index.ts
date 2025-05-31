@@ -1,5 +1,4 @@
 export * from "./add-product-client";
-export * from "./categories";
 export * from "./delete-product-client";
 export * from "./fetch-activity";
 export * from "./fetch-all-orders-client";

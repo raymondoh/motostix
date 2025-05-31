@@ -14,7 +14,7 @@ export async function registerUser(
   prevState: Auth.RegisterState | null,
   formData: FormData
 ): Promise<Auth.RegisterState> {
-  const name = formData.get("name") as string;
+  //const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
@@ -38,7 +38,7 @@ export async function registerUser(
       userRecord = await adminAuth().createUser({
         email,
         password,
-        displayName: name || email.split("@")[0],
+        //displayName: name || email.split("@")[0],
         emailVerified: false
       });
 
@@ -72,17 +72,14 @@ export async function registerUser(
       logger({ type: "info", message: `First user promoted to admin: ${email}`, context: "auth" });
     }
 
-    await adminDb()
-      .collection("users")
-      .doc(userRecord.uid)
-      .set({
-        name: name || email.split("@")[0],
-        email,
-        role,
-        passwordHash,
-        emailVerified: false,
-        createdAt: serverTimestamp()
-      });
+    await adminDb().collection("users").doc(userRecord.uid).set({
+      //name: name || email.split("@")[0],
+      email,
+      role,
+      passwordHash,
+      emailVerified: false,
+      createdAt: serverTimestamp()
+    });
 
     try {
       await logActivity({

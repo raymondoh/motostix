@@ -5,7 +5,8 @@ import { DashboardShell, DashboardHeader } from "@/components";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getAllProducts } from "@/actions/products/get-all-products";
-import { getCategories, getFeaturedCategories } from "@/actions/categories/get-categories";
+//import { getCategories, getFeaturedCategories } from "@/actions/categories/get-categories";
+import { getCategories, getFeaturedCategories } from "@/firebase/actions";
 //import type { Category } from "@/types/category";
 
 import { AdminProductsClient } from "@/components/dashboard/admin/products/AdminProductsClient";

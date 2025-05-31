@@ -197,6 +197,6 @@ export async function getUserOrders(...args: Parameters<typeof adminOrders.getUs
 }
 
 // ================= Content Management =================
-export async function getHeroSlidesFromFirestore(...args: Parameters<typeof adminProducts.getHeroSlidesFromFirestore>) {
-  return adminProducts.getHeroSlidesFromFirestore(...args);
-}
+// export async function getHeroSlidesFromFirestore(...args: Parameters<typeof adminProducts.getHeroSlidesFromFirestore>) {
+//   return adminProducts.getHeroSlidesFromFirestore(...args);
+// }

@@ -675,27 +675,27 @@ export async function getNewArrivals(limit = 10) {
 // ===================
 // GET HERO SLIDES
 // ===================
-export async function getHeroSlidesFromFirestore() {
-  try {
-    const snapshot = await adminDb().collection("products").where("isHero", "==", true).get();
-    const slides: HeroSlide[] = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        title: data.name,
-        description: data.description,
-        backgroundImage: data.image,
-        cta: "Shop Now",
-        ctaHref: `/products/${doc.id}`
-      };
-    });
-    return { success: true as const, data: slides };
-  } catch (error) {
-    const message = isFirebaseError(error)
-      ? firebaseError(error)
-      : (error as Error)?.message || "Unknown error fetching hero slides";
-    return { success: false as const, error: message };
-  }
-}
+// export async function getHeroSlidesFromFirestore() {
+//   try {
+//     const snapshot = await adminDb().collection("products").where("isHero", "==", true).get();
+//     const slides: HeroSlide[] = snapshot.docs.map(doc => {
+//       const data = doc.data();
+//       return {
+//         title: data.name,
+//         description: data.description,
+//         backgroundImage: data.image,
+//         cta: "Shop Now",
+//         ctaHref: `/products/${doc.id}`
+//       };
+//     });
+//     return { success: true as const, data: slides };
+//   } catch (error) {
+//     const message = isFirebaseError(error)
+//       ? firebaseError(error)
+//       : (error as Error)?.message || "Unknown error fetching hero slides";
+//     return { success: false as const, error: message };
+//   }
+// }
 
 // ===================
 // GET RELATED PRODUCTS

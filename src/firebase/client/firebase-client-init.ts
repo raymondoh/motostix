@@ -2,7 +2,7 @@
 "use client";
 
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, GithubAuthProvider, RecaptchaVerifier } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, GithubAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Firebase configuration
@@ -24,28 +24,3 @@ export const db = getFirestore(app);
 // Auth providers
 export const googleProvider = new GoogleAuthProvider();
 export const githubProvider = new GithubAuthProvider();
-
-// RecaptchaVerifier for 2FA
-let recaptchaVerifier: RecaptchaVerifier | null = null;
-
-// Initialize recaptchaVerifier lazily
-export const getRecaptchaVerifier = () => {
-  if (typeof window !== "undefined" && !recaptchaVerifier) {
-    recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "normal",
-      callback: () => {
-        // reCAPTCHA solved, allow the user to continue
-      },
-      "expired-callback": () => {
-        // Response expired. Ask user to solve reCAPTCHA again.
-        console.log("reCAPTCHA expired. Please solve it again.");
-      }
-    });
-  }
-  return recaptchaVerifier;
-};
-
-// Reset recaptchaVerifier (useful when you need to render a new one)
-export const resetRecaptchaVerifier = () => {
-  recaptchaVerifier = null;
-};

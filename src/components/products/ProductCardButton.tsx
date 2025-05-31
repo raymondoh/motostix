@@ -1,7 +1,9 @@
+//src/components/products/ProductCardButton.tsx
 "use client";
 
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingCart } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/types/product";
 

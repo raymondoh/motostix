@@ -1,12 +1,11 @@
-//src/providers/SessionProvider.tsx
 "use client";
 //import { connectFirebaseEmulator } from "@/firebase/connectEmulator";
+import type React from "react";
+
 //import { useEffect } from "react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { DashboardThemeProvider } from "@/providers/DashboardThemeProvider";
-
-import { Toaster } from "@/components/ui/sonner";
+import { ToasterProvider } from "@/providers/ToasterProvider";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -21,7 +20,7 @@ export function Providers({ children }: ProvidersProps) {
       {/* <UserProvider> */}
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         {children}
-        <Toaster position="top-right" />
+        <ToasterProvider />
       </ThemeProvider>
       {/* </UserProvider> */}
     </SessionProvider>

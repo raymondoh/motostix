@@ -1,3 +1,33 @@
+/**
+ * Rate limiting utility using Upstash Redis
+ *
+ * TODO: Implement rate limiting when Redis is set up
+ * Dependencies needed: @upstash/redis
+ * Environment variables needed: UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
+ */
+
+export interface RateLimitResult {
+  success: boolean;
+  limit?: number;
+  remaining?: number;
+  reset?: string;
+}
+
+export async function rateLimit(identifier: string): Promise<RateLimitResult> {
+  // TODO: Implement Redis-based rate limiting
+  // For now, allow all requests
+  console.warn("Rate limiting is not implemented yet. All requests are allowed.");
+
+  return {
+    success: true,
+    limit: 5,
+    remaining: 5,
+    reset: new Date(Date.now() + 60000).toISOString()
+  };
+}
+
+/* 
+// Future implementation with Redis:
 import { Redis } from "@upstash/redis";
 
 let redis: Redis | null = null;
@@ -13,7 +43,7 @@ try {
   console.error("Failed to initialize Redis:", error);
 }
 
-export async function rateLimit(identifier: string) {
+export async function rateLimit(identifier: string): Promise<RateLimitResult> {
   if (!redis) {
     console.warn("Redis is not configured. Rate limiting is disabled.");
     return { success: true };
@@ -45,3 +75,4 @@ export async function rateLimit(identifier: string) {
     return { success: true };
   }
 }
+*/

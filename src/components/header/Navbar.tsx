@@ -341,18 +341,18 @@ const UserMenu = () => {
             {themeItems}
             {/* 3. Log in / Sign up buttons */}
             <DropdownMenuSeparator /> {/* Separator before auth links */}
-            <Link href="/login" passHref legacyBehavior>
-              <DropdownMenuItem className="py-3 cursor-pointer">
+            <DropdownMenuItem className="py-3 cursor-pointer" asChild>
+              <Link href="/login">
                 <LogIn className="mr-3 h-5 w-5 text-primary" />
                 <span className="text-base">Log in</span>
-              </DropdownMenuItem>
-            </Link>
-            <Link href="/register" passHref legacyBehavior>
-              <DropdownMenuItem className="py-3 font-medium cursor-pointer">
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="py-3 font-medium cursor-pointer" asChild>
+              <Link href="/register">
                 <UserPlus className="mr-3 h-5 w-5 text-accent" />
                 <span className="text-base">Sign up</span>
-              </DropdownMenuItem>
-            </Link>
+              </Link>
+            </DropdownMenuItem>
           </>
         )}
       </DropdownMenuContent>
