@@ -6,7 +6,7 @@ export function FooterWrapper() {
   const pathname = usePathname();
 
   // Define paths where the footer should be completely hidden
-  // Keep this in sync with the same list in Header.tsx
+  // Keep this in sync with the same list in Header.tsx yes
   const hiddenFooterPaths = new Set([
     "/login",
     "/register",
