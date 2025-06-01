@@ -123,35 +123,32 @@ import { getAuth, type Auth } from "firebase-admin/auth";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { getStorage, type Storage } from "firebase-admin/storage";
 
-function initializeAdminApp(): App {
+function initializeAdminApp(): App | null {
+  // Don't initialize during build time
+  if (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV) {
+    console.log("[Firebase Admin] Skipping initialization during build");
+    return null;
+  }
+
   const apps = getApps();
   if (apps.length > 0) {
     console.log("[Firebase Admin] Using existing app:", apps[0].name);
     return apps[0];
   }
 
-  // Get environment variables
-  const projectId = process.env.FIREBASE_PROJECT_ID!;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL!;
-  const privateKeyEnv = process.env.FIREBASE_PRIVATE_KEY!;
-  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET!;
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKeyEnv = process.env.FIREBASE_PRIVATE_KEY;
+  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
 
-  // Ensure all required env vars are present
-  const missingEnvVars = [
-    !projectId && "FIREBASE_PROJECT_ID",
-    !clientEmail && "FIREBASE_CLIENT_EMAIL",
-    !privateKeyEnv && "FIREBASE_PRIVATE_KEY",
-    !storageBucket && "FIREBASE_STORAGE_BUCKET"
-  ].filter(Boolean);
-
-  if (missingEnvVars.length > 0) {
-    throw new Error(`Missing Firebase Admin credentials: ${missingEnvVars.join(", ")}`);
+  if (!projectId || !clientEmail || !privateKeyEnv || !storageBucket) {
+    console.warn("[Firebase Admin] Missing environment variables, skipping initialization");
+    return null;
   }
 
   const formattedPrivateKey = privateKeyEnv.replace(/\\n/g, "\n");
 
   try {
-    // Initialize Firebase Admin SDK
     const appInstance = initializeApp({
       credential: cert({
         projectId,
@@ -165,73 +162,29 @@ function initializeAdminApp(): App {
     return appInstance;
   } catch (error: any) {
     console.error("[Firebase Admin] Initialization failed:", error.message);
-    throw error; // Re-throw the error to indicate failure
+    return null;
   }
 }
 
-const firebaseAdminApp: App = initializeAdminApp();
-
-// Lazy service getters
-let _adminDb: Firestore | null = null;
-let _adminAuth: Auth | null = null;
-let _adminStorage: Storage | null = null;
+const firebaseAdminApp: App | null = initializeAdminApp();
 
 export function adminDb(): Firestore {
-  if (!_adminDb) {
-    try {
-      _adminDb = getFirestore(firebaseAdminApp);
-
-      if (!_adminDb || typeof _adminDb.collection !== "function") {
-        throw new Error("Failed to initialize Firestore service");
-      }
-    } catch (error: any) {
-      console.error("[Firebase Admin] Firestore initialization failed:", error.message);
-      throw error;
-    }
+  if (!firebaseAdminApp) {
+    throw new Error("Firebase Admin not initialized");
   }
-  return _adminDb;
+  return getFirestore(firebaseAdminApp);
 }
 
 export function adminAuth(): Auth {
-  if (!_adminAuth) {
-    try {
-      _adminAuth = getAuth(firebaseAdminApp);
-
-      if (!_adminAuth || typeof _adminAuth.getUser !== "function") {
-        throw new Error("Failed to initialize Auth service");
-      }
-    } catch (error: any) {
-      console.error("[Firebase Admin] Auth initialization failed:", error.message);
-      throw error;
-    }
+  if (!firebaseAdminApp) {
+    throw new Error("Firebase Admin not initialized");
   }
-  return _adminAuth;
+  return getAuth(firebaseAdminApp);
 }
 
 export function adminStorage(): Storage {
-  if (!_adminStorage) {
-    try {
-      _adminStorage = getStorage(firebaseAdminApp);
-
-      if (!_adminStorage || typeof _adminStorage.bucket !== "function") {
-        throw new Error("Failed to initialize Storage service");
-      }
-    } catch (error: any) {
-      console.error("[Firebase Admin] Storage initialization failed:", error.message);
-      throw error;
-    }
+  if (!firebaseAdminApp) {
+    throw new Error("Firebase Admin not initialized");
   }
-  return _adminStorage;
-}
-
-// Global ProcessEnv type definition
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      FIREBASE_PROJECT_ID: string;
-      FIREBASE_CLIENT_EMAIL: string;
-      FIREBASE_PRIVATE_KEY: string;
-      FIREBASE_STORAGE_BUCKET: string;
-    }
-  }
+  return getStorage(firebaseAdminApp);
 }
