@@ -7,7 +7,6 @@ import { registerSchema } from "@/schemas";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { hashPassword } from "@/utils/hashPassword";
 import { logServerEvent, logger } from "@/utils/logger";
-//import type { RegisterResponse } from "@/types/auth/register";
 import type { Auth } from "@/types";
 
 export async function registerUser(

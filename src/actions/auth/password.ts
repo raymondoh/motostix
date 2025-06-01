@@ -5,16 +5,12 @@ import { auth } from "@/auth";
 import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
 import { serverTimestamp } from "@/utils/date-server";
 import { logActivity } from "@/firebase/actions";
-import { forgotPasswordSchema, updatePasswordSchema } from "@/schemas/auth";
+import { updatePasswordSchema } from "@/schemas/auth";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
 import { hashPassword } from "@/utils/hashPassword";
-import { logPasswordResetActivity } from "./reset-password";
-//import type { ForgotPasswordState, UpdatePasswordState } from "@/types/auth/password";
 import type { Auth } from "@/types";
-//import type { UserData } from "@/types/user";
 import type { User } from "@/types";
-import type { Common } from "@/types";
 
 /**
  * Helper to safely extract a string value from FormData
