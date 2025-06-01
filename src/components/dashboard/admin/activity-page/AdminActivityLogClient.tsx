@@ -98,12 +98,6 @@ export function AdminActivityLogClient({
             ) : (
               filteredActivities.map(activity => (
                 <TableRow key={activity.id}>
-                  {/* <TableCell className="whitespace-nowrap">
-                    <div className="flex flex-col">
-                      <span className="font-medium">{getDisplayName(activity.name, activity.userEmail, "User")}</span>
-                      <span className="text-xs text-muted-foreground">{activity.userEmail ?? "Unknown"}</span>
-                    </div>
-                  </TableCell> */}
                   <TableCell className="whitespace-nowrap">
                     <div className="flex items-center gap-3">
                       <UserAvatar

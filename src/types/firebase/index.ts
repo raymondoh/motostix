@@ -5,39 +5,12 @@
  * Using this index file makes imports clearer and helps with IDE auto-imports.
  */
 
-// Activity logging types
+// Activity logging types (keep only the used ones)
 export type {
   // Core activity types
   ActivityType,
-  ActivityStatus,
   ActivityLogData,
-  ActivityLogWithId,
-  SerializedActivity,
-  // Result types
-  LogActivityResult,
-  GetUserActivityLogsResult
+  SerializedActivity
 } from "./activity";
 
-// Firebase Authentication types
-export type {
-  // Token and user types
-  DecodedIdToken,
-  // Authentication operation results
-  VerifyAndCreateUserResult,
-  GetUserFromTokenResult,
-  SendResetPasswordEmailResult,
-  SetCustomClaimsResult,
-  CustomClaims
-} from "./auth";
-
-// Firestore types
-export type {
-  // User document types
-  UserDocumentData,
-  // Firestore operation results
-  GetUsersResult,
-  CreateUserDocumentResult,
-  UpdateUserProfileResult,
-  GetUserProfileResult,
-  SetUserRoleResult
-} from "./firestore";
+// All other Firebase types removed as they are not used anywhere in the codebase
