@@ -26,8 +26,6 @@ export type {
   VerifyAndCreateUserResult,
   GetUserFromTokenResult,
   SendResetPasswordEmailResult,
-  VerifyPasswordResetCodeResult,
-  ConfirmPasswordResetResult,
   SetCustomClaimsResult,
   CustomClaims
 } from "./auth";

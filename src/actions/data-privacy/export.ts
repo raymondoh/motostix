@@ -7,15 +7,11 @@ import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logActivity } from "@/firebase/actions";
 import { logServerEvent, logger } from "@/utils/logger";
 import { convertTimestamps } from "@/firebase/utils/firestore";
-//import type { ExportFormat, ExportDataState } from "@/types/data-privacy/export";
-//import { ExportedActivityLog } from "@/types/data-privacy/export";
-import type { DataPrivacy } from "@/types";
+import type { ExportFormat, ExportDataState } from "@/types/data-privacy";
+import { ExportedActivityLog } from "@/types/data-privacy";
 import { objectToCSV } from "@/actions/utils/format-helpers";
 
-export async function exportUserData(
-  prevState: DataPrivacy.ExportDataState | null,
-  formData: FormData
-): Promise<DataPrivacy.ExportDataState> {
+export async function exportUserData(prevState: ExportDataState | null, formData: FormData): Promise<ExportDataState> {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -28,7 +24,7 @@ export async function exportUserData(
   }
 
   try {
-    const format = formData.get("format") as DataPrivacy.ExportFormat;
+    const format = formData.get("format") as ExportFormat;
     const result = exportDataSchema.safeParse({ format });
 
     if (!result.success) {
@@ -51,7 +47,7 @@ export async function exportUserData(
       return { success: false, error: "User data not found" };
     }
 
-    let activityLogs: DataPrivacy.ExportedActivityLog[] = [];
+    let activityLogs: ExportedActivityLog[] = [];
 
     try {
       const snapshot = await adminDb()
@@ -62,7 +58,7 @@ export async function exportUserData(
         .get();
 
       activityLogs = snapshot.docs.map(doc => ({
-        ...(convertTimestamps(doc.data()) as DataPrivacy.ExportedActivityLog),
+        ...(convertTimestamps(doc.data()) as ExportedActivityLog),
         id: doc.id
       }));
     } catch (indexError) {

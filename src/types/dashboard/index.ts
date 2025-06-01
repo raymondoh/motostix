@@ -19,6 +19,3 @@ export type {
   FetchActivityLogsParams,
   FetchActivityLogsResponse
 } from "./activity";
-
-// Dashboard metrics and statistics types
-export type { DashboardStatsProps, DashboardMetricProps, MetricCardProps } from "./metrics";

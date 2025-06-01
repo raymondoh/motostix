@@ -61,3 +61,20 @@ export interface PreviewUser {
   createdAt?: Date | string;
   lastLoginAt?: Date | string;
 }
+
+/**
+ * Raw user document data structure in Firestore
+ * Used for direct database operations
+ */
+export interface UserData {
+  passwordHash?: string;
+  name?: string;
+  email?: string;
+  role?: UserRole;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+  lastLoginAt?: unknown;
+  emailVerified?: boolean;
+  hasPassword?: boolean;
+  // Add any other fields your user documents store
+}

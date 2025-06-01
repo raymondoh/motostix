@@ -2,7 +2,7 @@
 
 // ================= Imports =================
 import { auth } from "@/auth";
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+import { adminDb } from "@/firebase/admin/firebase-admin-init";
 import { serverTimestamp } from "@/utils/date-server";
 import { createUser as createUserInFirebase, logActivity } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
@@ -11,16 +11,8 @@ import { serializeUser } from "@/utils/serializeUser";
 import { getUserImage } from "@/utils/get-user-image";
 import { logger } from "@/utils/logger";
 
-import type {
-  CreateUserInput,
-  CreateUserResponse,
-  FetchUsersResponse,
-  SearchUsersResponse,
-  UpdateUserResponse,
-  UpdateUserRoleResponse
-} from "@/types/user";
-import type { User, SerializedUser, UserRole } from "@/types/user/common";
-import type { CollectionReference, Query, DocumentData } from "firebase-admin/firestore";
+import type { CreateUserInput, CreateUserResponse, FetchUsersResponse, UpdateUserResponse } from "@/types/user";
+import type { User, SerializedUser } from "@/types/user/common";
 
 // ================= Admin User Actions =================
 
@@ -106,8 +98,16 @@ export async function fetchUsers(limit = 10, offset = 0): Promise<FetchUsersResp
 }
 
 /**
- * Search users by query (admin only)
+ * SERVER-SIDE USER SEARCH - NOT IMPLEMENTED YET
+ *
+ * This function provides server-side user search with pagination.
+ * Currently using client-side filtering in UsersDataTable.tsx instead.
+ *
+ * TODO: Implement server-side search UI when handling large user datasets
+ * TODO: Add pagination controls to admin users page
+ * TODO: Connect to search input in TableToolbar
  */
+/*
 export async function searchUsers(_: SearchUsersResponse, formData: FormData): Promise<SearchUsersResponse> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
@@ -175,10 +175,19 @@ export async function searchUsers(_: SearchUsersResponse, formData: FormData): P
     return { success: false, error: message };
   }
 }
+*/
 
 /**
- * Update a user's role (admin only)
+ * DEDICATED ROLE MANAGEMENT - NOT IMPLEMENTED YET
+ *
+ * This function provides specialized role-only updates with dedicated validation.
+ * Currently using general updateUser() function in AdminUserEditDialog.tsx instead.
+ *
+ * TODO: Implement dedicated role management UI if needed
+ * TODO: Add role change confirmation dialogs
+ * TODO: Add role change audit logging
  */
+/*
 export async function updateUserRole(_: UpdateUserRoleResponse, formData: FormData): Promise<UpdateUserRoleResponse> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
@@ -207,6 +216,7 @@ export async function updateUserRole(_: UpdateUserRoleResponse, formData: FormDa
     return { success: false, error: message };
   }
 }
+*/
 
 /**
  * Update user fields (admin only)

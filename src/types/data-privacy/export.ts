@@ -1,5 +1,5 @@
-// types/data-privacy/export.ts
-// Types for data export
+// Types for data export functionality
+
 export type ExportFormat = "json" | "csv";
 
 export type ExportDataState = {
@@ -8,6 +8,7 @@ export type ExportDataState = {
   downloadUrl?: string;
   message?: string;
 };
+
 export type ExportedActivityLog = {
   id: string;
   [key: string]: unknown;

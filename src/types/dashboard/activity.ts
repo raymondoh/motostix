@@ -49,10 +49,6 @@ export interface AdminActivityLogWrapperProps {
   className?: string;
 }
 
-export interface AdminActivityPageClientProps {
-  initialData?: SerializedActivity[];
-}
-
 //
 // 🔷 Generic Activity Log Props
 //

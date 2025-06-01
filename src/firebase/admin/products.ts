@@ -7,7 +7,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import { adminDb, adminStorage } from "@/firebase/admin/firebase-admin-init";
 import type { DocumentData } from "firebase-admin/firestore";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import type { UpdateProductInput, Product, HeroSlide, ProductFilterOptions } from "@/types/product";
+import type { UpdateProductInput, Product, ProductFilterOptions } from "@/types/product";
 import { serializeProduct, serializeProductArray } from "@/utils/serializeProduct";
 import { productSchema, productUpdateSchema } from "@/schemas/product";
 import { normalizeCategory, normalizeSubcategory } from "@/config/categories";

@@ -1,28 +1,26 @@
-// types/data-privacy/deletion.ts
-// Types for account deletion
-export type DeleteAccountState = {
-  success: boolean;
-  error?: string;
-  message?: string;
-  shouldRedirect?: boolean;
-};
+// Types for account deletion functionality
 
-// Types for deletion requests
 export type DeletionRequestStatus = "pending" | "processing" | "completed" | "failed";
 
 export type DeletionRequest = {
+  id: string;
   userId: string;
-  email: string;
-  requestedAt: Date;
   status: DeletionRequestStatus;
-  completedAt: Date | null;
+  requestedAt: string;
+  processedAt?: string;
   reason?: string;
 };
 
-// Types for admin deletion processing
-export type ProcessDeletionsResult = {
+export interface ProcessDeletionsResult {
   success: boolean;
   processed: number;
   errors: number;
-  error?: string; // Added error property
-};
+  error?: string;
+}
+
+export interface DeleteAccountState {
+  success: boolean;
+  message?: string;
+  error?: string;
+  shouldRedirect?: boolean;
+}

@@ -1,4 +1,3 @@
-//src/actions/data-privacy/admin.ts
 "use server";
 
 import { auth } from "@/auth";
@@ -7,10 +6,10 @@ import { processAccountDeletion } from "./deletion";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
 import { serverTimestamp } from "@/utils/date-server";
-//import type { ProcessDeletionsResult } from "@/types/data-privacy/deletion";
-import type { DataPrivacy } from "@/types";
+import type { ProcessDeletionsResult } from "@/types/data-privacy/deletion";
+
 // Admin-only: Process all pending deletion requests
-export async function processPendingDeletions(): Promise<DataPrivacy.ProcessDeletionsResult> {
+export async function processPendingDeletions(): Promise<ProcessDeletionsResult> {
   const session = await auth();
 
   // Authorization check

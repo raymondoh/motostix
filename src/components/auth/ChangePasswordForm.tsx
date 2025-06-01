@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { Auth } from "@/types";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
-
 // Import the server action directly.
 import { updatePassword } from "@/actions/auth/password";
 

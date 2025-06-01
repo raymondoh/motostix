@@ -28,23 +28,6 @@ export type SendResetPasswordEmailResult = {
   error?: string;
 };
 
-/**
- * @deprecated This type appears to be unused. If you're using it, please remove this comment.
- */
-export type VerifyPasswordResetCodeResult = {
-  success: boolean;
-  email?: string;
-  error?: string;
-};
-
-/**
- * @deprecated This type appears to be unused. If you're using it, please remove this comment.
- */
-export type ConfirmPasswordResetResult = {
-  success: boolean;
-  error?: string;
-};
-
 export type SetCustomClaimsResult = {
   success: boolean;
   error?: unknown; // safer than `any`

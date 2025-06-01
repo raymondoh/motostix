@@ -10,7 +10,7 @@ import { Trash2, Loader2 } from "lucide-react";
 import { ProductsDataTable } from "./ProductsDataTable";
 import { getProductColumns } from "./products-columns";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import type { Product } from "@/types/product";
+import type { Product, GetAllProductsSuccess } from "@/types/product";
 import type { Category } from "@/types/category"; // Make sure this type is correctly defined
 import { deleteProductClient as deleteProduct } from "@/actions/client/delete-product-client";
 import { fetchAllProductsClient } from "@/actions/client/fetch-all-products";
@@ -59,8 +59,9 @@ export function AdminProductsClient({
       const result = await fetchAllProductsClient(); // Assumes this fetches all products
 
       if (result.success) {
-        // Type guard: if success is true, we know data exists
-        setProducts(result.data);
+        // Explicit type guard to help TypeScript understand the discriminated union
+        const successResult = result as GetAllProductsSuccess;
+        setProducts(successResult.data);
         toast.success("Products refreshed successfully!");
         // If ProductsDataTable internally resets its pagination on data change, this is fine.
         // Otherwise, you might need a way to signal it, but typically for client-side

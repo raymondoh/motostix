@@ -57,20 +57,20 @@ export const productUpdateSchema = productSchema.partial();
 export type UpdateProductInput = z.infer<typeof productUpdateSchema>;
 
 /* ──────────────────────────────────────────────────────────
-   Legacy aliases so existing imports keep working:
-   DEPRECATED: These will be removed in a future version
+   DEPRECATED ALIASES - Will be removed in future version
+   Use the main exports above instead
    ────────────────────────────────────────────────────────── */
 // @deprecated Use productSchema instead
-export const createProductSchema = productSchema;
+// export const createProductSchema = productSchema
 
 // @deprecated Use productUpdateSchema instead
-export const updateProductSchemaLegacy = productUpdateSchema;
+// export const updateProductSchemaLegacy = productUpdateSchema
 
 // @deprecated Use ProductInput instead
-export type ProductFormValues = ProductInput;
+// export type ProductFormValues = ProductInput
 
 // @deprecated Use ProductInput instead
-export type CreateProductInput = ProductInput;
+// export type CreateProductInput = ProductInput
 
 // @deprecated Use UpdateProductInput instead
-export type ProductUpdateValues = UpdateProductInput;
+// export type ProductUpdateValues = UpdateProductInput

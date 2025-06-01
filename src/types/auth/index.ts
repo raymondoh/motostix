@@ -8,16 +8,15 @@
  */
 
 // Common auth types
-export type { AuthActionResponse, UserProfile } from "./common"; //
+export type { AuthActionResponse, UserProfile } from "./common";
 
 // Login types
-export type { LoginState, LoginResponse } from "./login"; //
+export type { LoginState, LoginResponse } from "./login";
 
 // Registration types
-export type { RegisterState } from "./register"; //
+export type { RegisterState } from "./register";
 
 // Password management types
-// export type { ForgotPasswordState, ResetPasswordState, UpdatePasswordState } from "./password"; //
 export type {
   ForgotPasswordState,
   ResetPasswordState,
@@ -25,19 +24,11 @@ export type {
   LogPasswordResetInput,
   GetUserIdByEmailInput,
   GetUserIdByEmailResponse,
-  UpdatePasswordHashInput //here if needed via Auth. namespace
+  UpdatePasswordHashInput
 } from "./password";
 
-// **** ADD THIS LINE: ****
-export * from "./email-verification"; // This will export UpdateEmailVerificationInput, UpdateEmailVerificationResponse, etc.
-export * from "./firebase-auth"; // This will export SignInWithFirebaseInput, SignInWithFirebaseResponse, etc.
-// Or, if you prefer explicit re-exports:
-// export type { UpdateEmailVerificationInput, UpdateEmailVerificationResponse } from "./email-verification";
+// Email verification types
+export * from "./email-verification";
 
-// Re-export all types (alternative approach shown in your file)
-// If you uncomment these, make sure "./email-verification" is also included:
-// export * from "./common";
-// export * from "./login";
-// export * from "./register";
-// export * from "./password";
-// export * from "./email-verification"; // Add here too if using this style
+// Firebase auth types
+export * from "./firebase-auth";

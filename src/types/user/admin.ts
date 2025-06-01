@@ -19,44 +19,13 @@ export interface FetchUsersResponse extends ActionResponse {
   total?: number;
 }
 
-export interface SearchUsersResponse extends ActionResponse {
-  users?: User[];
-  total?: number;
-}
-
-export interface UpdateUserInput {
-  userId: string;
-  data: Partial<User>;
-}
-
 export interface UpdateUserResponse extends ActionResponse {}
 
-export interface UpdateUserRoleInput {
-  userId: string;
-  role: UserRole;
-}
+// Remove these unused types:
+// - SearchUsersResponse (for commented out searchUsers function)
+// - UpdateUserInput (not used anywhere)
+// - UpdateUserRoleInput (for commented out updateUserRole function)
+// - UpdateUserRoleResponse (for commented out updateUserRole function)
+// - UserSearchState (not used anywhere)
 
-export interface UpdateUserRoleResponse extends ActionResponse {
-  message?: string;
-}
-
-export interface UserSearchState extends ActionResponse {
-  users?: User[];
-  total?: number;
-}
-
-// export interface UserRoleUpdateState extends ActionResponse {
-//   message?: string;
-// }
-// src/types/user.ts (or wherever your user types live)
-
-export interface UserData {
-  passwordHash?: string;
-  name?: string;
-  email?: string;
-  role?: "user" | "admin";
-  createdAt?: unknown;
-  updatedAt?: unknown;
-  lastLoginAt?: unknown;
-  // Add any other fields your user documents store
-}
+// Also remove the UserData interface at the bottom if it's not used elsewhere

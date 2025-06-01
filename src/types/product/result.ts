@@ -1,17 +1,41 @@
-// types/product/result.ts
+// Types for product-related action results
+import { SerializedProduct } from "./product";
 
-import type { Product } from "./product";
+export type GetUserLikedProductsResult = {
+  success: boolean;
+  likedProducts?: string[];
+  error?: string;
+};
 
-export type GetAllProductsResult = { success: true; data: Product[] } | { success: false; error: string };
+export interface GetAllProductsSuccess {
+  success: true;
+  data: import("./product").SerializedProduct[];
+  total?: number;
+  page?: number;
+  limit?: number;
+}
 
-export type AddProductResult = { success: true; id: string } | { success: false; error: string };
-export type DeleteProductResult = { success: true } | { success: false; error: string };
-// src/types/product/result.ts
+export interface GetAllProductsError {
+  success: false;
+  error: string;
+}
 
-// Used when fetching related products
-export type GetRelatedProductsResult = { success: true; products: Product[] } | { success: false; error: string };
+export type GetAllProductsResult = GetAllProductsSuccess | GetAllProductsError;
 
-export type GetUserLikedProductsResult = { success: true; products: Product[] } | { success: false; error: string };
+export type DeleteProductResult = {
+  success: boolean;
+  error?: string;
+};
 
-export type UnlikeProductResult = { success: true } | { success: false; error: string };
-export type LikeProductResult = { success: true } | { success: false; error: string };
+export interface GetRelatedProductsSuccess {
+  success: true;
+  //products: import("./product").SerializedProduct[];
+  products: SerializedProduct[];
+}
+
+export interface GetRelatedProductsError {
+  success: false;
+  error: string;
+}
+
+export type GetRelatedProductsResult = GetRelatedProductsSuccess | GetRelatedProductsError;

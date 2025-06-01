@@ -1,13 +1,8 @@
-// src/types/index.ts
-
-// Auth types
-export * as Auth from "./auth"; //
-
 // User types
 export * as User from "./user"; //
 
-// Data Privacy types
-export * as DataPrivacy from "./data-privacy"; //
+// Auth types
+export * as Auth from "./auth"; //
 
 // Firebase types
 export * as Firebase from "./firebase"; //
@@ -18,6 +13,9 @@ export * as Product from "./product"; //
 // Order types
 export * as Order from "./order"; //
 
+// Data Privacy types
+export * as DataPrivacy from "./data-privacy"; //
+
 // Common types
 export * as Common from "./common";
 
@@ -26,7 +24,6 @@ export * as Common from "./common";
 export * as Category from "./category";
 export * as Dashboard from "./dashboard";
 export * as Ecommerce from "./ecommerce";
-export * as Search from "./search";
 
 // Note on next-auth:
 // Types for next-auth module augmentation (from next-auth/index.d.ts)
