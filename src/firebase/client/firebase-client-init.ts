@@ -45,7 +45,7 @@ const firebaseConfig = {
 };
 
 // Add validation and log environment variables to help debug
-const firebaseConfigKeys = Object.keys(firebaseConfig) as (keyof typeof firebaseConfig)[];
+const firebaseConfigKeys = Object.keys(firebaseConfig) as Array<keyof typeof firebaseConfig>;
 const missingVariables = firebaseConfigKeys.filter(key => !firebaseConfig[key]);
 
 if (missingVariables.length > 0) {
