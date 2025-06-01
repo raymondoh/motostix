@@ -15,11 +15,21 @@ type ExtendedUser = AdapterUser & {
   bio?: string;
 };
 
+// Check if required environment variables are present
+const projectId = process.env.FIREBASE_PROJECT_ID;
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const privateKeyEnv = process.env.FIREBASE_PRIVATE_KEY;
+
+if (!projectId || !clientEmail || !privateKeyEnv) {
+  console.error("Missing Firebase Admin credentials in authOptions.ts");
+}
+
 const firebaseAdminConfig = {
   credential: cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+    projectId: projectId || "",
+    clientEmail: clientEmail || "",
+    // Use optional chaining and nullish coalescing to safely handle undefined
+    privateKey: privateKeyEnv?.replace(/\\n/g, "\n") || ""
   })
 };
 
