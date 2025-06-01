@@ -7,9 +7,6 @@
  * Using this index file makes imports clearer and helps with IDE auto-imports.
  */
 
-// Common auth types
-export type { AuthActionResponse, UserProfile } from "./common";
-
 // Login types
 export type { LoginState, LoginResponse } from "./login";
 
@@ -18,7 +15,6 @@ export type { RegisterState } from "./register";
 
 // Password management types
 export type {
-  ForgotPasswordState,
   ResetPasswordState,
   UpdatePasswordState,
   LogPasswordResetInput,

@@ -3,13 +3,6 @@ import type { ActionResponse } from "../common/response";
 import type { FirebaseError } from "firebase/app";
 //import { UserRole } from "../user/common"; // if needed elsewhere
 
-// ✅ UI State types (keep these)
-export interface ForgotPasswordState {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
 export interface ResetPasswordState {
   success: boolean;
   message?: string;
