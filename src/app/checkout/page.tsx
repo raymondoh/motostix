@@ -1,12 +1,34 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/siteConfig";
 import { redirect } from "next/navigation";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { UserService } from "@/lib/services/user-service";
 import { ShoppingBag, CreditCard, TruckIcon } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Checkout | MotoStix",
-  description: "Complete your purchase securely and quickly"
+  title: `Secure Checkout | ${siteConfig.name}`,
+  description: "Complete your order securely with our encrypted checkout process.",
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    noimageindex: true,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+      noimageindex: true
+    }
+  },
+  other: {
+    referrer: "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, must-revalidate",
+    pragma: "no-cache",
+    expires: "0"
+  }
 };
 
 export default async function CheckoutPage() {

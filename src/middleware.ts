@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Routes that don't require authentication
 const publicRoutes = new Set([
   "/",
   "/login",
@@ -12,8 +13,22 @@ const publicRoutes = new Set([
   "/error",
   "/resend-verification",
   "/verify-email",
-  "/verify-success"
+  "/verify-success",
+  "/products",
+  "/about",
+  "/contact"
+  // Add any other public routes
 ]);
+
+// Routes that specifically require authentication
+// const protectedRoutes = new Set([
+//   "/checkout",
+//   "/user",
+//   "/account",
+//   "/orders",
+//   '/admin'
+//   // Add any other protected routes
+// ])
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname.replace(/\/$/, "") || "/";

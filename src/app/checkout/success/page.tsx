@@ -1,6 +1,35 @@
 // src/app/(root)/checkout/success/page.tsx
 import { Suspense } from "react";
 import { CheckoutSuccessClient } from "@/components/checkout/CheckoutSuccessClient";
+import type { Metadata } from "next";
+import { siteConfig } from "@/config/siteConfig";
+export const metadata: Metadata = {
+  title: `Order Confirmation | ${siteConfig.name}`,
+  description: "Thank you for your order! Your purchase has been confirmed.",
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+    },
+  },
+  other: {
+    referrer: "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, must-revalidate",
+  },
+}
+
+
+  other: {
+    referrer: "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, must-revalidate"
+  }
+};
 
 function CheckoutSuccessFallback() {
   return (

@@ -1,9 +1,17 @@
 // src/config/siteConfig.ts
+// export const siteConfig = {
+//   name: "Firebase Boilerplate",
+//   description: "A modern full-stack boilerplate using Firebase, Next.js, and Tailwind CSS.",
+//   url: "http://localhost:3000",
+//   author: "Idiom",
+//   keywords: ["firebase", "nextjs", "boilerplate", "tailwind"],
+//   ogImage: "/og-image.png"
+// };
 export const siteConfig = {
-  name: "Firebase Boilerplate",
-  description: "A modern full-stack boilerplate using Firebase, Next.js, and Tailwind CSS.",
-  url: "http://localhost:3000",
-  author: "Idiom",
-  keywords: ["firebase", "nextjs", "boilerplate", "tailwind"],
-  ogImage: "/og-image.png"
+  name: "MotoStix",
+  url: "https://motostix.com", // Replace with the actual URL
+  ogImage: "https://motostix.com/og.jpg", // Replace with the actual OG image URL
+  description: "High-quality custom stickers for any surface or occasion.",
+  keywords: ["custom stickers", "vinyl stickers", "waterproof stickers", "decals", "labels"],
+  twitter: "https://twitter.com/example" // Replace with the actual Twitter URL
 };

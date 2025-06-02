@@ -1,10 +1,64 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/siteConfig";
 import Image from "next/image";
 import { MapPin, Mail, Phone } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About MotoStix | Premium Motorcycle Decals",
-  description: "Learn about our passion for creating high-quality motorcycle decals and stickers"
+  title: `About Us - Our Story & Mission | ${siteConfig.name}`,
+  description:
+    "Discover the passion behind MotoStix - your trusted source for premium custom stickers and decals. Learn about our commitment to quality, craftsmanship, and customer satisfaction since our founding.",
+  keywords: [
+    "about motostix",
+    "custom sticker company",
+    "sticker manufacturing",
+    "premium decals",
+    "company story",
+    "sticker craftsmanship",
+    "quality stickers",
+    "custom printing"
+  ],
+  openGraph: {
+    title: `About Us - Our Story & Mission | ${siteConfig.name}`,
+    description:
+      "Discover the passion behind MotoStix - your trusted source for premium custom stickers and decals. Learn about our commitment to quality, craftsmanship, and customer satisfaction.",
+    type: "website",
+    url: `${siteConfig.url}/about`,
+    images: [
+      {
+        url: "/og-about.jpg", // You'll want to create this image showing your team/workshop
+        width: 1200,
+        height: 630,
+        alt: "About MotoStix - Our Team and Workshop"
+      }
+    ],
+    siteName: siteConfig.name
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `About Us | ${siteConfig.name}`,
+    description:
+      "Discover the passion behind MotoStix - your trusted source for premium custom stickers and decals. Learn about our commitment to quality and craftsmanship.",
+    images: ["/og-about.jpg"],
+    creator: "@motostix" // Replace with your actual Twitter handle
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/about`
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1
+    }
+  },
+  other: {
+    "article:author": siteConfig.name,
+    "article:section": "About"
+  }
 };
 
 export default function AboutPage() {

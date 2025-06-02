@@ -62,14 +62,32 @@ const NavLinks = ({ setOpen, isMobile }: { setOpen?: (open: boolean) => void; is
       key={item.href}
       href={item.href}
       className={cn(
-        "text-sm font-bold uppercase tracking-wide transition-colors px-4 py-2 rounded-full",
+        "text-sm font-bold uppercase tracking-wide transition-colors px-4 py-2",
         isActive(item.href)
           ? "bg-black text-white dark:bg-white dark:text-black"
           : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-secondary/60",
-        isMobile ? "w-full text-center" : ""
+        isMobile ? "w-full text-left text-lg py-3 px-6 flex items-center rounded-lg" : "rounded-full"
       )}
       onClick={() => setOpen?.(false)}>
+      {isMobile && (
+        <div
+          className="w-1.5 h-1.5 rounded-full mr-3 bg-primary"
+          style={{ opacity: isActive(item.href) ? 1 : 0 }}></div>
+      )}
       <span>{item.title}</span>
+      {isMobile && isActive(item.href) && (
+        <div className="ml-auto">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6 12L10 8L6 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      )}
     </Link>
   );
 
@@ -111,7 +129,7 @@ export const Navbar = () => {
               </SheetTrigger>
               <SheetContent side="left">
                 <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
+                  <SheetTitle></SheetTitle>
                   <SheetDescription></SheetDescription>
                 </SheetHeader>
                 <div className="py-4">
@@ -121,10 +139,7 @@ export const Navbar = () => {
                       setOpen(false);
                     }}
                     className="w-full flex justify-center items-center gap-2 mb-4"
-                    aria-label="Search">
-                    <Search className="h-5 w-5" />
-                    <span>Search</span>
-                  </HeaderIconButton>
+                    aria-label="Search"></HeaderIconButton>
                   <NavLinks setOpen={setOpen} isMobile={true} />
                 </div>
               </SheetContent>
