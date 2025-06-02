@@ -15,22 +15,14 @@ export const metadata: Metadata = {
       index: false,
       follow: false,
       noarchive: true,
-      nosnippet: true,
-    },
+      nosnippet: true
+    }
   },
-  other: {
-    referrer: "strict-origin-when-cross-origin",
-    "cache-control": "no-cache, no-store, must-revalidate",
-  },
-}
-
-
   other: {
     referrer: "strict-origin-when-cross-origin",
     "cache-control": "no-cache, no-store, must-revalidate"
   }
 };
-
 function CheckoutSuccessFallback() {
   return (
     <div className="w-full max-w-md px-4 sm:px-6 mx-auto py-12">
