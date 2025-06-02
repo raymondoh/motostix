@@ -4,14 +4,12 @@
 
 // // ================= Imports =================
 // import { Timestamp } from "firebase-admin/firestore";
-// import { auth } from "@/auth"; // ✅ Server auth (current session)
 // import { adminDb } from "@/firebase/admin/firebase-admin-init"; // ✅ Firestore admin DB
 // import { serverTimestamp } from "@/firebase/admin/firestore"; // ✅ Firestore timestamps
 // import { isFirebaseError, firebaseError } from "@/utils/firebase-error"; // ✅ Firebase error handling
 // import { orderSchema } from "@/schemas/order"; // ✅ Validation schema
 // import type { Order, OrderData } from "@/types/order"; // ✅ Type definitions
 // import { logger } from "@/utils/logger";
-// //import type { User } from "@/types/user";
 // import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 
 // // ================= Types =================
@@ -50,6 +48,9 @@
 //   try {
 //     // ✅ Validate incoming data
 //     const validatedData = orderSchema.parse(orderData);
+
+//     // Dynamic import to avoid build-time initialization
+//     const { auth } = await import("@/auth");
 
 //     // ✅ Get current user session
 //     const session = await auth();
@@ -134,9 +135,6 @@
 
 // // ================= Get All Orders Function (Admin Only) =================
 
-// // /**
-// //  * Fetches all orders for admin dashboard
-// //  */
 // /**
 //  * Fetches all orders (Admin use)
 //  */
@@ -197,6 +195,7 @@
 //     throw new Error(message);
 //   }
 // }
+
 // /**
 //  * Update a single order by ID (Admin use)
 //  */
@@ -238,25 +237,23 @@
 // ===============================
 
 // ================= Imports =================
-import { Timestamp } from "firebase-admin/firestore";
-import { adminDb } from "@/firebase/admin/firebase-admin-init"; // ✅ Firestore admin DB
-import { serverTimestamp } from "@/firebase/admin/firestore"; // ✅ Firestore timestamps
-import { isFirebaseError, firebaseError } from "@/utils/firebase-error"; // ✅ Firebase error handling
-import { orderSchema } from "@/schemas/order"; // ✅ Validation schema
-import type { Order, OrderData } from "@/types/order"; // ✅ Type definitions
+import { Timestamp, FieldValue } from "firebase-admin/firestore";
+import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
+import { orderSchema } from "@/schemas/order";
+import type { Order, OrderData } from "@/types/order";
 import { logger } from "@/utils/logger";
 import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 
 // ================= Types =================
-export type { OrderData }; // ✅ Explicitly export OrderData here for Actions or elsewhere
+export type { OrderData };
 
 // ================= Helper Functions =================
 
 /**
  * Maps a Firestore document to an OrderData object
  */
-
-function mapDocToOrder(doc: FirebaseFirestore.DocumentSnapshot): Order {
+function mapDocToOrder(doc: any): Order {
   const data = doc.data() ?? {};
 
   return {
@@ -273,6 +270,11 @@ function mapDocToOrder(doc: FirebaseFirestore.DocumentSnapshot): Order {
     updatedAt: data?.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : undefined
   };
 }
+
+// Server timestamp helper
+export const serverTimestamp = () => {
+  return FieldValue.serverTimestamp();
+};
 
 // ================= Firestore Functions =================
 
@@ -307,19 +309,18 @@ export async function createOrder(orderData: OrderData) {
     const total = subtotal + tax + shipping;
 
     // ✅ Create the order document in Firestore
-    const orderRef = await adminDb()
-      .collection("orders")
-      .add({
-        ...validatedData,
-        userId: session.user.id,
-        status: validatedData.status || "processing",
-        amount: subtotal, // 💸 Base amount (subtotal)
-        tax,
-        shipping,
-        total, // ✅ Final total saved separately
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+    const db = getAdminFirestore();
+    const orderRef = await db.collection("orders").add({
+      ...validatedData,
+      userId: session.user.id,
+      status: validatedData.status || "processing",
+      amount: subtotal, // 💸 Base amount (subtotal)
+      tax,
+      shipping,
+      total, // ✅ Final total saved separately
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
 
     return {
       success: true,
@@ -353,11 +354,8 @@ export async function createOrder(orderData: OrderData) {
  */
 export async function getUserOrders(userId: string) {
   try {
-    const snapshot = await adminDb()
-      .collection("orders")
-      .where("userId", "==", userId)
-      .orderBy("createdAt", "desc")
-      .get();
+    const db = getAdminFirestore();
+    const snapshot = await db.collection("orders").where("userId", "==", userId).orderBy("createdAt", "desc").get();
 
     const orders = snapshot.docs.map(mapDocToOrder);
 
@@ -375,7 +373,8 @@ export async function getUserOrders(userId: string) {
  */
 export async function getAllOrders() {
   try {
-    const snapshot = await adminDb().collection("orders").orderBy("createdAt", "desc").get();
+    const db = getAdminFirestore();
+    const snapshot = await db.collection("orders").orderBy("createdAt", "desc").get();
 
     const orders = snapshot.docs.map(mapDocToOrder);
 
@@ -405,7 +404,8 @@ export async function getAllOrders() {
  */
 export async function getOrderById(id: string) {
   try {
-    const doc = await adminDb().collection("orders").doc(id).get();
+    const db = getAdminFirestore();
+    const doc = await db.collection("orders").doc(id).get();
 
     if (!doc.exists) {
       return null;
@@ -436,7 +436,8 @@ export async function getOrderById(id: string) {
  */
 export async function updateOrderStatus(orderId: string, status: Order["status"]) {
   try {
-    await adminDb().collection("orders").doc(orderId).update({
+    const db = getAdminFirestore();
+    await db.collection("orders").doc(orderId).update({
       status,
       updatedAt: serverTimestamp()
     });

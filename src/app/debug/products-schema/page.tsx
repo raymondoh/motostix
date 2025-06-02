@@ -1,28 +1,7 @@
-import { adminDb } from "@/firebase/admin/firebase-admin-init";
-
-async function getProductSample() {
-  try {
-    // Use admin SDK methods instead of client SDK
-    const productsRef = adminDb().collection("products");
-    const querySnapshot = await productsRef.limit(5).get();
-
-    const products: any[] = [];
-    querySnapshot.forEach(doc => {
-      products.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-
-    return products;
-  } catch (error) {
-    console.error("Error fetching product sample:", error);
-    return [];
-  }
-}
+import { getProductSample } from "@/lib/services/product-services";
 
 export default async function ProductsSchemaDebugPage() {
-  const sampleProducts = await getProductSample();
+  const sampleProducts = await getProductSample(5);
 
   if (sampleProducts.length === 0) {
     return (

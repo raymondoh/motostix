@@ -1,116 +1,92 @@
-// import { getUserActivityLogs, getAllActivityLogs } from "@/firebase/actions";
-// import { auth } from "@/auth";
-// import { serializeActivityLogs } from "@/utils/serializeActivity";
-// import { logger } from "@/utils/logger";
-// //import type { FetchActivityLogsParams, FetchActivityLogsResponse } from "@/types/dashboard/activity";
-// import type { Dashboard } from "@/types";
+"use server";
 
-// export async function fetchActivityLogs({
-//   limit = 10,
-//   startAfter,
-//   type
-// }: Dashboard.FetchActivityLogsParams): Promise<Dashboard.FetchActivityLogsResponse> {
-//   const session = await auth();
+import { getAllActivityLogs, getUserActivityLogs, type ActivityLog } from "@/firebase/admin/activity";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 
-//   if (!session?.user?.id) {
-//     logger({ type: "warn", message: "Unauthorized fetchActivityLogs attempt", context: "activity" });
-//     return { success: false, error: "Not authenticated" };
-//   }
+// Define the return type for activity logs actions
+type ActivityLogsResult = { success: true; logs: ActivityLog[] } | { success: false; error: string };
 
-//   try {
-//     const result =
-//       session.user.role === "admin"
-//         ? await getAllActivityLogs(limit, startAfter, type)
-//         : await getUserActivityLogs(limit, startAfter, type);
-
-//     if (!result.success || !result.activities) {
-//       logger({
-//         type: "error",
-//         message: `Failed to fetch activity logs for userId: ${session.user.id}`,
-//         metadata: { error: result.error },
-//         context: "activity"
-//       });
-//       return { success: false, error: result.error || "Failed to fetch logs" };
-//     }
-
-//     const serialized = serializeActivityLogs(result.activities);
-
-//     logger({
-//       type: "info",
-//       message: `Fetched ${serialized.length} activity logs for userId: ${session.user.id}`,
-//       context: "activity"
-//     });
-
-//     return {
-//       success: true,
-//       activities: serialized
-//     };
-//   } catch (error) {
-//     logger({
-//       type: "error",
-//       message: "Unexpected error in fetchActivityLogs",
-//       metadata: { error },
-//       context: "activity"
-//     });
-
-//     return { success: false, error: "Unexpected error occurred" };
-//   }
-// }
-import { getUserActivityLogs, getAllActivityLogs } from "@/firebase/actions";
-import { serializeActivityLogs } from "@/utils/serializeActivity";
-import { logger } from "@/utils/logger";
-import type { Dashboard } from "@/types";
-
-export async function fetchActivityLogs({
-  limit = 10,
-  startAfter,
-  type
-}: Dashboard.FetchActivityLogsParams): Promise<Dashboard.FetchActivityLogsResponse> {
+// Get all activity logs (admin only)
+export async function fetchAllActivityLogs(limit = 100): Promise<ActivityLogsResult> {
   try {
     // Dynamic import to avoid build-time initialization
     const { auth } = await import("@/auth");
     const session = await auth();
 
     if (!session?.user?.id) {
-      logger({ type: "warn", message: "Unauthorized fetchActivityLogs attempt", context: "activity" });
       return { success: false, error: "Not authenticated" };
     }
 
-    const result =
-      session.user.role === "admin"
-        ? await getAllActivityLogs(limit, startAfter, type)
-        : await getUserActivityLogs(limit, startAfter, type);
+    // Check if user is admin
+    const { UserService } = await import("@/lib/services/user-service");
+    const userRole = await UserService.getUserRole(session.user.id);
 
-    if (!result.success || !result.activities) {
-      logger({
-        type: "error",
-        message: `Failed to fetch activity logs for userId: ${session.user.id}`,
-        metadata: { error: result.error },
-        context: "activity"
-      });
-      return { success: false, error: result.error || "Failed to fetch logs" };
+    if (userRole !== "admin") {
+      return { success: false, error: "Unauthorized. Admin access required." };
     }
 
-    const serialized = serializeActivityLogs(result.activities);
+    const result = await getAllActivityLogs(limit);
 
-    logger({
-      type: "info",
-      message: `Fetched ${serialized.length} activity logs for userId: ${session.user.id}`,
-      context: "activity"
-    });
-
-    return {
-      success: true,
-      activities: serialized
-    };
+    if (result.success && result.logs) {
+      return { success: true, logs: result.logs };
+    } else {
+      return { success: false, error: result.error || "Failed to fetch activity logs" };
+    }
   } catch (error) {
-    logger({
-      type: "error",
-      message: "Unexpected error in fetchActivityLogs",
-      metadata: { error },
-      context: "activity"
-    });
-
-    return { success: false, error: "Unexpected error occurred" };
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching activity logs";
+    return { success: false, error: message };
   }
 }
+
+// Get user activity logs
+export async function fetchUserActivityLogs(userId?: string, limit = 100): Promise<ActivityLogsResult> {
+  try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    // Use provided userId or current user's ID
+    const targetUserId = userId || session.user.id;
+
+    // If requesting another user's logs, check admin permission
+    if (targetUserId !== session.user.id) {
+      const { UserService } = await import("@/lib/services/user-service");
+      const userRole = await UserService.getUserRole(session.user.id);
+
+      if (userRole !== "admin") {
+        return { success: false, error: "Unauthorized. Admin access required." };
+      }
+    }
+
+    // Ensure targetUserId is defined before calling getUserActivityLogs
+    if (!targetUserId) {
+      return { success: false, error: "User ID is required" };
+    }
+
+    const result = await getUserActivityLogs(targetUserId, limit);
+
+    if (result.success && result.logs) {
+      return { success: true, logs: result.logs };
+    } else {
+      return { success: false, error: result.error || "Failed to fetch user activity logs" };
+    }
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching user activity logs";
+    return { success: false, error: message };
+  }
+}
+
+// Alias for backward compatibility
+export const fetchActivityLogs = fetchAllActivityLogs;

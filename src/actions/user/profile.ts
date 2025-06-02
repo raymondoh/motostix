@@ -1,8 +1,7 @@
 "use server";
 
 // ================= Imports =================
-import { auth } from "@/auth";
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { serverTimestamp } from "@/utils/date-server";
 import { profileUpdateSchema } from "@/schemas/user";
 import { logActivity } from "@/firebase/actions";
@@ -20,13 +19,21 @@ import type { User } from "@/types/user";
  * Get the current user's profile
  */
 export async function getProfile(): Promise<GetProfileResponse> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Not authenticated" };
-
   try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminAuth = getAdminAuth();
+    const db = getAdminFirestore();
+
     const [authUser, userDoc] = await Promise.all([
-      adminAuth().getUser(session.user.id),
-      adminDb().collection("users").doc(session.user.id).get()
+      adminAuth.getUser(session.user.id),
+      db.collection("users").doc(session.user.id).get()
     ]);
 
     const userData = userDoc.data();
@@ -56,7 +63,12 @@ export async function getProfile(): Promise<GetProfileResponse> {
     };
   } catch (error) {
     const message = isFirebaseError(error) ? firebaseError(error) : "Failed to get profile";
-    logger({ type: "error", message: "Error in getProfile", metadata: { error: message }, context: "user-profile" });
+    logger({
+      type: "error",
+      message: "Error in getProfile",
+      metadata: { error: message },
+      context: "user-profile"
+    });
     return { success: false, error: message };
   }
 }
@@ -65,10 +77,15 @@ export async function getProfile(): Promise<GetProfileResponse> {
  * Update the current user's profile
  */
 export async function updateUserProfile(_: unknown, formData: FormData): Promise<UpdateUserProfileResponse> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Not authenticated" };
-
   try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
     const name = formData.get("name") as string;
     const bio = formData.get("bio") as string;
     const imageUrl = formData.get("imageUrl") as string | null;
@@ -86,6 +103,9 @@ export async function updateUserProfile(_: unknown, formData: FormData): Promise
       return { success: false, error: errorMessage };
     }
 
+    const adminAuth = getAdminAuth();
+    const db = getAdminFirestore();
+
     // Prepare Firebase Auth update
     const authUpdate: { displayName?: string; photoURL?: string } = {};
     if (name) authUpdate.displayName = name;
@@ -93,7 +113,7 @@ export async function updateUserProfile(_: unknown, formData: FormData): Promise
 
     if (Object.keys(authUpdate).length > 0) {
       try {
-        await adminAuth().updateUser(session.user.id, authUpdate);
+        await adminAuth.updateUser(session.user.id, authUpdate);
       } catch (error) {
         const message = isFirebaseError(error) ? firebaseError(error) : "Failed to update auth profile";
         logger({
@@ -112,7 +132,7 @@ export async function updateUserProfile(_: unknown, formData: FormData): Promise
     if (bio !== undefined) updateData.bio = bio;
     if (imageUrl) updateData.picture = imageUrl;
 
-    await adminDb().collection("users").doc(session.user.id).update(updateData);
+    await db.collection("users").doc(session.user.id).update(updateData);
 
     // Log activity
     await logActivity({

@@ -1,14 +1,14 @@
-// app/api/upload/route.ts
-
 import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
-import { adminStorage } from "@/firebase/admin/firebase-admin-init";
+import { uploadFile } from "@/lib/services/storage-service";
 
 export async function POST(request: NextRequest) {
   try {
     console.log("Upload API route called");
 
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
     const session = await auth();
+
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -20,41 +20,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "File must be an image" }, { status: 400 });
-    }
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    const bucket = adminStorage().bucket();
-    const fileExtension = file.name.split(".").pop();
-    const isAdmin = session.user.role === "admin";
-    const isProfileImage = file.name.startsWith("profile-");
-
-    let filePath = "";
-
-    if (isProfileImage) {
-      // All users can upload profile images
-      filePath = `users/${session.user.id}/profile-${Date.now()}.${fileExtension}`;
-    } else if (isAdmin) {
-      // Only admins can upload product images
-      filePath = `products/product-${Date.now()}.${fileExtension}`;
-    } else {
-      return NextResponse.json({ error: "Unauthorized to upload this image" }, { status: 403 });
-    }
-
-    const fileRef = bucket.file(filePath);
-
-    await fileRef.save(buffer, {
-      metadata: {
-        contentType: file.type
-      }
+    // Use the storage service
+    const result = await uploadFile({
+      file,
+      userId: session.user.id,
+      userRole: session.user.role || "user"
     });
 
-    await fileRef.makePublic();
-
-    const url = `https://storage.googleapis.com/${bucket.name}/${fileRef.name}`;
-    return NextResponse.json({ url });
+    if (result.success) {
+      return NextResponse.json({ url: result.url });
+    } else {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
   } catch (error) {
     console.error("Upload route error:", error);
 

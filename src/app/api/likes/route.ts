@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { getUserLikedProducts, likeProduct, unlikeProduct } from "@/firebase/admin/products";
 
 export async function GET() {
   try {
-    // Get the session using auth()
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
     const session = await auth();
 
     // Check if session and user exist
@@ -62,7 +62,8 @@ export async function GET() {
 // POST and DELETE handlers remain the same
 export async function POST(request: Request) {
   try {
-    // Get the session using auth()
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
     const session = await auth();
 
     // Check if session and user exist
@@ -121,7 +122,8 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    // Get the session using auth()
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
     const session = await auth();
 
     // Check if session and user exist

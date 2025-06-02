@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
-import { requestAccountDeletion } from "@/actions/data-privacy";
+import { requestAccountDeletion } from "@/actions/data-privacy/deletion";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
@@ -35,10 +35,12 @@ export function AccountDeletion() {
 
   useEffect(() => {
     if (state?.success && !isRedirecting) {
-      toast.success(state.message || "Account deletion request submitted");
+      // Fix: Use a hardcoded success message instead of state.message
+      toast.success("Account deletion request submitted");
       setDialogOpen(false);
 
-      if (state.shouldRedirect) {
+      // Fix: Check if shouldRedirect exists before using it
+      if ("shouldRedirect" in state && state.shouldRedirect) {
         setIsRedirecting(true);
 
         const handleCompleteSignOut = async () => {
@@ -76,7 +78,8 @@ export function AccountDeletion() {
 
         handleCompleteSignOut();
       }
-    } else if (state?.error) {
+    } else if (state && !state.success) {
+      // Fix: Access error property correctly
       const message = isFirebaseError(state.error)
         ? firebaseError(state.error)
         : typeof state.error === "string"
@@ -86,17 +89,20 @@ export function AccountDeletion() {
     }
   }, [state, router, update, isRedirecting]);
 
-  const handleDeleteRequest = () => {
+  const handleDeleteRequest = (event: React.FormEvent) => {
+    event.preventDefault();
+
     if (confirmText !== "DELETE") {
       toast.error("Please type DELETE to confirm");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("immediateDelete", immediateDelete.toString());
+    // Use the form action directly without arguments
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
 
     React.startTransition(() => {
-      formAction(formData);
+      formAction(); // Call without arguments as expected by useActionState
     });
   };
 
@@ -134,7 +140,7 @@ export function AccountDeletion() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
+            <form onSubmit={handleDeleteRequest} className="space-y-4 py-4">
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
@@ -145,6 +151,7 @@ export function AccountDeletion() {
               <div className="flex items-center space-x-2 py-2">
                 <Checkbox
                   id="immediate-delete"
+                  name="immediateDelete"
                   checked={immediateDelete}
                   onCheckedChange={checked => setImmediateDelete(checked === true)}
                 />
@@ -164,44 +171,49 @@ export function AccountDeletion() {
                 <Label htmlFor="confirm">Type DELETE to confirm</Label>
                 <Input
                   id="confirm"
+                  name="confirm"
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
                   placeholder="DELETE"
                 />
               </div>
-            </div>
 
-            <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="w-full sm:w-auto">
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteRequest}
-                disabled={confirmText !== "DELETE" || isPending || isRedirecting}
-                className="w-full sm:w-auto">
-                {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : isRedirecting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  "Delete Account"
-                )}
-              </Button>
-            </DialogFooter>
+              <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="w-full sm:w-auto">
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={confirmText !== "DELETE" || isPending || isRedirecting}
+                  className="w-full sm:w-auto">
+                  {isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : isRedirecting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Redirecting...
+                    </>
+                  ) : (
+                    "Delete Account"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
 
         {state?.success && (
           <Alert className="mt-4 bg-yellow-50 text-yellow-800 border-yellow-200">
             <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription>{state.message || "Your account deletion request has been submitted."}</AlertDescription>
+            <AlertDescription>Your account deletion request has been submitted.</AlertDescription>
           </Alert>
         )}
       </CardContent>

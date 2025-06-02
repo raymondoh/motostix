@@ -1,10 +1,24 @@
-// src/actions/products/get-all-products.ts
 "use server";
 
-import { getAllProducts as getAllProductsFromDB } from "@/firebase/actions";
-import type { GetAllProductsResult } from "@/types/product/result";
-import type { ProductFilterOptions } from "@/types/product/filter";
+import { getAllProducts } from "@/firebase/admin/products";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
+import type { ProductFilterOptions } from "@/types/product";
 
-export async function getAllProducts(filters?: ProductFilterOptions): Promise<GetAllProductsResult> {
-  return await getAllProductsFromDB(filters);
+// Get all products with optional filters
+export async function getAllProductsAction(filters?: ProductFilterOptions) {
+  try {
+    const result = await getAllProducts(filters);
+    return result;
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching products";
+    return { success: false, error: message };
+  }
 }
+
+// Export for backward compatibility
+export { getAllProductsAction as getAllProductsFromDB };
+export { getAllProductsAction as getAllProducts };

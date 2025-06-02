@@ -1,10 +1,10 @@
 "use server";
 
 // ================= Imports =================
-import { auth } from "@/auth";
-import { adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { serverTimestamp } from "@/utils/date-server";
-import { createUser as createUserInFirebase, logActivity } from "@/firebase/actions";
+import { createUserInFirebase } from "@/firebase/admin/auth";
+import { logActivity } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { revalidatePath } from "next/cache";
 import { serializeUser } from "@/utils/serializeUser";
@@ -20,14 +20,28 @@ import type { User, SerializedUser } from "@/types/user/common";
  * Create a new user (admin only)
  */
 export async function createUser({ email, password, name, role }: CreateUserInput): Promise<CreateUserResponse> {
+  // Dynamic import to avoid build-time initialization
+  const { auth } = await import("@/auth");
   const session = await auth();
+
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const result = await createUserInFirebase({ email, password, displayName: name, createdBy: session.user.id, role });
+    const result = await createUserInFirebase({
+      email,
+      password,
+      displayName: name,
+      createdBy: session.user.id,
+      role
+    });
 
     if (!result.success) {
       return { success: false, error: result.error || "Failed to create user" };
+    }
+
+    // Fix: Check that result.data exists and access uid safely
+    if (!result.data?.uid) {
+      return { success: false, error: "Failed to get user ID from created user" };
     }
 
     await logActivity({
@@ -35,12 +49,16 @@ export async function createUser({ email, password, name, role }: CreateUserInpu
       type: "admin-action",
       description: `Created a new user (${email})`,
       status: "success",
-      metadata: { createdUserId: result.uid, createdUserEmail: email, createdUserRole: role || "user" }
+      metadata: {
+        createdUserId: result.data.uid,
+        createdUserEmail: email,
+        createdUserRole: role || "user"
+      }
     });
 
     revalidatePath("/admin/users");
 
-    return { success: true, userId: result.uid };
+    return { success: true, userId: result.data.uid };
   } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
@@ -48,7 +66,12 @@ export async function createUser({ email, password, name, role }: CreateUserInpu
       ? error.message
       : "Unknown error";
 
-    logger({ type: "error", message: "Error in createUser", metadata: { error: message }, context: "admin-users" });
+    logger({
+      type: "error",
+      message: "Error in createUser",
+      metadata: { error: message },
+      context: "admin-users"
+    });
 
     return { success: false, error: message };
   }
@@ -58,18 +81,22 @@ export async function createUser({ email, password, name, role }: CreateUserInpu
  * Fetch users (admin only)
  */
 export async function fetchUsers(limit = 10, offset = 0): Promise<FetchUsersResponse> {
+  // Dynamic import to avoid build-time initialization
+  const { auth } = await import("@/auth");
   const session = await auth();
+
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
+    const db = getAdminFirestore();
+    const adminData = (await db.collection("users").doc(session.user.id).get()).data();
     if (!adminData || adminData.role !== "admin") {
       return { success: false, error: "Unauthorized. Admin access required." };
     }
 
-    const usersQuery = adminDb().collection("users").limit(limit).offset(offset);
+    const usersQuery = db.collection("users").limit(limit).offset(offset);
     const usersSnapshot = await usersQuery.get();
-    const totalSnapshot = await adminDb().collection("users").count().get();
+    const totalSnapshot = await db.collection("users").count().get();
     const total = totalSnapshot.data().count;
 
     const users: SerializedUser[] = usersSnapshot.docs.map(doc => {
@@ -92,141 +119,29 @@ export async function fetchUsers(limit = 10, offset = 0): Promise<FetchUsersResp
     return { success: true, users, total };
   } catch (error) {
     const message = isFirebaseError(error) ? firebaseError(error) : "Failed to fetch users";
-    logger({ type: "error", message: "Error in fetchUsers", metadata: { error: message }, context: "admin-users" });
+    logger({
+      type: "error",
+      message: "Error in fetchUsers",
+      metadata: { error: message },
+      context: "admin-users"
+    });
     return { success: false, error: message };
   }
 }
-
-/**
- * SERVER-SIDE USER SEARCH - NOT IMPLEMENTED YET
- *
- * This function provides server-side user search with pagination.
- * Currently using client-side filtering in UsersDataTable.tsx instead.
- *
- * TODO: Implement server-side search UI when handling large user datasets
- * TODO: Add pagination controls to admin users page
- * TODO: Connect to search input in TableToolbar
- */
-/*
-export async function searchUsers(_: SearchUsersResponse, formData: FormData): Promise<SearchUsersResponse> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Not authenticated" };
-
-  try {
-    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
-    if (!adminData || adminData.role !== "admin") {
-      return { success: false, error: "Unauthorized. Admin access required." };
-    }
-
-    const query = formData.get("query") as string;
-    const limit = parseInt(formData.get("limit") as string) || 10;
-    const offset = parseInt(formData.get("offset") as string) || 0;
-
-    let usersQuery: CollectionReference<DocumentData> | Query<DocumentData> = adminDb().collection("users");
-
-    if (query) {
-      usersQuery = usersQuery
-        .where("name", ">=", query)
-        .where("name", "<=", query + "\uf8ff")
-        .limit(limit)
-        .offset(offset);
-    } else {
-      usersQuery = usersQuery.limit(limit).offset(offset);
-    }
-
-    const usersSnapshot = await usersQuery.get();
-    const totalSnapshot = await adminDb().collection("users").count().get();
-    const total = totalSnapshot.data().count;
-
-    const users: SerializedUser[] = await Promise.all(
-      usersSnapshot.docs.map(async doc => {
-        const data = doc.data() as Partial<User>;
-        let rawUser: User = {
-          id: doc.id,
-          name: data.name ?? "",
-          email: data.email ?? "",
-          role: data.role ?? "user",
-          bio: data.bio ?? "",
-          emailVerified: data.emailVerified ?? false,
-          status: data.status ?? "active",
-          createdAt: data.createdAt,
-          lastLoginAt: data.lastLoginAt,
-          updatedAt: data.updatedAt
-        };
-        try {
-          const authUser = await adminAuth().getUser(doc.id);
-          rawUser = {
-            ...rawUser,
-            name: authUser.displayName || rawUser.name,
-            email: authUser.email || rawUser.email,
-            image: getUserImage({ ...data, photoURL: authUser.photoURL })
-          };
-        } catch {
-          // fallback silently
-        }
-        return serializeUser(rawUser);
-      })
-    );
-
-    return { success: true, users, total };
-  } catch (error) {
-    const message = isFirebaseError(error) ? firebaseError(error) : "Failed to search users";
-    logger({ type: "error", message: "Error in searchUsers", metadata: { error: message }, context: "admin-users" });
-    return { success: false, error: message };
-  }
-}
-*/
-
-/**
- * DEDICATED ROLE MANAGEMENT - NOT IMPLEMENTED YET
- *
- * This function provides specialized role-only updates with dedicated validation.
- * Currently using general updateUser() function in AdminUserEditDialog.tsx instead.
- *
- * TODO: Implement dedicated role management UI if needed
- * TODO: Add role change confirmation dialogs
- * TODO: Add role change audit logging
- */
-/*
-export async function updateUserRole(_: UpdateUserRoleResponse, formData: FormData): Promise<UpdateUserRoleResponse> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Not authenticated" };
-
-  try {
-    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
-    if (!adminData || adminData.role !== "admin") {
-      return { success: false, error: "Unauthorized. Admin access required." };
-    }
-
-    const userId = formData.get("userId") as string;
-    const role = formData.get("role") as UserRole;
-
-    if (!userId) return { success: false, error: "User ID is required" };
-    if (!["user", "admin"].includes(role)) return { success: false, error: "Role must be either 'user' or 'admin'" };
-    if (userId === session.user.id) return { success: false, error: "You cannot change your own role" };
-
-    await adminDb().collection("users").doc(userId).update({ role, updatedAt: serverTimestamp() });
-
-    logger({ type: "info", message: `Updated role for userId ${userId} to ${role}`, context: "admin-users" });
-
-    return { success: true, message: `User role updated to ${role}` };
-  } catch (error) {
-    const message = isFirebaseError(error) ? firebaseError(error) : "Failed to update user role";
-    logger({ type: "error", message: "Error in updateUserRole", metadata: { error: message }, context: "admin-users" });
-    return { success: false, error: message };
-  }
-}
-*/
 
 /**
  * Update user fields (admin only)
  */
 export async function updateUser(userId: string, userData: Partial<User>): Promise<UpdateUserResponse> {
+  // Dynamic import to avoid build-time initialization
+  const { auth } = await import("@/auth");
   const session = await auth();
+
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const adminData = (await adminDb().collection("users").doc(session.user.id).get()).data();
+    const db = getAdminFirestore();
+    const adminData = (await db.collection("users").doc(session.user.id).get()).data();
     if (!adminData || adminData.role !== "admin") {
       return { success: false, error: "Unauthorized. Admin access required." };
     }
@@ -238,15 +153,24 @@ export async function updateUser(userId: string, userData: Partial<User>): Promi
       }
     });
 
-    await adminDb().collection("users").doc(userId).update(updateData);
+    await db.collection("users").doc(userId).update(updateData);
     revalidatePath("/admin/users");
 
-    logger({ type: "info", message: `Updated user ${userId}`, context: "admin-users" });
+    logger({
+      type: "info",
+      message: `Updated user ${userId}`,
+      context: "admin-users"
+    });
 
     return { success: true };
   } catch (error) {
     const message = isFirebaseError(error) ? firebaseError(error) : "Failed to update user";
-    logger({ type: "error", message: "Error in updateUser", metadata: { error: message }, context: "admin-users" });
+    logger({
+      type: "error",
+      message: "Error in updateUser",
+      metadata: { error: message },
+      context: "admin-users"
+    });
     return { success: false, error: message };
   }
 }

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-//import { getServerAuthSession } from "@/lib/auth";
-import { auth } from "@/auth";
 import { fetchUserOrders } from "@/actions/orders/fetch-user-orders";
 import { logger } from "@/utils/logger";
 
 export async function GET() {
   try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
     const session = await auth();
 
     if (!session || !session.user) {
@@ -18,8 +18,12 @@ export async function GET() {
     // Return the orders as JSON
     return NextResponse.json({ success: true, orders });
   } catch (error) {
-    //logger.error("Error fetching orders from API", { error });
-    console.log("Error fetching orders from API", { error });
+    logger({
+      type: "error",
+      message: "Error fetching orders from API",
+      metadata: { error },
+      context: "api-orders"
+    });
 
     return NextResponse.json({ success: false, error: "Failed to fetch orders" }, { status: 500 });
   }

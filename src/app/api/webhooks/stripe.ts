@@ -1,16 +1,14 @@
-// src/pages/api/webhooks/stripe.ts
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createOrder } from "@/firebase/actions";
-import { logger, logServerEvent } from "@/utils/logger";
+import { createNewOrder } from "@/actions/orders/create-order";
+import { logger } from "@/utils/logger";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-//import type { OrderData } from "@/types/order";
-import type { OrderData } from "@/firebase/admin/orders";
+import type { OrderData } from "@/types/order";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // ① Either pin to a *valid* released version …
+  // ① Either pin to a *valid* released version …
   //apiVersion: "2024-02-15",              // <-- current GA as of May 2025
-  // ② … or simply remove the line entirely:
+  // ② … or simply remove the line entirely:
   apiVersion: undefined
 });
 
@@ -64,13 +62,18 @@ export async function POST(req: Request) {
         const customerEmail = paymentIntent.metadata.customerEmail || "";
         const customerName = paymentIntent.metadata.customerName || "";
 
-        const result = await createOrder({
+        // Create order data object
+        const orderData: OrderData = {
           paymentIntentId: paymentIntent.id,
           amount,
           customerEmail,
-          customerName
-          // Add shipping fields if you're collecting them via metadata
-        });
+          customerName,
+          items: [], // You'll need to get this from metadata or another source
+          //shippingAddress: {}, // You'll need to get this from metadata or another source
+          status: "processing"
+        };
+
+        const result = await createNewOrder(orderData);
 
         if (result.success) {
           console.log(`[webhook] Order created for ${customerEmail}`);

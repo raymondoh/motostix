@@ -1,121 +1,48 @@
 "use server";
 
+import { updateProduct } from "@/firebase/admin/products";
 import { revalidatePath } from "next/cache";
-import { type UpdateProductInput, productUpdateSchema as updateProductSchema } from "@/schemas/product";
-import { updateProduct as updateProductInDb } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import { logger } from "@/utils/logger";
-import type { UpdateProductResult } from "@/types/product";
 
-/**
- * Server action to update a product
- */
-export async function updateProduct(productId: string, data: UpdateProductInput): Promise<UpdateProductResult> {
+// Update product (admin only)
+export async function updateProductAction(id: string, data: any) {
   try {
-    // Log the incoming data for debugging
-    logger({
-      type: "info",
-      message: "Updating product - received data",
-      metadata: {
-        productId,
-        name: data.name,
-        price: data.price,
-        dataKeys: Object.keys(data)
-      },
-      context: "products"
-    });
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-    // ✅ Step 1: Validate incoming update data
-    const validated = updateProductSchema.safeParse(data);
-
-    if (!validated.success) {
-      logger({
-        type: "warn",
-        message: "Invalid product data during updateProduct",
-        metadata: { productId, error: validated.error.flatten() },
-        context: "products"
-      });
-      return { success: false, error: "Invalid product data: " + validated.error.message };
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
     }
 
-    // Log the validated data
-    logger({
-      type: "info",
-      message: "Validated product data",
-      metadata: {
-        productId,
-        name: validated.data.name,
-        validatedKeys: Object.keys(validated.data)
-      },
-      context: "products"
-    });
+    // Check if user is admin
+    const { UserService } = await import("@/lib/services/user-service");
+    const userRole = await UserService.getUserRole(session.user.id);
 
-    // ✅ Step 2: Update product in database
-    const result = await updateProductInDb(productId, validated.data);
+    if (userRole !== "admin") {
+      return { success: false, error: "Unauthorized. Admin access required." };
+    }
+
+    const result = await updateProduct(id, data);
 
     if (result.success) {
-      logger({
-        type: "info",
-        message: "Product updated successfully",
-        metadata: {
-          productId,
-          updatedName: validated.data.name,
-          updatedPrice: validated.data.price,
-          updatedFields: Object.keys(validated.data)
-        },
-        context: "products"
-      });
-
-      // ✅ Step 3: Revalidate all relevant cache paths
-      revalidatePath("/admin/products"); // Admin products list
-      revalidatePath(`/admin/products/${productId}`); // Admin product detail
-      revalidatePath(`/products/${productId}`); // Public product detail
-      revalidatePath("/products"); // Public products list
-      revalidatePath("/"); // Homepage (in case featured products are shown)
-
-      // Force revalidation of dynamic routes that might show this product
-      revalidatePath("/products/category/[slug]", "page");
-      revalidatePath("/search", "page");
-
-      // Return success without the full product object
-      return {
-        success: true
-      };
-    } else {
-      logger({
-        type: "error",
-        message: "Failed to update product",
-        metadata: {
-          productId,
-          error: result.error,
-          attemptedName: validated.data.name
-        },
-        context: "products"
-      });
-
-      return {
-        success: false,
-        error: result.error
-      };
+      // Revalidate relevant paths
+      revalidatePath("/admin/products");
+      revalidatePath("/products");
+      revalidatePath(`/products/${id}`);
     }
-  } catch (error: unknown) {
+
+    return result;
+  } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
       ? error.message
       : "Unknown error updating product";
-
-    logger({
-      type: "error",
-      message: "Unhandled exception in updateProduct",
-      metadata: {
-        productId,
-        error: message,
-        attemptedData: JSON.stringify(data)
-      },
-      context: "products"
-    });
-
     return { success: false, error: message };
   }
 }
+
+// Export for backward compatibility
+export { updateProductAction as updateProductInDb };
+export { updateProductAction as updateProduct };

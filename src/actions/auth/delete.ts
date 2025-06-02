@@ -1,112 +1,75 @@
 "use server";
 
-// ================= Imports =================
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
-import { deleteUserImage } from "@/firebase/admin/auth";
-import { logActivity } from "@/firebase/actions";
+import { getAdminAuth, getAdminFirestore, getAdminStorage } from "@/lib/firebase/admin/initialize";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import { logServerEvent, logger } from "@/utils/logger";
-import type { Common } from "@/types";
-import type { DeleteUserAsAdminInput } from "@/types/auth/delete";
+import { logActivity } from "@/firebase/log/logActivity";
 
-// ================= Delete User (Admin) =================
-
-/**
- * Deletes a user from Firestore, Firebase Auth, and optionally Storage.
- * Logs the deletion for auditing purposes.
- */
-export async function deleteUserAsAdmin({ userId, adminId }: DeleteUserAsAdminInput): Promise<Common.ActionResponse> {
-  if (!userId || typeof userId !== "string") {
-    logger({ type: "warn", message: "Invalid userId passed to deleteUserAsAdmin", context: "users" });
-    return { success: false, error: "Invalid user ID passed to deleteUserAsAdmin" };
-  }
-
+// Delete user account
+export async function deleteUserAccount(userId: string) {
   try {
-    // 1. Fetch Firestore user document
-    const userDocRef = adminDb().collection("users").doc(userId);
-    const userDocSnap = await userDocRef.get();
+    const auth = getAdminAuth();
+    const db = getAdminFirestore();
+    const storage = getAdminStorage();
 
-    if (!userDocSnap.exists) {
-      logger({ type: "warn", message: `User not found in Firestore: ${userId}`, context: "users" });
-      return { success: false, error: "User not found in Firestore" };
-    }
+    // Log the deletion request
+    await logActivity({
+      userId,
+      type: "account-deletion",
+      description: "Account deletion requested",
+      status: "info"
+    });
 
-    const userData = userDocSnap.data();
-    const imageUrl = userData?.image || userData?.picture || userData?.photoURL;
+    // Get user data for cleanup
+    const userDoc = await db.collection("users").doc(userId).get();
+    const userData = userDoc.data();
 
-    // 2. Delete user image from Storage (if exists)
-    if (imageUrl) {
-      const imageResult = await deleteUserImage(imageUrl);
-      if (!imageResult.success) {
-        logger({
-          type: "warn",
-          message: `Failed to delete user image for ${userId}`,
-          metadata: { error: imageResult.error },
-          context: "users"
-        });
-      } else {
-        logger({ type: "info", message: `Deleted user image for ${userId}`, context: "users" });
+    // Delete user's profile image if exists
+    if (userData?.picture) {
+      try {
+        const bucket = storage.bucket();
+        const url = new URL(userData.picture);
+        const fullPath = url.pathname.slice(1);
+        const storagePath = fullPath.replace(`${bucket.name}/`, "");
+        await bucket.file(storagePath).delete();
+      } catch (imageError) {
+        console.error("Error deleting profile image:", imageError);
       }
     }
 
-    // 3. Delete Firestore user document
-    await userDocRef.delete();
-    logger({ type: "info", message: `Deleted Firestore document for user ${userId}`, context: "users" });
+    // Delete user's data from Firestore
+    // 1. Delete likes
+    const likesSnapshot = await db.collection("users").doc(userId).collection("likes").get();
+    const likesDeletePromises = likesSnapshot.docs.map(doc => doc.ref.delete());
+    await Promise.all(likesDeletePromises);
 
-    // 4. Delete user from Firebase Auth
-    await adminAuth().deleteUser(userId);
-    logger({ type: "info", message: `Deleted Firebase Auth user ${userId}`, context: "users" });
+    // 2. Delete user document
+    await db.collection("users").doc(userId).delete();
 
-    // 5. Log admin deletion activity (non-blocking)
-    try {
-      await logActivity({
-        userId: adminId,
-        type: "admin_deleted_user",
-        description: `Deleted user account (${userId})`,
-        status: "success",
-        metadata: { deletedUserId: userId }
-      });
-    } catch (logError) {
-      logger({
-        type: "error",
-        message: "Failed to log admin delete activity",
-        metadata: { logError },
-        context: "users"
-      });
-    }
+    // 3. Delete user from Firebase Auth
+    await auth.deleteUser(userId);
 
-    // 6. Log server event for auditing
-    await logServerEvent({
-      type: "admin:delete_user",
-      message: `Admin ${adminId} deleted user ${userId}`,
-      userId: adminId,
-      metadata: { deletedUserId: userId },
-      context: "users"
+    // Log successful deletion
+    await logActivity({
+      userId: "system",
+      type: "account-deletion",
+      description: `User account ${userId} deleted`,
+      status: "success",
+      metadata: { deletedUserId: userId }
     });
 
     return { success: true };
-  } catch (error: unknown) {
+  } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
       ? error.message
-      : "Unknown error deleting user";
-
-    logger({
-      type: "error",
-      message: "Error in deleteUserAsAdmin",
-      metadata: { error: message },
-      context: "users"
-    });
-
-    await logServerEvent({
-      type: "admin:delete_user_error",
-      message: `Error deleting user ${userId}`,
-      userId: adminId,
-      metadata: { error: message },
-      context: "users"
-    });
-
+      : "Unknown error deleting user account";
+    console.error("Error deleting user account:", message);
     return { success: false, error: message };
   }
+}
+
+// Admin delete user function (alias for backward compatibility)
+export async function deleteUserAsAdmin(userId: string) {
+  return await deleteUserAccount(userId);
 }

@@ -1,43 +1,32 @@
-// src/actions/products/get-related-products.ts
 "use server";
 
-import { getRelatedProducts as getRelatedProductsFromDb } from "@/firebase/actions";
-import { logger } from "@/utils/logger";
-import type { GetRelatedProductsResult } from "@/types/product/result";
+import { getRelatedProducts } from "@/firebase/admin/products";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 
-interface GetRelatedProductsParams {
+// Get related products
+export async function getRelatedProductsAction(params: {
   productId: string;
   category?: string;
+  subcategory?: string;
+  designTheme?: string;
+  productType?: string;
+  brand?: string;
+  tags?: string[];
   limit?: number;
-}
-
-/**
- * Action to fetch related products by category (excluding current product)
- */
-export async function getRelatedProducts(params: GetRelatedProductsParams): Promise<GetRelatedProductsResult> {
+}) {
   try {
-    const result = await getRelatedProductsFromDb(params);
-
-    if (!result.success) {
-      logger({
-        type: "warn",
-        message: "Failed to fetch related products",
-        context: "products",
-        metadata: { ...params, error: result.error }
-      });
-    }
-
+    const result = await getRelatedProducts(params);
     return result;
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Unknown error occurred while fetching related products";
-
-    logger({
-      type: "error",
-      message: "Unhandled exception in getRelatedProducts action",
-      context: "products",
-      metadata: { ...params, error: message }
-    });
-
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching related products";
     return { success: false, error: message };
   }
 }
+
+// Export for backward compatibility
+export { getRelatedProductsAction as getRelatedProductsFromDb };
+export { getRelatedProductsAction as getRelatedProducts };

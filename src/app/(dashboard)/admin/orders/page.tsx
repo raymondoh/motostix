@@ -1,36 +1,88 @@
+// import type { Metadata } from "next";
+// import { DashboardShell, DashboardHeader } from "@/components";
+// import { Separator } from "@/components/ui/separator";
+// import { auth } from "@/auth";
+// import { redirect } from "next/navigation";
+// import { fetchAllOrders } from "@/actions/orders/fetch-all-orders";
+// import { AdminOrdersClient } from "@/components/dashboard/admin/orders/AdminOrdersClient";
+
+// export const metadata: Metadata = {
+//   title: "Manage Orders - Admin",
+//   description: "View and manage all customer orders."
+// };
+
+// export default async function AdminOrdersPage() {
+//   const session = await auth();
+
+//   if (!session?.user?.id || session.user.role !== "admin") {
+//     redirect("/not-authorized");
+//   }
+
+//   const orders = await fetchAllOrders();
+
+//   return (
+//     <DashboardShell>
+//       <DashboardHeader
+//         title="Order Management"
+//         description="View and manage all customer orders."
+//         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Admin", href: "/admin" }, { label: "Orders" }]}
+//       />
+//       <Separator className="mb-8" />
+//       <div className="w-full overflow-hidden">
+//         <AdminOrdersClient orders={orders} />
+//       </div>
+//     </DashboardShell>
+//   );
+// }
 import type { Metadata } from "next";
-import { DashboardShell, DashboardHeader } from "@/components";
 import { Separator } from "@/components/ui/separator";
-import { auth } from "@/auth";
+import { DashboardShell, DashboardHeader } from "@/components";
+import { AdminOrdersClient } from "@/components/dashboard/admin/orders/AdminOrdersClient";
 import { redirect } from "next/navigation";
 import { fetchAllOrders } from "@/actions/orders/fetch-all-orders";
-import { AdminOrdersClient } from "@/components/dashboard/admin/orders/AdminOrdersClient";
+import { UserService } from "@/lib/services/user-service";
 
 export const metadata: Metadata = {
-  title: "Manage Orders - Admin",
-  description: "View and manage all customer orders."
+  title: "Order Management",
+  description: "View and manage all orders in your store."
 };
 
 export default async function AdminOrdersPage() {
-  const session = await auth();
+  try {
+    // Dynamic import for auth to avoid build-time issues
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-  if (!session?.user?.id || session.user.role !== "admin") {
-    redirect("/not-authorized");
+    if (!session?.user) {
+      redirect("/login");
+    }
+
+    // Check admin role using UserService
+    const userRole = await UserService.getUserRole(session.user.id);
+    if (userRole !== "admin") {
+      redirect("/not-authorized");
+    }
+
+    // Fetch initial orders
+    const result = await fetchAllOrders();
+    const orders = result.success ? result.orders || [] : [];
+
+    return (
+      <DashboardShell>
+        <DashboardHeader
+          title="Order Management"
+          description="View and manage all orders in your store."
+          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Admin", href: "/admin" }, { label: "Orders" }]}
+        />
+        <Separator className="mb-8" />
+
+        <div className="w-full overflow-hidden">
+          <AdminOrdersClient orders={orders} />
+        </div>
+      </DashboardShell>
+    );
+  } catch (error) {
+    console.error("Error in AdminOrdersPage:", error);
+    redirect("/login");
   }
-
-  const orders = await fetchAllOrders();
-
-  return (
-    <DashboardShell>
-      <DashboardHeader
-        title="Order Management"
-        description="View and manage all customer orders."
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Admin", href: "/admin" }, { label: "Orders" }]}
-      />
-      <Separator className="mb-8" />
-      <div className="w-full overflow-hidden">
-        <AdminOrdersClient orders={orders} />
-      </div>
-    </DashboardShell>
-  );
 }

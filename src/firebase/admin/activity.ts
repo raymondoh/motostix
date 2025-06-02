@@ -1,400 +1,121 @@
-// // src/firebase/admin/activity.ts
-// import { adminDb } from "@/firebase/admin/firebase-admin-init";
-// import { Timestamp, Query, DocumentData } from "firebase-admin/firestore";
-// import { auth } from "@/auth";
-
-// import type {
-//   ActivityLogWithId,
-//   GetUserActivityLogsResult,
-//   LogActivityResult,
-//   ActivityLogData
-// } from "@/types/firebase/activity";
-// import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-// import { getUserImage } from "@/utils/get-user-image";
-
-// export async function getAllActivityLogs(
-//   limit = 10,
-//   startAfter?: string,
-//   type?: string
-// ): Promise<GetUserActivityLogsResult> {
-//   const session = await auth();
-
-//   if (!session?.user?.id || session.user.role !== "admin") {
-//     return { success: false, error: "Unauthorized access" };
-//   }
-
-//   try {
-//     const collectionRef = adminDb().collection("activityLogs");
-//     let query: Query<DocumentData> = collectionRef;
-
-//     if (type) {
-//       query = query.where("type", "==", type);
-//     }
-
-//     query = query.orderBy("timestamp", "desc");
-
-//     if (startAfter) {
-//       const startAfterDoc = await collectionRef.doc(startAfter).get();
-//       if (startAfterDoc.exists) {
-//         query = query.startAfter(startAfterDoc);
-//       }
-//     }
-
-//     query = query.limit(limit);
-
-//     const logsSnapshot = await query.get();
-//     const logs = logsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as ActivityLogData) }));
-
-//     // 🧠 Get unique userIds and fetch user metadata
-//     const uniqueUserIds = [...new Set(logs.map(log => log.userId))];
-
-//     const userDataMap: Record<string, { name?: string; email?: string; image?: string }> = {};
-
-//     await Promise.all(
-//       uniqueUserIds.map(async userId => {
-//         try {
-//           const userDoc = await adminDb().collection("users").doc(userId).get();
-//           const userData = userDoc.exists ? userDoc.data() : null;
-
-//           userDataMap[userId] = {
-//             name: userData?.name || "",
-//             email: userData?.email || "",
-//             image: getUserImage(userData || {}) || undefined
-//           };
-//         } catch {
-//           userDataMap[userId] = {
-//             name: "",
-//             email: "",
-//             image: ""
-//           };
-//         }
-//       })
-//     );
-
-//     const activities: ActivityLogWithId[] = logs.map(log => {
-//       const user = userDataMap[log.userId] ?? {};
-//       return {
-//         ...log,
-//         name: user.name,
-//         userEmail: user.email,
-//         image: user.image
-//       };
-//     });
-
-//     console.log("[getAllActivityLogs] Logs fetched:", logs.length);
-//     return { success: true, activities };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : error instanceof Error
-//       ? error.message
-//       : "Unknown error";
-
-//     console.error("Error getting all activity logs:", message);
-//     return { success: false, error: message };
-//   }
-// }
-
-// export async function getUserActivityLogs(
-//   limit = 100,
-//   startAfter?: string,
-//   type?: string,
-//   description?: string
-// ): Promise<GetUserActivityLogsResult> {
-//   const session = await auth();
-
-//   if (!session?.user?.id) {
-//     return { success: false, error: "Not authenticated" };
-//   }
-
-//   try {
-//     const collectionRef = adminDb().collection("activityLogs");
-//     let query: Query<DocumentData> = collectionRef.where("userId", "==", session.user.id);
-
-//     if (type) {
-//       query = query.where("type", "==", type);
-//     }
-
-//     if (description) {
-//       query = query.where("description", "==", description);
-//     }
-
-//     query = query.orderBy("timestamp", "desc");
-
-//     if (startAfter) {
-//       const startAfterDoc = await collectionRef.doc(startAfter).get();
-//       if (startAfterDoc.exists) {
-//         query = query.startAfter(startAfterDoc);
-//       }
-//     }
-
-//     query = query.limit(limit);
-
-//     const logsSnapshot = await query.get();
-//     const logs = logsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-//     // 🧠 Fetch the current user’s Firestore doc
-//     let userEmail = "";
-//     let userName = "";
-//     let image: string | null = null;
-
-//     try {
-//       const userDoc = await adminDb().collection("users").doc(session.user.id).get();
-//       const userData = userDoc.exists ? userDoc.data() : null;
-
-//       userEmail = userData?.email || "";
-//       userName = userData?.name || "";
-//       image = getUserImage(userData || {});
-//     } catch (error) {
-//       const message = isFirebaseError(error)
-//         ? firebaseError(error)
-//         : error instanceof Error
-//         ? error.message
-//         : "Unknown error";
-
-//       console.warn(`Could not fetch user metadata for ${session.user.id}: ${message}`);
-//     }
-
-//     const activities: ActivityLogWithId[] = logs.map(log => ({
-//       ...(log as ActivityLogWithId),
-//       name: userName,
-//       userEmail,
-//       image
-//     }));
-
-//     return { success: true, activities };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : error instanceof Error
-//       ? error.message
-//       : "Unknown error";
-
-//     console.error("Error getting user activity logs:", message);
-//     return { success: false, error: message };
-//   }
-// }
-
-// //**Purpose**: Creates a new activity log entry in the database.
-// export async function logActivity(data: Omit<ActivityLogData, "timestamp">): Promise<LogActivityResult> {
-//   try {
-//     const payload: ActivityLogData = {
-//       ...data,
-//       timestamp: Timestamp.now()
-//     };
-
-//     const docRef = await adminDb().collection("activityLogs").add(payload);
-
-//     return { success: true, activityId: docRef.id };
-//   } catch (error: unknown) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : error instanceof Error
-//       ? error.message
-//       : "Unknown error logging activity";
-
-//     console.error("🔥 Error logging activity:", message); // optional: helpful log
-//     return { success: false, error: message };
-//   }
-// }
-import { adminDb } from "@/firebase/admin/firebase-admin-init";
-import { Timestamp, Query, DocumentData } from "firebase-admin/firestore";
-
-import type {
-  ActivityLogWithId,
-  GetUserActivityLogsResult,
-  LogActivityResult,
-  ActivityLogData
-} from "@/types/firebase/activity";
+import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import { getUserImage } from "@/utils/get-user-image";
+import { Timestamp } from "firebase-admin/firestore";
 
-export async function getAllActivityLogs(
-  limit = 10,
-  startAfter?: string,
-  type?: string
-): Promise<GetUserActivityLogsResult> {
+// Types
+export interface ActivityLog {
+  id: string;
+  userId: string;
+  type: string;
+  description: string;
+  status: "success" | "error" | "warning" | "info";
+  timestamp: Date | Timestamp;
+  metadata?: Record<string, any>;
+}
+
+// Helper function to map Firestore document to ActivityLog
+function mapDocToActivityLog(doc: any): ActivityLog {
+  const data = doc.data() ?? {};
+
+  return {
+    id: doc.id,
+    userId: data.userId || "",
+    type: data.type || "",
+    description: data.description || "",
+    status: data.status || "info",
+    timestamp: data.timestamp instanceof Timestamp ? data.timestamp.toDate() : data.timestamp || new Date(),
+    metadata: data.metadata || {}
+  };
+}
+
+// Get all activity logs
+export async function getAllActivityLogs(limit = 100) {
   try {
-    // Dynamic import to avoid build-time initialization
-    const { auth } = await import("@/auth");
-    const session = await auth();
+    console.log("[getAllActivityLogs] Starting query");
+    const db = getAdminFirestore();
+    const snapshot = await db.collection("activity").orderBy("timestamp", "desc").limit(limit).get();
 
-    if (!session?.user?.id || session.user.role !== "admin") {
-      return { success: false, error: "Unauthorized access" };
-    }
+    const logs = snapshot.docs.map(mapDocToActivityLog);
 
-    const collectionRef = adminDb().collection("activityLogs");
-    let query: Query<DocumentData> = collectionRef;
+    console.log(`[getAllActivityLogs] Logs fetched: ${logs.length}`);
+    return { success: true, logs };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching activity logs";
+    console.error("[getAllActivityLogs] Error:", message);
+    return { success: false, error: message };
+  }
+}
 
-    if (type) {
-      query = query.where("type", "==", type);
-    }
+// Get activity logs for a specific user - FIXED parameter order
+export async function getUserActivityLogs(userId: string, limit = 100) {
+  try {
+    const db = getAdminFirestore();
+    const snapshot = await db
+      .collection("activity")
+      .where("userId", "==", userId)
+      .orderBy("timestamp", "desc")
+      .limit(limit)
+      .get();
 
-    query = query.orderBy("timestamp", "desc");
+    const logs = snapshot.docs.map(mapDocToActivityLog);
 
-    if (startAfter) {
-      const startAfterDoc = await collectionRef.doc(startAfter).get();
-      if (startAfterDoc.exists) {
-        query = query.startAfter(startAfterDoc);
-      }
-    }
-
-    query = query.limit(limit);
-
-    const logsSnapshot = await query.get();
-    const logs = logsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as ActivityLogData) }));
-
-    // 🧠 Get unique userIds and fetch user metadata
-    const uniqueUserIds = [...new Set(logs.map(log => log.userId))];
-
-    const userDataMap: Record<string, { name?: string; email?: string; image?: string }> = {};
-
-    await Promise.all(
-      uniqueUserIds.map(async userId => {
-        try {
-          const userDoc = await adminDb().collection("users").doc(userId).get();
-          const userData = userDoc.exists ? userDoc.data() : null;
-
-          userDataMap[userId] = {
-            name: userData?.name || "",
-            email: userData?.email || "",
-            image: getUserImage(userData || {}) || undefined
-          };
-        } catch {
-          userDataMap[userId] = {
-            name: "",
-            email: "",
-            image: ""
-          };
-        }
-      })
+    console.log(
+      `[${new Date().toISOString()}] [INFO] [activity] Fetched ${logs.length} activity logs for userId: ${userId}`
     );
+    return { success: true, logs };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching user activity logs";
+    console.error(
+      `[${new Date().toISOString()}] [ERROR] [activity] Error fetching logs for userId ${userId}:`,
+      message
+    );
+    return { success: false, error: message };
+  }
+}
 
-    const activities: ActivityLogWithId[] = logs.map(log => {
-      const user = userDataMap[log.userId] ?? {};
-      return {
-        ...log,
-        name: user.name,
-        userEmail: user.email,
-        image: user.image
-      };
+// Log activity
+export async function logActivity({
+  userId,
+  type,
+  description,
+  status = "info",
+  metadata = {}
+}: {
+  userId: string;
+  type: string;
+  description: string;
+  status?: "success" | "error" | "warning" | "info";
+  metadata?: Record<string, any>;
+}) {
+  try {
+    const db = getAdminFirestore();
+    const activityRef = db.collection("activity").doc();
+
+    await activityRef.set({
+      userId,
+      type,
+      description,
+      status,
+      timestamp: new Date(),
+      metadata
     });
 
-    console.log("[getAllActivityLogs] Logs fetched:", logs.length);
-    return { success: true, activities };
+    return { success: true, id: activityRef.id };
   } catch (error) {
-    const message = isFirebaseError(error)
-      ? firebaseError(error)
-      : error instanceof Error
-      ? error.message
-      : "Unknown error";
-
-    console.error("Error getting all activity logs:", message);
-    return { success: false, error: message };
-  }
-}
-
-export async function getUserActivityLogs(
-  limit = 100,
-  startAfter?: string,
-  type?: string,
-  description?: string
-): Promise<GetUserActivityLogsResult> {
-  try {
-    // Dynamic import to avoid build-time initialization
-    const { auth } = await import("@/auth");
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const collectionRef = adminDb().collection("activityLogs");
-    let query: Query<DocumentData> = collectionRef.where("userId", "==", session.user.id);
-
-    if (type) {
-      query = query.where("type", "==", type);
-    }
-
-    if (description) {
-      query = query.where("description", "==", description);
-    }
-
-    query = query.orderBy("timestamp", "desc");
-
-    if (startAfter) {
-      const startAfterDoc = await collectionRef.doc(startAfter).get();
-      if (startAfterDoc.exists) {
-        query = query.startAfter(startAfterDoc);
-      }
-    }
-
-    query = query.limit(limit);
-
-    const logsSnapshot = await query.get();
-    const logs = logsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // 🧠 Fetch the current user's Firestore doc
-    let userEmail = "";
-    let userName = "";
-    let image: string | null = null;
-
-    try {
-      const userDoc = await adminDb().collection("users").doc(session.user.id).get();
-      const userData = userDoc.exists ? userDoc.data() : null;
-
-      userEmail = userData?.email || "";
-      userName = userData?.name || "";
-      image = getUserImage(userData || {});
-    } catch (error) {
-      const message = isFirebaseError(error)
-        ? firebaseError(error)
-        : error instanceof Error
-        ? error.message
-        : "Unknown error";
-
-      console.warn(`Could not fetch user metadata for ${session.user.id}: ${message}`);
-    }
-
-    const activities: ActivityLogWithId[] = logs.map(log => ({
-      ...(log as ActivityLogWithId),
-      name: userName,
-      userEmail,
-      image
-    }));
-
-    return { success: true, activities };
-  } catch (error) {
-    const message = isFirebaseError(error)
-      ? firebaseError(error)
-      : error instanceof Error
-      ? error.message
-      : "Unknown error";
-
-    console.error("Error getting user activity logs:", message);
-    return { success: false, error: message };
-  }
-}
-
-//**Purpose**: Creates a new activity log entry in the database.
-export async function logActivity(data: Omit<ActivityLogData, "timestamp">): Promise<LogActivityResult> {
-  try {
-    const payload: ActivityLogData = {
-      ...data,
-      timestamp: Timestamp.now()
-    };
-
-    const docRef = await adminDb().collection("activityLogs").add(payload);
-
-    return { success: true, activityId: docRef.id };
-  } catch (error: unknown) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
       ? error.message
       : "Unknown error logging activity";
-
-    console.error("🔥 Error logging activity:", message); // optional: helpful log
+    console.error("[logActivity] Error:", message);
     return { success: false, error: message };
   }
 }

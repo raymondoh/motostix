@@ -1,12 +1,13 @@
-import { NextResponse } from "next/server";
-import { fetchActivityLogs } from "@/actions/dashboard/activity-logs";
+import { type NextRequest, NextResponse } from "next/server";
+import { fetchAllActivityLogs } from "@/actions/dashboard/activity-logs";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const limit = parseInt(searchParams.get("limit") || "10", 10);
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const limit = Number.parseInt(searchParams.get("limit") || "10", 10);
   const startAfter = searchParams.get("startAfter") || undefined;
 
-  const result = await fetchActivityLogs({ limit, startAfter });
+  // Update to use the correct function signature - fetchAllActivityLogs only accepts a limit parameter
+  const result = await fetchAllActivityLogs(limit);
 
   return NextResponse.json(result);
 }

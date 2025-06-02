@@ -1,18 +1,47 @@
 "use server";
 
-import { updateOrderStatus } from "@/firebase/actions";
-//import type { OrderStatus } from "@/types/order";
-import type { Order } from "@/types";
+import { updateOrderStatus } from "@/firebase/admin/orders";
+import { revalidatePath } from "next/cache";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
+import type { Order } from "@/types/order";
 
-export async function updateOrderStatusAction(orderId: string, newStatus: Order.OrderStatus) {
-  const result = await updateOrderStatus(orderId, newStatus);
+// Update order status (admin only)
+export async function updateOrderStatusAction(orderId: string, status: Order["status"]) {
+  try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-  if (!result.success) {
-    return {
-      success: false,
-      error: result.error || "Failed to update order status"
-    };
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    // Check if user is admin
+    const { UserService } = await import("@/lib/services/user-service");
+    const userRole = await UserService.getUserRole(session.user.id);
+
+    if (userRole !== "admin") {
+      return { success: false, error: "Unauthorized. Admin access required." };
+    }
+
+    const result = await updateOrderStatus(orderId, status);
+
+    if (result.success) {
+      // Revalidate relevant paths
+      revalidatePath("/admin/orders");
+      revalidatePath(`/admin/orders/${orderId}`);
+    }
+
+    return result;
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error updating order status";
+    return { success: false, error: message };
   }
-
-  return { success: true };
 }
+
+// Export for backward compatibility
+export { updateOrderStatusAction as updateOrderStatus };

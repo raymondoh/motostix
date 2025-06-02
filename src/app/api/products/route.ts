@@ -1,8 +1,6 @@
-// src/app/api/products/route.ts
 import { type NextRequest, NextResponse } from "next/server";
-import { getAllProducts, addProduct } from "@/firebase/actions";
+import { getAllProducts, addProduct } from "@/firebase/admin/products";
 import type { Product } from "@/types";
-import { auth } from "@/auth";
 import { logActivity } from "@/firebase/actions";
 
 export async function GET(req: NextRequest) {
@@ -64,7 +62,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
     const session = await auth();
+
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -115,10 +116,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("[POST /api/products]", error);
-    const data = await request.json(); // Declare data variable here
+    let data;
+
+    try {
+      data = await request.clone().json(); // Use clone() to avoid "body used already" error
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError);
+      data = { name: "Unknown" };
+    }
 
     // Log activity for failed product creation
     try {
+      const { auth } = await import("@/auth");
       const session = await auth();
       if (session?.user) {
         await logActivity({

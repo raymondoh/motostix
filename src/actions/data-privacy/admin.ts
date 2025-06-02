@@ -1,147 +1,114 @@
 "use server";
 
-import { auth } from "@/auth";
-import { adminDb } from "@/firebase/admin/firebase-admin-init";
-import { processAccountDeletion } from "./deletion";
-import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
-import { logServerEvent, logger } from "@/utils/logger";
-import { serverTimestamp } from "@/utils/date-server";
-import type { ProcessDeletionsResult } from "@/types/data-privacy/deletion";
+import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
+import { logActivity } from "@/firebase/log/logActivity";
+import { revalidatePath } from "next/cache";
 
-// Admin-only: Process all pending deletion requests
-export async function processPendingDeletions(): Promise<ProcessDeletionsResult> {
-  const session = await auth();
-
-  // Authorization check
-  if (!session?.user?.role || session.user.role !== "admin") {
-    logger({
-      type: "warn",
-      message: "Unauthorized attempt to process pending deletions",
-      context: "deletion"
-    });
-    return {
-      success: false,
-      processed: 0,
-      errors: 0,
-      error: "Unauthorized. Only admins can process deletion requests."
-    };
-  }
-
+// Get deletion requests
+export async function getDeletionRequests() {
   try {
-    const pendingRequestsSnapshot = await adminDb()
-      .collection("deletionRequests")
-      .where("status", "==", "pending")
-      .get();
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-    if (pendingRequestsSnapshot.empty) {
-      logger({
-        type: "info",
-        message: "No pending deletion requests found",
-        context: "deletion"
-      });
-      return { success: true, processed: 0, errors: 0 };
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
     }
 
-    logger({
-      type: "info",
-      message: `Found ${pendingRequestsSnapshot.size} pending deletion requests`,
-      context: "deletion"
-    });
+    // Check if user is admin
+    const db = getAdminFirestore();
+    const userDoc = await db.collection("users").doc(session.user.id).get();
+    const userData = userDoc.data();
 
-    let processed = 0;
-    let errors = 0;
-
-    for (const doc of pendingRequestsSnapshot.docs) {
-      const request = doc.data();
-      const userId = request.userId;
-
-      if (!userId) {
-        logger({
-          type: "warn",
-          message: `Skipping deletion request with missing userId in doc ${doc.id}`,
-          context: "deletion"
-        });
-        errors++;
-        continue;
-      }
-
-      try {
-        const success = await processAccountDeletion(userId);
-        if (success) {
-          processed++;
-
-          await adminDb().collection("deletionRequests").doc(doc.id).update({
-            status: "processed",
-            processedAt: serverTimestamp()
-          });
-
-          logger({
-            type: "info",
-            message: `Successfully processed deletion for userId: ${userId}`,
-            context: "deletion"
-          });
-
-          await logServerEvent({
-            type: "deletion:processed",
-            message: `Processed account deletion for userId: ${userId}`,
-            userId,
-            context: "deletion"
-          });
-        } else {
-          logger({
-            type: "warn",
-            message: `Failed to process account deletion for userId: ${userId}`,
-            context: "deletion"
-          });
-          errors++;
-        }
-      } catch (err: unknown) {
-        logger({
-          type: "error",
-          message: `Error processing account deletion for userId: ${userId}`,
-          metadata: { error: err },
-          context: "deletion"
-        });
-
-        if (isFirebaseError(err)) {
-          logger({
-            type: "error",
-            message: firebaseError(err),
-            context: "deletion"
-          });
-        }
-
-        errors++;
-      }
+    if (!userData || userData.role !== "admin") {
+      return { success: false, error: "Unauthorized. Admin access required." };
     }
 
-    return { success: true, processed, errors };
-  } catch (error: unknown) {
-    logger({
-      type: "error",
-      message: "Error processing pending deletions",
-      metadata: { error },
-      context: "deletion"
-    });
+    // Get all users with deletion requests
+    const snapshot = await db.collection("users").where("deletionRequested", "==", true).get();
 
-    const errorMessage = isFirebaseError(error)
+    const requests = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    return { success: true, requests };
+  } catch (error) {
+    const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
       ? error.message
-      : String(error);
+      : "Unknown error getting deletion requests";
+    console.error("Error getting deletion requests:", message);
+    return { success: false, error: message };
+  }
+}
 
-    await logServerEvent({
-      type: "deletion:processing_error",
-      message: "Error processing pending deletion requests",
-      metadata: { error: errorMessage },
-      context: "deletion"
-    });
+// Process deletion request (admin)
+export async function processDeletionRequest(userId: string, action: "approve" | "reject") {
+  try {
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-    return {
-      success: false,
-      processed: 0,
-      errors: 0,
-      error: errorMessage
-    };
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    // Check if user is admin
+    const db = getAdminFirestore();
+    const adminDoc = await db.collection("users").doc(session.user.id).get();
+    const adminData = adminDoc.data();
+
+    if (!adminData || adminData.role !== "admin") {
+      return { success: false, error: "Unauthorized. Admin access required." };
+    }
+
+    if (action === "approve") {
+      // Import the deletion function - use the correct function name from the file
+      const { deleteUserAccount } = await import("@/actions/auth/delete");
+      const result = await deleteUserAccount(userId);
+
+      if (!result.success) {
+        return result;
+      }
+
+      await logActivity({
+        userId: session.user.id,
+        type: "admin-action",
+        description: `Admin approved account deletion for user ${userId}`,
+        status: "success",
+        metadata: { targetUserId: userId }
+      });
+    } else {
+      // Reject the deletion request
+      await db.collection("users").doc(userId).update({
+        deletionRequested: false,
+        deletionRequestedAt: null,
+        deletionRejectedAt: new Date(),
+        deletionRejectedBy: session.user.id
+      });
+
+      await logActivity({
+        userId: session.user.id,
+        type: "admin-action",
+        description: `Admin rejected account deletion for user ${userId}`,
+        status: "info",
+        metadata: { targetUserId: userId }
+      });
+    }
+
+    revalidatePath("/admin/users");
+
+    return { success: true };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error processing deletion request";
+    console.error("Error processing deletion request:", message);
+    return { success: false, error: message };
   }
 }

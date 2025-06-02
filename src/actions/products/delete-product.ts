@@ -1,52 +1,48 @@
 "use server";
 
+import { deleteProduct } from "@/firebase/admin/products";
 import { revalidatePath } from "next/cache";
-import { deleteProduct as deleteProductFromDb } from "@/firebase/actions";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import { logger } from "@/utils/logger";
-//import type { DeleteProductResult } from "@/types/product/result";
-import type { Product } from "@/types";
 
-export async function deleteProduct(productId: string): Promise<Product.DeleteProductResult> {
+// Delete product (admin only)
+export async function deleteProductAction(productId: string) {
   try {
-    // ✅ Step 1: Call Firebase function
-    const result = await deleteProductFromDb(productId);
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-    if (!result.success) {
-      logger({
-        type: "error",
-        message: "Failed to delete product",
-        metadata: { productId, error: result.error },
-        context: "products"
-      });
-      return result;
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
     }
 
-    // ✅ Step 2: Revalidate products page cache
-    revalidatePath("/admin/products"); // or /products if that's your public grid
+    // Check if user is admin
+    const { UserService } = await import("@/lib/services/user-service");
+    const userRole = await UserService.getUserRole(session.user.id);
 
-    logger({
-      type: "info",
-      message: "Product deleted successfully",
-      metadata: { productId },
-      context: "products"
-    });
+    if (userRole !== "admin") {
+      return { success: false, error: "Unauthorized. Admin access required." };
+    }
 
-    return { success: true };
-  } catch (error: unknown) {
+    const result = await deleteProduct(productId);
+
+    if (result.success) {
+      // Revalidate relevant paths
+      revalidatePath("/admin/products");
+      revalidatePath("/products");
+      revalidatePath(`/products/${productId}`);
+    }
+
+    return result;
+  } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
       ? error.message
-      : "Unexpected error occurred while deleting product";
-
-    logger({
-      type: "error",
-      message: "Unhandled exception in deleteProduct action",
-      metadata: { productId, error: message },
-      context: "products"
-    });
-
+      : "Unknown error deleting product";
     return { success: false, error: message };
   }
 }
+
+// Export for backward compatibility
+export { deleteProductAction as deleteProductFromDb };
+export { deleteProductAction as deleteProduct };

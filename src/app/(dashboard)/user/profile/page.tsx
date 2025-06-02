@@ -1,39 +1,64 @@
+import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { DashboardShell, DashboardHeader } from "@/components";
 import { UserProfileForm } from "@/components/auth/UserProfileForm";
-import { getCurrentUser } from "@/firebase/actions";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { UserService } from "@/lib/services/user-service";
 
 export default async function UserProfilePage() {
-  // Run these in parallel for better performance
-  const [session, userResult] = await Promise.all([auth(), getCurrentUser()]);
+  try {
+    // Dynamic import for auth to avoid build-time issues
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-  if (!session?.user) {
+    // Check authentication
+    if (!session?.user) {
+      redirect("/login");
+    }
+
+    // Get current user using UserService
+    const userResult = await UserService.getCurrentUser();
+
+    // Handle error case
+    if (!userResult.success) {
+      console.error("Error getting current user:", userResult.error);
+      return (
+        <DashboardShell>
+          <DashboardHeader
+            title="Profile"
+            description="Update your account settings"
+            breadcrumbs={[{ label: "Home", href: "/" }, { label: "Profile" }]}
+          />
+          <Separator className="mb-8" />
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>Error loading profile: {userResult.error}</AlertDescription>
+          </Alert>
+        </DashboardShell>
+      );
+    }
+
+    const user = userResult.data;
+
+    return (
+      <DashboardShell>
+        <DashboardHeader
+          title="Profile"
+          description="Update your account settings"
+          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Profile" }]}
+        />
+        <Separator className="mb-8" />
+
+        <div className="w-full max-w-7xl overflow-hidden">
+          <div className="profile-form-container">
+            <UserProfileForm user={user} isLoading={false} isAdmin={false} />
+          </div>
+        </div>
+      </DashboardShell>
+    );
+  } catch (error) {
+    console.error("Error in UserProfilePage:", error);
     redirect("/login");
   }
-
-  // Extract the user data or set to null if unsuccessful
-  const user = userResult.success ? userResult.data : null;
-
-  return (
-    <DashboardShell>
-      {/* <DashboardHeader title="Profile" description="Manage your account settings and profile information" /> */}
-      <DashboardHeader
-        title="Profile"
-        description="Manage your account settings and profile information"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Dashboard", href: "/user" }, { label: "My Profile" }]}
-      />
-      <Separator className="mb-8" />
-
-      <div className="w-full max-w-4xl overflow-hidden">
-        <div className="profile-form-container">
-          <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
-          <p className="text-muted-foreground mb-6">Update your personal details and profile picture.</p>
-
-          <UserProfileForm user={user} isLoading={!user} />
-        </div>
-      </div>
-    </DashboardShell>
-  );
 }

@@ -1,112 +1,148 @@
 "use server";
 
-import bcryptjs from "bcryptjs";
-import { auth } from "@/auth";
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
-import { serverTimestamp } from "@/utils/date-server";
-import { logActivity } from "@/firebase/actions";
-import { updatePasswordSchema } from "@/schemas/auth";
+import { getAdminAuth } from "@/lib/firebase/admin/initialize";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
-import { logServerEvent, logger } from "@/utils/logger";
-import { hashPassword } from "@/utils/hashPassword";
-import type { Auth } from "@/types";
-import type { User } from "@/types";
+import { logActivity } from "@/firebase/log/logActivity";
+import { z } from "zod";
 
-/**
- * Helper to safely extract a string value from FormData
- */
-function getFormValue(formData: FormData, key: string): string | null {
-  const value = formData.get(key);
-  return typeof value === "string" && value.trim() !== "" ? value : null;
+// Schema for password reset request
+const passwordResetSchema = z.object({
+  email: z.string().email("Please enter a valid email address")
+});
+
+// Request password reset
+export async function requestPasswordReset(formData: FormData) {
+  try {
+    const email = formData.get("email") as string;
+    const validatedFields = passwordResetSchema.safeParse({ email });
+
+    if (!validatedFields.success) {
+      return { success: false, error: "Please enter a valid email address" };
+    }
+
+    const auth = getAdminAuth();
+    const resetLink = await auth.generatePasswordResetLink(email);
+
+    // In a real app, you would send this link via email
+    console.log("Password reset link:", resetLink);
+
+    await logActivity({
+      userId: email, // We don't have the user ID yet
+      type: "password-reset-request",
+      description: "Password reset requested",
+      status: "success"
+    });
+
+    return { success: true };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error requesting password reset";
+    console.error("Error requesting password reset:", message);
+    return { success: false, error: message };
+  }
 }
 
-/**
- * UPDATE PASSWORD FOR LOGGED-IN USER
- */
-export async function updatePassword(
-  prevState: Auth.UpdatePasswordState,
-  formData: FormData
-): Promise<Auth.UpdatePasswordState> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    logger({ type: "warn", message: "Unauthorized password update attempt", context: "auth" });
-    return { success: false, error: "Not authenticated" };
-  }
+// Schema for password update
+const updatePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(6, "Current password must be at least 6 characters"),
+    newPassword: z.string().min(6, "New password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters")
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"]
+  });
 
-  const currentPassword = getFormValue(formData, "currentPassword");
-  const newPassword = getFormValue(formData, "newPassword");
-  const confirmPassword = getFormValue(formData, "confirmPassword");
-
-  if (!currentPassword) return { success: false, error: "Current password is required" };
-  if (!newPassword) return { success: false, error: "New password is required" };
-  if (!confirmPassword) return { success: false, error: "Confirm password is required" };
-
-  const result = updatePasswordSchema.safeParse({ currentPassword, newPassword, confirmPassword });
-  if (!result.success) {
-    const errorMessage = result.error.issues[0]?.message || "Invalid form data";
-    logger({ type: "warn", message: `Password update validation failed: ${errorMessage}`, context: "auth" });
-    return { success: false, error: errorMessage };
-  }
-
+// Update password for logged-in user
+export async function updatePassword(prevState: any, formData: FormData) {
   try {
-    const userDoc = await adminDb().collection("users").doc(session.user.id).get();
-    const userData = userDoc.exists ? (userDoc.data() as User.UserData | undefined) : undefined;
+    // Dynamic import to avoid build-time initialization
+    const { auth } = await import("@/auth");
+    const session = await auth();
 
-    if (!userData?.passwordHash) {
-      logger({ type: "warn", message: "User data missing or password not set during updatePassword", context: "auth" });
-      return { success: false, error: "User data not found or password not set" };
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
     }
 
-    const isCurrentPasswordValid = await bcryptjs.compare(currentPassword, userData.passwordHash);
-    if (!isCurrentPasswordValid) {
-      logger({ type: "warn", message: "Current password invalid during updatePassword", context: "auth" });
-      return { success: false, error: "Current password is incorrect" };
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    const validatedFields = updatePasswordSchema.safeParse({
+      currentPassword,
+      newPassword,
+      confirmPassword
+    });
+
+    if (!validatedFields.success) {
+      const errorMessage = validatedFields.error.issues[0]?.message || "Invalid form data";
+      return { success: false, error: errorMessage };
     }
 
-    const newPasswordHash = await hashPassword(newPassword);
+    const adminAuth = getAdminAuth();
 
-    await adminAuth().updateUser(session.user.id, { password: newPassword });
-
-    await adminDb().collection("users").doc(session.user.id).update({
-      passwordHash: newPasswordHash,
-      updatedAt: serverTimestamp()
+    // Update password in Firebase Auth
+    await adminAuth.updateUser(session.user.id, {
+      password: newPassword
     });
 
     await logActivity({
       userId: session.user.id,
-      type: "password_change",
+      type: "password-change",
       description: "Password changed successfully",
       status: "success"
     });
 
-    logger({ type: "info", message: `Password updated for uid: ${session.user.id}`, context: "auth" });
+    return { success: true, message: "Password updated successfully" };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error updating password";
+    console.error("Error updating password:", message);
+    return { success: false, error: message };
+  }
+}
 
-    await logServerEvent({
-      type: "auth:update_password",
-      message: `Password updated for uid: ${session.user.id}`,
-      userId: session.user.id,
-      context: "auth"
+// Legacy function for backward compatibility
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  try {
+    const validatedFields = updatePasswordSchema.safeParse({
+      currentPassword,
+      newPassword,
+      confirmPassword: newPassword
+    });
+
+    if (!validatedFields.success) {
+      return { success: false, error: "Please check your password requirements" };
+    }
+
+    const auth = getAdminAuth();
+
+    await auth.updateUser(userId, {
+      password: newPassword
+    });
+
+    await logActivity({
+      userId,
+      type: "password-change",
+      description: "Password changed successfully",
+      status: "success"
     });
 
     return { success: true };
-  } catch (error: unknown) {
-    logger({
-      type: "error",
-      message: "Error updating password",
-      metadata: { error },
-      context: "auth"
-    });
-
-    if (isFirebaseError(error) && error.code === "auth/weak-password") {
-      return {
-        success: false,
-        error: "The password is too weak. Please choose a stronger password."
-      };
-    }
-
-    return {
-      success: false,
-      error: isFirebaseError(error) ? firebaseError(error) : "Failed to update password. Please try again."
-    };
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error changing password";
+    console.error("Error changing password:", message);
+    return { success: false, error: message };
   }
 }

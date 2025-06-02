@@ -1,11 +1,23 @@
 "use server";
 
-import { getProductById as getProductByIdFromDb } from "@/firebase/actions";
-import type { GetProductByIdResponse } from "@/types/product";
+import { getProductById } from "@/firebase/admin/products";
+import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 
-/**
- * Action to fetch a single product by ID
- */
-export async function getProductById(id: string): Promise<GetProductByIdResponse> {
-  return await getProductByIdFromDb(id);
+// Get product by ID
+export async function getProductByIdAction(id: string) {
+  try {
+    const result = await getProductById(id);
+    return result;
+  } catch (error) {
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+      ? error.message
+      : "Unknown error fetching product";
+    return { success: false, error: message };
+  }
 }
+
+// Export for backward compatibility
+export { getProductByIdAction as getProductByIdFromDb };
+export { getProductByIdAction as getProductById };
