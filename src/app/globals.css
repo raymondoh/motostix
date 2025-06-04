@@ -490,3 +490,36 @@ button.absolute.right-4.top-4 svg,
   --tw-ring-offset-shadow: none !important;
   --tw-ring-shadow: none !important;
 }
+/* src/app/globals.css */
+
+/* Remove or comment out any previous 'body::before' or 'body { position: relative; overflow-x: hidden; }' styles related to the glow effect */
+
+.page-glow-container {
+  position: relative; /* Establishes a positioning context for the pseudo-element */
+  overflow: hidden; /* This is key to containing the glow and preventing overflow */
+  /* isolation: isolate; */ /* Optional: Uncomment if you experience z-index issues with other absolute elements */
+}
+
+.page-glow-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* A very large width, which will be clipped by the parent's 'overflow: hidden' */
+  width: 150vw; /* Can also be a large fixed value like 1800px or 2000px */
+  height: 500px; /* Adjust this to control how far down the glow extends */
+
+  /* Light mode glow - adjust opacity (last value) for subtlety */
+  background-image: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.5), transparent 70%);
+
+  z-index: -1; /* Places the glow behind the container's content */
+  pointer-events: none; /* Ensures the glow doesn't interfere with mouse interactions */
+}
+
+/* For dark mode (if your <html> tag gets a 'dark' class) */
+.dark .page-glow-container::before {
+  /* Adjust color and opacity for dark mode */
+  background-image: radial-gradient(ellipse at top, rgba(107, 114, 128, 0.15), transparent 70%);
+}

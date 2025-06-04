@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CategoryImage } from "./CategoryImage";
-import { SectionHeader } from "./SectionHeader";
+import { SectionHeader } from "../shared/SectionHeader";
 import { stickerGridSections } from "@/config/homepage-categories";
 
 export default function StickerGridSectionsStatic() {

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Mail, Phone, Send } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader"; // <<< 1. Import the new component
 
 export const metadata: Metadata = {
   title: "Contact MotoStix | Get in Touch",
@@ -15,13 +16,11 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="py-16 w-full bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">Contact Us</h1>
-            <div className="w-12 h-0.5 bg-primary mb-6"></div>
-            <p className="text-muted-foreground text-center max-w-2xl text-lg">
-              Have questions or need assistance? We're here to help you with anything related to our products.
-            </p>
-          </div>
+          {/* 2. Replace the old header div with the new component */}
+          <PageHeader
+            title="Contact Us"
+            subtitle="Have questions or need assistance? We're here to help you with anything related to our products."
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Contact Information */}
@@ -58,18 +57,6 @@ export default function ContactPage() {
                     <p className="text-muted-foreground">info@motostix.com</p>
                   </div>
                 </div>
-
-                {/* <div className="flex items-start gap-3">
-                  <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Business Hours</p>
-                    <ul className="text-muted-foreground space-y-1">
-                      <li>Monday - Friday: 9am - 6pm</li>
-                      <li>Saturday: 10am - 4pm</li>
-                      <li>Sunday: Closed</li>
-                    </ul>
-                  </div>
-                </div> */}
               </div>
             </div>
 
@@ -129,30 +116,6 @@ export default function ContactPage() {
                 </Button>
               </form>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="py-16 w-full bg-secondary/5 border-y border-border/40">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Find Us</h2>
-            <div className="w-12 h-0.5 bg-primary mb-6"></div>
-            <p className="text-muted-foreground text-center max-w-2xl">
-              Visit our showroom to see our products in person and speak with our team.
-            </p>
-          </div>
-
-          <div className="rounded-xl overflow-hidden shadow-sm border border-border/40 h-[400px] md:h-[500px]">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215266754809!2d-73.98776692426385!3d40.75797623440235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1710341000000!5m2!1sen!2sus"
-              width="600"
-              height="450"
-              style={{ border: 0, width: "100%", height: "100%" }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
       </section>

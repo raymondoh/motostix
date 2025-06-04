@@ -5,7 +5,7 @@ import { CategoriesStatic } from "@/components/homepage-sections/CategoriesStati
 import { TestimonialSection } from "@/components/homepage-sections/TestimonialSection";
 import { PromoSection } from "@/components/homepage-sections/PromoSection";
 import StickerGridSectionsStatic from "@/components/homepage-sections/StickerGridSectionStatic";
-import { ProductCarousel } from "@/components/homepage-sections/ProductCarousel";
+import { ProductCarousel } from "@/components/shared/ProductCarousel";
 import { getAllProducts, getOnSaleProducts, getNewArrivals } from "@/firebase/admin/products";
 import { getDesignThemes } from "@/firebase/admin/categories";
 

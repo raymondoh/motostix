@@ -1,4 +1,4 @@
-import { ProductCarousel } from "@/components/homepage-sections/ProductCarousel";
+import { ProductCarousel } from "@/components/shared/ProductCarousel";
 import { getOnSaleProducts } from "@/firebase/admin/products";
 
 export const dynamic = "force-dynamic";

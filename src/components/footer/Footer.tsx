@@ -102,18 +102,41 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Payment Methods */}
+        {/* Payment Methods & Security */}
         <div className="border-t border-border/40 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-muted-foreground text-sm">Secure payments provided by trusted partners</div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            {/* Left Side: Accepted Cards Label */}
+            <div className="text-muted-foreground text-sm font-medium">We Accept:</div>
 
-            <div className="flex items-center gap-4 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-              <Image src="/images/visa-card-logo.png" alt="Visa" className="h-8" width={80} height={32} />
-              <Image src="/images/mastercard-logo.png" alt="Mastercard" className="h-8" width={80} height={32} />
-              <Image src="/images/paypal-logo.png" alt="PayPal" className="h-8" width={80} height={32} />
-              <Image src="/images/apple-pay-logo.png" alt="Apple Pay" className="h-8" width={80} height={32} />
-              <Image src="/images/google-pay.png" alt="Google Pay" width={80} height={32} />
+            {/* Right Side: Payment Method Logos (with uniform height) */}
+            <div className="flex items-center gap-4">
+              <Image
+                src="/images/visa-card-logo.svg"
+                alt="Visa"
+                // Adjusted width to maintain aspect ratio for a 24px height
+                width={24}
+                height={24}
+              />
+              <Image
+                src="/images/mastercard-logo.svg"
+                alt="Mastercard"
+                // Adjusted width to maintain aspect ratio for a 24px height
+                width={24}
+                height={24}
+              />
             </div>
+          </div>
+
+          {/* Stripe Security Badge (This can remain a different size) */}
+          <div className="flex justify-center mt-6">
+            <a
+              href="https://stripe.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <span className="text-xs">Secure payments powered by</span>
+              <Image src="/images/stripe-logo.svg" alt="Stripe" width={50} height={20} />
+            </a>
           </div>
         </div>
 
@@ -124,19 +147,19 @@ export function Footer() {
               © {new Date().getFullYear()} MotoStix. All rights reserved.
             </div>
             <div className="flex flex-wrap justify-center gap-4 text-sm">
-              <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
               </Link>
               <Separator orientation="vertical" className="hidden md:block h-4" />
-              <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors">
                 Terms of Service
               </Link>
               <Separator orientation="vertical" className="hidden md:block h-4" />
-              <Link href="/shipping" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/shipping-policy" className="text-muted-foreground hover:text-primary transition-colors">
                 Shipping Policy
               </Link>
               <Separator orientation="vertical" className="hidden md:block h-4" />
-              <Link href="/returns" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/returns-policy" className="text-muted-foreground hover:text-primary transition-colors">
                 Returns & Refunds
               </Link>
             </div>

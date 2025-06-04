@@ -62,17 +62,28 @@ const NavLinks = ({ setOpen, isMobile }: { setOpen?: (open: boolean) => void; is
       key={item.href}
       href={item.href}
       className={cn(
-        "text-sm font-bold uppercase tracking-wide transition-colors px-4 py-2",
+        // Universal base styles
+        "font-bold uppercase tracking-wide transition-colors",
+
+        // --- Desktop vs. Mobile specific styles ---
+        isMobile
+          ? // Mobile base styles
+            "w-full text-left text-lg py-3 px-6 flex items-center"
+          : // Desktop base styles (no border)
+            "text-sm py-2 px-3",
+
+        // --- Active/Inactive state styling ---
         isActive(item.href)
-          ? "bg-black text-white dark:bg-white dark:text-black"
-          : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-secondary/60",
-        isMobile ? "w-full text-left text-lg py-3 px-6 flex items-center rounded-lg" : "rounded-lg"
+          ? // Active state for both mobile and desktop is now just the text color
+            "text-accent"
+          : // Inactive state
+          isMobile
+          ? "text-muted-foreground" // Inactive on Mobile
+          : "text-muted-foreground hover:text-accent" // Inactive on Desktop (with hover effect)
       )}
       onClick={() => setOpen?.(false)}>
       {isMobile && (
-        <div
-          className="w-1.5 h-1.5 rounded-full mr-3 bg-primary"
-          style={{ opacity: isActive(item.href) ? 1 : 0 }}></div>
+        <div className="w-1.5 h-1.5 rounded-full mr-3 bg-accent" style={{ opacity: isActive(item.href) ? 1 : 0 }}></div>
       )}
       <span>{item.title}</span>
       {isMobile && isActive(item.href) && (
@@ -130,7 +141,7 @@ export const Navbar = () => {
               <SheetContent side="left">
                 <SheetHeader>
                   <SheetTitle></SheetTitle>
-                  <SheetDescription></SheetDescription>
+                  <SheetDescription>ss</SheetDescription>
                 </SheetHeader>
                 <div className="py-4">
                   <HeaderIconButton
