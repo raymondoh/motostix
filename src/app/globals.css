@@ -399,6 +399,7 @@ button.absolute.right-4.top-4:hover,
 .sheet-content button:last-child:hover {
   opacity: 1 !important;
   background: hsl(var(--secondary)) !important;
+  border-radius: 9999px !important; /* <<< Add this line */
 
   /* Ensure no borders on hover */
   border: none !important;

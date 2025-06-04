@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/siteConfig";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -10,8 +11,61 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Dashboard | MotoStix",
-  description: "Manage your MotoStix account and orders"
+  // Dashboard-specific title template
+  title: {
+    template: `%s | Dashboard | ${siteConfig.name}`,
+    default: `Dashboard | ${siteConfig.name}`
+  },
+
+  // Dashboard description
+  description:
+    "Manage your MotoStix account, view orders, track shipments, and access your custom sticker designs from your personal dashboard.",
+
+  // Dashboard-specific keywords
+  keywords: [
+    "motostix dashboard",
+    "account management",
+    "order tracking",
+    "user dashboard",
+    "account settings",
+    "order history",
+    "custom designs",
+    "user portal",
+    "account overview"
+  ],
+
+  // Dashboard pages should NOT be indexed - private user data
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    noimageindex: true,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+      noimageindex: true
+    }
+  },
+
+  // No Open Graph for dashboard - these are private pages
+  // Individual dashboard pages shouldn't be shared on social media
+
+  // Enhanced security headers for dashboard
+  other: {
+    "X-Frame-Options": "DENY", // Prevent embedding in frames
+    "X-Content-Type-Options": "nosniff",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Cache-Control": "no-cache, no-store, must-revalidate", // Don't cache private pages
+    Pragma: "no-cache",
+    Expires: "0",
+    // Content Security Policy for dashboard security
+    "Content-Security-Policy": "frame-ancestors 'none';" // Additional clickjacking protection
+  }
 };
 
 // This layout uses auth() or headers(), so force dynamic rendering

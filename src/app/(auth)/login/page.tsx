@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: "/og-auth.jpg", // Same auth image as forgot password
+        url: `${siteConfig.url}/og-auth.jpg`, // Same auth image as forgot password
         width: 1200,
         height: 630,
         alt: "Sign in to your MotoStix account"
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `Sign In to Your Account | ${siteConfig.name}`,
     description: "Access your MotoStix account to manage orders, track shipments, and enjoy personalized shopping.",
-    images: ["/og-auth.jpg"],
+    images: [`${siteConfig.url}/og-auth.jpg`],
     creator: "@motostix" // Replace with your actual Twitter handle
   },
 

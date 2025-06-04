@@ -18,12 +18,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Logo } from "./Logo"; // Assuming Logo component is in './Logo'
-import { UserAvatar } from "../shared/UserAvatar"; // Assuming UserAvatar is in '../shared/UserAvatar'
-import { HeaderIconButton } from "./header-icon-button"; // Assuming HeaderIconButton is in './header-icon-button'
-import { cn } from "@/lib/utils"; // Assuming cn utility is in '@/lib/utils'
-import { CartIcon } from "@/components/cart/cart-icon"; // Assuming CartIcon is in '@/components/cart/cart-icon'
-import { useSearch } from "@/contexts/SearchContext"; // Assuming SearchContext is set up
+import { Logo } from "./Logo";
+import { UserAvatar } from "../shared/UserAvatar";
+import { HeaderIconButton } from "./header-icon-button";
+import { cn } from "@/lib/utils";
+import { CartIcon } from "@/components/cart/cart-icon";
+import { useSearch } from "@/contexts/SearchContext";
 import { useTheme } from "next-themes";
 
 // Custom hook for media queries
@@ -66,7 +66,7 @@ const NavLinks = ({ setOpen, isMobile }: { setOpen?: (open: boolean) => void; is
         isActive(item.href)
           ? "bg-black text-white dark:bg-white dark:text-black"
           : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-secondary/60",
-        isMobile ? "w-full text-left text-lg py-3 px-6 flex items-center rounded-lg" : "rounded-full"
+        isMobile ? "w-full text-left text-lg py-3 px-6 flex items-center rounded-lg" : "rounded-lg"
       )}
       onClick={() => setOpen?.(false)}>
       {isMobile && (
@@ -374,6 +374,3 @@ const UserMenu = () => {
     </DropdownMenu>
   );
 };
-
-// Ensure your imported components (Logo, UserAvatar, HeaderIconButton, CartIcon)
-// and variables (generalNavItems, adminNavItems) are correctly defined/imported in your actual project.
