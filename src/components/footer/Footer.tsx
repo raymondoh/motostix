@@ -109,20 +109,20 @@ export function Footer() {
             <div className="text-muted-foreground text-sm font-medium">We Accept:</div>
 
             {/* Right Side: Payment Method Logos (with uniform height) */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <Image
-                src="/images/visa-card-logo.svg"
+                src="/images/visa-logo.svg"
                 alt="Visa"
                 // Adjusted width to maintain aspect ratio for a 24px height
-                width={24}
-                height={24}
+                width={80}
+                height={80}
               />
               <Image
                 src="/images/mastercard-logo.svg"
                 alt="Mastercard"
                 // Adjusted width to maintain aspect ratio for a 24px height
-                width={24}
-                height={24}
+                width={80}
+                height={80}
               />
             </div>
           </div>
@@ -135,7 +135,24 @@ export function Footer() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
               <span className="text-xs">Secure payments powered by</span>
-              <Image src="/images/stripe-logo.svg" alt="Stripe" width={50} height={20} />
+
+              {/* Light mode image */}
+              <Image
+                src="/images/stripe-logo-light-mode.svg"
+                alt="Stripe"
+                width={100}
+                height={100}
+                className="block dark:hidden"
+              />
+
+              {/* Dark mode image */}
+              <Image
+                src="/images/stripe-logo-dark.svg"
+                alt="Stripe"
+                width={100}
+                height={100}
+                className="hidden dark:block"
+              />
             </a>
           </div>
         </div>

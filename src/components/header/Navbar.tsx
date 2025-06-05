@@ -5,10 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Menu, LogIn, LogOut, UserPlus, User, Search, Sun, Moon } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useSession, signOut } from "next-auth/react";
-import { generalNavItems, adminNavItems, type NavItem } from "@/lib/navigation"; // Assuming these are correctly defined elsewhere
-import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +14,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useSession, signOut } from "next-auth/react";
+import { cn } from "@/lib/utils";
+import { generalNavItems, adminNavItems, type NavItem } from "@/lib/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { UserAvatar } from "../shared/UserAvatar";
 import { HeaderIconButton } from "./header-icon-button";
-import { cn } from "@/lib/utils";
+
 import { CartIcon } from "@/components/cart/cart-icon";
 import { useSearch } from "@/contexts/SearchContext";
 import { useTheme } from "next-themes";
@@ -141,7 +142,7 @@ export const Navbar = () => {
               <SheetContent side="left">
                 <SheetHeader>
                   <SheetTitle></SheetTitle>
-                  <SheetDescription>ss</SheetDescription>
+                  <SheetDescription></SheetDescription>
                 </SheetHeader>
                 <div className="py-4">
                   <HeaderIconButton

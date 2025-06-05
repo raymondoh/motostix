@@ -121,6 +121,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto mt-16">
             <article className="prose dark:prose-invert max-w-none">
               <h2 className="text-3xl font-bold mb-6">Our Story</h2>
+              <div className="w-12 h-0.5 bg-primary mb-6"></div>
               <p>
                 Hi, I'm [Your Name/Nickname], the founder and creative force behind MotoStix. What started in [Year] as
                 a personal quest for the perfect [motorcycle/car] decal has grown into a passion for helping fellow

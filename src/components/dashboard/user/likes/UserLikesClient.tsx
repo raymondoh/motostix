@@ -1,53 +1,124 @@
+// // components/dashboard/user/likes/UserLikesClient.tsx
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { fetchUserLikesClient } from "@/actions/client/fetch-user-likes-client";
+// import type { Product } from "@/types/product";
+// import { ProductCard } from "@/components/products/ProductCard";
+// import { Loader } from "lucide-react";
+// import { Alert, AlertDescription } from "@/components/ui/alert";
+// import { useLikes } from "@/contexts/LikesContext";
+// import Link from "next/link";
+
+// export function UserLikesClient() {
+//   const [products, setProducts] = useState<Product[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+//   const { likedProductIds } = useLikes(); // Get the liked product IDs from context
+
+//   useEffect(() => {
+//     async function loadLikes() {
+//       try {
+//         const data = await fetchUserLikesClient();
+//         setProducts(data);
+//       } catch (err) {
+//         setError((err as Error).message || "Failed to load liked products.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     }
+
+//     loadLikes();
+//   }, [likedProductIds]); // Re-fetch when likedProductIds changes
+
+//   if (loading) {
+//     return (
+//       <div className="flex justify-center py-10">
+//         <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Alert variant="destructive" className="mt-6">
+//         <AlertDescription>{error}</AlertDescription>
+//       </Alert>
+//     );
+//   }
+
+//   if (!products || products.length === 0) {
+//     return (
+//       <div className="text-center py-10">
+//         <p className="text-muted-foreground mb-4">You haven't liked any products yet.</p>
+//         <Link href="/products" className="text-primary hover:underline">
+//           Browse products
+//         </Link>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+//       {products.map(product => (
+//         <ProductCard key={product.id} product={product} />
+//       ))}
+//     </div>
+//   );
+// }
 // components/dashboard/user/likes/UserLikesClient.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchUserLikesClient } from "@/actions/client/fetch-user-likes-client";
+import { useEffect, useState, useMemo } from "react";
+import { fetchUserLikesClient } from "@/actions/client/fetch-user-likes-client"; // Fetches full product details of liked items
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Loader } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLikes } from "@/contexts/LikesContext";
+
+import { useLikes } from "@/contexts/LikesContext"; // Key for immediate UI updates
 import Link from "next/link";
 
 export function UserLikesClient() {
-  const [products, setProducts] = useState<Product[]>([]);
+  // Stores the full product details of items initially fetched as liked
+  const [allFetchedLikedProducts, setAllFetchedLikedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { likedProductIds } = useLikes(); // Get the liked product IDs from context
 
+  // This is the CRITICAL piece: likedProductIds comes from the context,
+  // which is optimistically updated when toggleLike is called.
+  const { likedProductIds, isLoading: likesContextLoading } = useLikes();
+
+  // 1. Initial Fetch: Get all products the user has liked from the backend.
   useEffect(() => {
-    async function loadLikes() {
+    async function loadInitialLikes() {
+      setLoading(true);
       try {
-        const data = await fetchUserLikesClient();
-        setProducts(data);
+        const data = await fetchUserLikesClient(); // Assumes this returns Product[] based on server-side likes
+        setAllFetchedLikedProducts(data);
       } catch (err) {
         setError((err as Error).message || "Failed to load liked products.");
       } finally {
         setLoading(false);
       }
     }
+    loadInitialLikes();
+  }, []); // Runs once on mount
 
-    loadLikes();
-  }, [likedProductIds]); // Re-fetch when likedProductIds changes
+  // 2. Derive Displayed Products:
+  // This `useMemo` hook re-calculates `productsToDisplay` WHENEVER `likedProductIds` (from context)
+  // or `allFetchedLikedProducts` (from initial fetch) changes.
+  const productsToDisplay = useMemo(() => {
+    if (loading || likesContextLoading) return []; // Don't process if still loading initial data
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-10">
-        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+    // Filter the initially fetched list of liked products based on the CURRENT (optimistically updated)
+    // list of liked IDs from the context. If an ID is removed from likedProductIds,
+    // the corresponding product will be filtered out here.
+    return allFetchedLikedProducts.filter(product => likedProductIds.includes(product.id));
+  }, [allFetchedLikedProducts, likedProductIds, loading, likesContextLoading]);
 
-  if (error) {
-    return (
-      <Alert variant="destructive" className="mt-6">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    );
-  }
+  // ... (loading, error, no products states) ...
 
-  if (!products || products.length === 0) {
+  if (!loading && !likesContextLoading && productsToDisplay.length === 0) {
     return (
       <div className="text-center py-10">
         <p className="text-muted-foreground mb-4">You haven't liked any products yet.</p>
@@ -60,7 +131,7 @@ export function UserLikesClient() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map(product => (
+      {productsToDisplay.map(product => (
         <ProductCard key={product.id} product={product} />
       ))}
     </div>
