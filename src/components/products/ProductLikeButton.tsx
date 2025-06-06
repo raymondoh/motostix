@@ -77,7 +77,7 @@ export function ProductLikeButton({
       <Heart
         className={`h-4 w-4 transition-colors ${isLiked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`}
       />
-      {showText && <span className="ml-2">{isLiked ? "Remove from Wishlist" : "Add to Wishlist"}</span>}
+      {showText && <span className="ml-2 text-sm">{isLiked ? "Remove from Wishlist" : "Add to Wishlist"}</span>}
     </div>
   );
 }

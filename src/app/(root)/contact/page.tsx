@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Mail, Phone, Send } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { ContactForm } from "@/components/forms/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact MotoStix | Get in Touch",
@@ -61,61 +62,7 @@ export default function ContactPage() {
             </div>
 
             {/* Contact Form */}
-            <div className="bg-secondary/5 rounded-xl p-6 shadow-sm border border-border/40">
-              <h2 className="text-2xl font-bold mb-4">Send Us a Message</h2>
-              <form className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">
-                      Your Name
-                    </label>
-                    <Input
-                      id="name"
-                      placeholder="John Doe"
-                      className="bg-background border-border focus:border-primary"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
-                      Email Address
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      className="bg-background border-border focus:border-primary"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-medium">
-                    Subject
-                  </label>
-                  <Input
-                    id="subject"
-                    placeholder="How can we help you?"
-                    className="bg-background border-border focus:border-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="message" className="text-sm font-medium">
-                    Message
-                  </label>
-                  <Textarea
-                    id="message"
-                    placeholder="Tell us more about your inquiry..."
-                    rows={5}
-                    className="bg-background border-border focus:border-primary"
-                  />
-                </div>
-
-                <Button className="bg-black text-white dark:bg-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 w-full">
-                  Send Message <Send className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
-            </div>
+            <ContactForm />
           </div>
         </div>
       </section>

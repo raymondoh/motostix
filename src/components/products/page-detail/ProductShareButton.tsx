@@ -56,7 +56,7 @@ export function ProductShareButton({ product }: ProductShareButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" className="flex-1 hover:bg-secondary/60">
+        <Button variant="secondary" className="flex-1 hover:bg-secondary/60 py-5 w-full">
           <Share2 className="mr-2 h-4 w-4" />
           Share
         </Button>
