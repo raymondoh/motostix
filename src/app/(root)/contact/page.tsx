@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Mail, Phone, Send } from "lucide-react";
-import { PageHeader } from "@/components/shared/PageHeader"; // <<< 1. Import the new component
+import { PageHeader } from "@/components/shared/PageHeader";
 
 export const metadata: Metadata = {
   title: "Contact MotoStix | Get in Touch",

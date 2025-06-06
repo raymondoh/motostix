@@ -8,7 +8,7 @@ import { ProductActions } from "@/components/products/ProductActions";
 import { formatPriceWithCode } from "@/lib/utils";
 import type { Product } from "@/types/product";
 import { ProductLikeButton } from "@/components/products/ProductLikeButton";
-
+import { ProductShareButton } from "./ProductShareButton";
 interface ProductInfoProps {
   product: Product;
 }
@@ -120,10 +120,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
           />
         </div>
 
-        <Button variant="secondary" className="flex-1 hover:bg-secondary/60">
-          <Share2 className="mr-2 h-4 w-4" />
-          Share
-        </Button>
+        <div className="flex-1">
+          <ProductShareButton product={product} />
+        </div>
       </div>
     </div>
   );
