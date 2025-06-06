@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       from: "Contact Form <onboarding@resend.dev>", // Use a default Resend address for now
       to: ["raymondmhylton@gmail.com"], // <<< YOUR EMAIL ADDRESS HERE
       subject: `New MotoStix Contact Form Submission: ${subject}`,
-      reply_to: email, // Set the reply-to as the user's email
+      replyTo: email, // Set the reply-to as the user's email
       html: `
         <h1>New Contact Form Submission</h1>
         <p>You have received a new message from your website's contact form.</p>
