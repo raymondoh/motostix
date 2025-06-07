@@ -3,8 +3,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import Stripe from "stripe";
-import { siteConfig } from "@/config/siteConfig";
-import type { CartItem } from "@/contexts/CartContext"; // 1. We now use this type
+import type { CartItem } from "@/contexts/CartContext";
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -13,20 +12,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    // 3. Renamed to 'authSession' to avoid conflict
     const authSession = await auth();
     if (!authSession?.user?.id) {
       return NextResponse.json({ error: "Unauthorized: You must be logged in to make a purchase." }, { status: 401 });
     }
 
-    // 4. Explicitly type the incoming items array
     const { items }: { items: CartItem[] } = await req.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
     }
 
-    // 5. 'item' is now correctly typed as CartItem
+    // THIS SECTION BUILDS THE PRODUCT DETAILS FOR STRIPE CHECKOUT
+    // It includes the name, description, and image for each item.
     const line_items = items.map((item: CartItem) => {
       const unitAmount =
         item.product.onSale && item.product.salePrice && item.product.salePrice < item.product.price
@@ -47,31 +45,32 @@ export async function POST(req: Request) {
       };
     });
 
-    const success_url = `${siteConfig.url}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancel_url = `${siteConfig.url}/`; // Redirect to home on cancel
+    // THIS SECTION DYNAMICALLY CREATES THE REDIRECT URLS
+    const origin = req.headers.get("origin");
+    const success_url = `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancel_url = `${origin}/`;
 
-    // 6. Renamed to 'stripeSession'
     const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
       success_url,
       cancel_url,
-      // Pre-fill the user's email on the Stripe page for a better UX
       customer_email: authSession.user.email,
       shipping_address_collection: {
         allowed_countries: ["GB", "US", "CA"]
+      },
+      metadata: {
+        userId: authSession.user.id // Pass the user ID here
       }
     });
 
-    // The 'url' property will exist on the 'stripeSession' object
     if (stripeSession.url) {
       return NextResponse.json({ url: stripeSession.url }, { status: 200 });
     } else {
       throw new Error("Could not create Stripe Checkout session.");
     }
   } catch (error: unknown) {
-    // 7. Use 'unknown' for safer error handling
     console.error("[STRIPE_ERROR]", error);
     const message = error instanceof Error ? error.message : "An unexpected error occurred.";
     return NextResponse.json({ error: message }, { status: 500 });
