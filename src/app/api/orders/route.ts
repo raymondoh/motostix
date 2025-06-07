@@ -13,7 +13,11 @@ export async function GET() {
     }
 
     // Fetch the user's orders
-    const orders = await fetchUserOrders();
+    const { success, orders, error } = await fetchUserOrders();
+
+    if (!success) {
+      return NextResponse.json({ success: false, error }, { status: 500 });
+    }
 
     // Return the orders as JSON
     return NextResponse.json({ success: true, orders });
