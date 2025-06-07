@@ -47,82 +47,14 @@ export const serverTimestamp = () => {
 /**
  * Creates a new order in Firestore
  */
-// export async function createOrder(orderData: OrderData) {
-//   try {
-//     // ✅ Validate incoming data
-//     const validatedData = orderSchema.parse(orderData);
-
-//     // Dynamic import to avoid build-time initialization
-//     const { auth } = await import("@/auth");
-
-//     // ✅ Get current user session
-//     const session = await auth();
-//     if (!session?.user?.id) {
-//       return { success: false, error: "Unauthorized. Please sign in." };
-//     }
-
-//     // ✅ Calculate total amount
-//     if (!validatedData.items || validatedData.items.length === 0) {
-//       return { success: false, error: "No items provided in order." };
-//     }
-
-//     const subtotal = validatedData.items.reduce((total, item) => {
-//       return total + item.price * item.quantity;
-//     }, 0);
-
-//     const tax = subtotal * TAX_RATE;
-//     const shipping = subtotal > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
-//     const total = subtotal + tax + shipping;
-
-//     // ✅ Create the order document in Firestore
-//     const db = getAdminFirestore();
-//     const orderRef = await db.collection("orders").add({
-//       ...validatedData,
-//       userId: session.user.id,
-//       status: validatedData.status || "processing",
-//       amount: subtotal, // 💸 Base amount (subtotal)
-//       tax,
-//       shipping,
-//       total, // ✅ Final total saved separately
-//       createdAt: serverTimestamp(),
-//       updatedAt: serverTimestamp()
-//     });
-
-//     return {
-//       success: true,
-//       orderId: orderRef.id
-//     };
-//   } catch (error) {
-//     console.error("Error creating order:", error);
-
-//     logger({
-//       type: "error",
-//       message: "Failed to create order",
-//       metadata: { error },
-//       context: "orders"
-//     });
-
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : error instanceof Error
-//         ? error.message
-//         : "Unknown error while creating order";
-
-//     return {
-//       success: false,
-//       error: message
-//     };
-//   }
-// }
-
-// ...
-
-/**
- * Creates a new order in Firestore
- */
 export async function createOrder(orderData: OrderData) {
+  const db = getAdminFirestore();
+  console.log("📦 Got Firestore instance:", !!db);
+  // Optional: confirm Admin SDK is in use
+  console.log("📦 Is Admin SDK:", typeof db?.collection === "function");
   try {
     const validatedData = orderSchema.parse(orderData);
+    console.log("🧾 createOrderInDb validated data:", validatedData);
 
     // FIX: The auth() check has been removed from this function.
     // We trust the userId passed in from the webhook data.
@@ -132,10 +64,12 @@ export async function createOrder(orderData: OrderData) {
 
     // We already have the final amount from Stripe, no need to recalculate here.
     const finalAmount = validatedData.amount;
+    console.log("🧾 createOrderInDb validated data:", validatedData);
 
     const db = getAdminFirestore();
     const orderRef = await db.collection("orders").add({
       ...validatedData,
+
       // Use the userId from the validated data, not from a session object
       userId: validatedData.userId,
       status: validatedData.status || "processing",
@@ -145,6 +79,7 @@ export async function createOrder(orderData: OrderData) {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
+    console.log("✅ Firestore order created with ID:", orderRef.id);
 
     return {
       success: true,

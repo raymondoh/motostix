@@ -7,6 +7,8 @@ import type { OrderData } from "@/types/order";
 
 // This action is now a simple pass-through. The auth() check has been removed.
 export async function createNewOrder(orderData: OrderData) {
+  console.log("🚀 createNewOrder called with:", JSON.stringify(orderData, null, 2));
+
   try {
     const result = await createOrderInDb(orderData);
 
