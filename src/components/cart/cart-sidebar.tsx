@@ -49,7 +49,12 @@ export function CartSidebar({ shippingDetails }: Props) {
             </div>
             <div className="text-xl font-medium">Your cart is empty</div>
             <p className="text-center text-muted-foreground">Looks like you haven't added anything to your cart yet.</p>
-            <Button onClick={closeCart} className="mt-4 h-12 px-6">
+            <Button
+              onClick={() => {
+                closeCart();
+                router.push("/products");
+              }}
+              className="mt-4 h-12 px-6">
               Browse Products
             </Button>
           </div>
