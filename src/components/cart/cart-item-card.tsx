@@ -38,7 +38,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
             <h3 className="font-medium line-clamp-1">{product.name}</h3>
             <p className="text-sm text-muted-foreground line-clamp-1">{product.category}</p>
           </div>
-          <div className="text-base font-medium">{formatPriceWithCode(product.price, "GB")}</div>
+          {/* <div className="text-base font-medium">{formatPriceWithCode(product.price, "GB")}</div> */}
         </div>
 
         <div className="mt-auto flex items-center justify-between pt-2">
@@ -64,6 +64,8 @@ export function CartItemCard({ item }: CartItemCardProps) {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">{formatPriceWithCode(product.price * quantity, "GB")}</span>
+            {/* <span className="text-sm text-muted-foreground">Total:</span>
+            <span className="text-sm font-medium">{formatPriceWithCode(product.price * quantity, "GB")}</span> */}
             <Button
               variant="ghost"
               size="icon"

@@ -28,14 +28,6 @@ export function CartSidebar({ shippingDetails }: Props) {
               <ShoppingBag className="h-5 w-5" />
               Cart ({itemCount})
             </SheetTitle>
-            {/* <Button
-              onClick={closeCart}
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full"
-              aria-label="Close cart">
-              <X className="h-4 w-4" />
-            </Button> */}
           </div>
           <SheetDescription className="text-sm text-muted-foreground">
             Review your items before proceeding to checkout
