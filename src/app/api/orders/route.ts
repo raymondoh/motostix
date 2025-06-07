@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
 import { fetchUserOrders } from "@/actions/orders/fetch-user-orders";
+import { auth } from "@/auth";
 import { logger } from "@/utils/logger";
 
 export async function GET() {
   try {
-    // Dynamic import to avoid build-time initialization
-    const { auth } = await import("@/auth");
     const session = await auth();
 
-    if (!session || !session.user) {
+    // It's still good practice to ensure there's a session before calling the action
+    if (!session?.user?.id) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch the user's orders
+    // --- THIS IS THE FIX ---
+    // Call fetchUserOrders without any arguments.
+    // The action itself will get the user ID from the session.
     const { success, orders, error } = await fetchUserOrders();
 
     if (!success) {

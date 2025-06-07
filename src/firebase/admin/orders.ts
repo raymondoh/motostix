@@ -124,16 +124,13 @@ export async function createOrder(orderData: OrderData) {
   try {
     const validatedData = orderSchema.parse(orderData);
 
-    // REMOVED: The auth() check has been removed from this function.
-    // We will trust the userId provided in the orderData from the webhook.
-
+    // FIX: The auth() check has been removed from this function.
+    // We trust the userId passed in from the webhook data.
     if (!validatedData.userId) {
       return { success: false, error: "No user ID provided in order data." };
     }
 
-    // This calculation logic seems incorrect for this function,
-    // as the final amount is already provided by Stripe.
-    // Let's use the amount from the validated data directly.
+    // We already have the final amount from Stripe, no need to recalculate here.
     const finalAmount = validatedData.amount;
 
     const db = getAdminFirestore();
@@ -142,9 +139,9 @@ export async function createOrder(orderData: OrderData) {
       // Use the userId from the validated data, not from a session object
       userId: validatedData.userId,
       status: validatedData.status || "processing",
-      amount: finalAmount, // Use the amount passed from the Stripe session
-      // tax, shipping, and total can also be passed from Stripe if needed
-      // or calculated here if that's your business logic. For now, let's rely on the passed amount.
+      amount: finalAmount,
+      // You can add tax/shipping here if you calculate it separately
+      // For now, we rely on the total amount from Stripe
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -154,14 +151,12 @@ export async function createOrder(orderData: OrderData) {
       orderId: orderRef.id
     };
   } catch (error) {
-    // ... (your existing error handling is good)
     console.error("Error creating order:", error);
+    // ... (rest of your error handling)
     const message = error instanceof Error ? error.message : "Unknown error while creating order";
     return { success: false, error: message };
   }
 }
-
-// ... (the rest of the file remains the same)
 
 /**
  * Fetches all orders belonging to a specific user
