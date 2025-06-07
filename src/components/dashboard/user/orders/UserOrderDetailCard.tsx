@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { formatDate } from "@/utils/date";
-import { formatPriceWithCode } from "@/lib/utils";
+// 1. Import the new 'formatPrice' function
+import { formatPrice } from "@/lib/utils";
 import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 import type { Order } from "@/types/order";
 import { Separator } from "@/components/ui/separator";
@@ -50,26 +51,27 @@ export function UserOrderDetailCard({ order }: UserOrderDetailCardProps) {
           <span>{order.id}</span>
         </div>
 
+        {/* 2. Update all instances of the price formatting function */}
         <div className="flex justify-between">
           <span className="font-medium text-muted-foreground">Subtotal:</span>
-          <span>{formatPriceWithCode(subtotal, "GB")}</span>
+          <span>{formatPrice(subtotal, "gbp")}</span>
         </div>
 
         <div className="flex justify-between">
           <span className="font-medium text-muted-foreground">Tax:</span>
-          <span>{formatPriceWithCode(tax, "GB")}</span>
+          <span>{formatPrice(tax, "gbp")}</span>
         </div>
 
         <div className="flex justify-between">
           <span className="font-medium text-muted-foreground">Shipping:</span>
-          <span>{shipping === 0 ? "Free" : formatPriceWithCode(shipping, "GB")}</span>
+          <span>{shipping === 0 ? "Free" : formatPrice(shipping, "gbp")}</span>
         </div>
 
         <Separator />
 
         <div className="flex justify-between font-medium text-base">
           <span>Total Paid:</span>
-          <span>{formatPriceWithCode(total, "GB")}</span>
+          <span>{formatPrice(total, "gbp")}</span>
         </div>
 
         <div className="flex justify-between">
@@ -85,7 +87,7 @@ export function UserOrderDetailCard({ order }: UserOrderDetailCardProps) {
         <ul className="list-disc ml-5 space-y-1 text-muted-foreground text-sm">
           {order.items.map((item, i) => (
             <li key={i}>
-              {item.quantity} × {item.name} @ {formatPriceWithCode(item.price, "GB")}
+              {item.quantity} × {item.name} @ {formatPrice(item.price, "gbp")}
             </li>
           ))}
         </ul>
@@ -96,6 +98,8 @@ export function UserOrderDetailCard({ order }: UserOrderDetailCardProps) {
       <div>
         <h3 className="font-semibold mb-2">Shipping Address</h3>
         <div className="space-y-0.5 text-muted-foreground text-sm">
+          {/* Add the customer's name for clarity */}
+          <p className="font-medium text-foreground">{order.customerName}</p>
           <p>{order.shippingAddress.address}</p>
           <p>
             {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}

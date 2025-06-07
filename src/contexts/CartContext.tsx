@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { createContext, useContext, useEffect, useState } from "react";
 import type { Product } from "@/types/product";
 
@@ -68,8 +67,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Calculate total item count
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
 
-  // Calculate subtotal
-  const subtotal = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  // --- THIS IS THE FIX ---
+  // Calculate subtotal, checking for a sale price on each item
+  const subtotal = items.reduce((total, item) => {
+    const itemPrice = item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price;
+    return total + itemPrice * item.quantity;
+  }, 0);
+  // -------------------------
 
   // Add item to cart
   const addItem = (product: Product, quantity = 1) => {
@@ -77,15 +81,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const existingItem = prevItems.find(item => item.id === product.id);
 
       if (existingItem) {
-        // Update quantity if item already exists
         return prevItems.map(item => (item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item));
       } else {
-        // Add new item
         return [...prevItems, { id: product.id, product, quantity }];
       }
     });
-
-    // Open cart when adding items
     setIsOpen(true);
   };
 
@@ -100,7 +100,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem(id);
       return;
     }
-
     setItems(prevItems => prevItems.map(item => (item.id === id ? { ...item, quantity } : item)));
   };
 

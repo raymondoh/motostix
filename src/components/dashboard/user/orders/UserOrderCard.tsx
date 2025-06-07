@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/utils/date";
 import { Badge } from "@/components/ui/badge";
-import { formatPriceWithCode } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import type { Order } from "@/types/order";
 import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 
@@ -32,7 +32,7 @@ export function UserOrderCard({ order }: UserOrderCardProps) {
 
         <div className="flex justify-between text-sm">
           <span>Total Paid:</span>
-          <span>{formatPriceWithCode(total, "GB")}</span>
+          <span> {formatPrice(total, "gbp")}</span>
         </div>
 
         <div>
@@ -40,7 +40,7 @@ export function UserOrderCard({ order }: UserOrderCardProps) {
           <ul className="list-disc ml-4 mt-1 space-y-1 text-muted-foreground text-sm">
             {order.items.map((item, i) => (
               <li key={i}>
-                {item.quantity} × {item.name} @ {formatPriceWithCode(item.price, "GB")}
+                {item.quantity} × {item.name} @ {formatPrice(item.price, "gbp")}
               </li>
             ))}
           </ul>

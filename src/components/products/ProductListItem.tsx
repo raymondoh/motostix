@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Heart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatPriceWithCode } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { ProductCardButton } from "@/components/products/ProductCardButton";
 import type { Product } from "@/types/product";
 
@@ -56,8 +56,8 @@ export function ProductListItem({ product }: ProductListItemProps) {
                 product.badge.toLowerCase() === "new"
                   ? "bg-primary"
                   : product.badge.toLowerCase() === "sale"
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-secondary"
+                    ? "bg-accent text-accent-foreground"
+                    : "bg-secondary"
               }`}>
               {product.badge}
             </Badge>
@@ -83,7 +83,7 @@ export function ProductListItem({ product }: ProductListItemProps) {
         )}
 
         <div className="mt-auto pt-2 flex items-center justify-between">
-          <span className="font-bold text-lg">{formatPriceWithCode(product.price, "GB")}</span>
+          <span className="font-bold text-lg">{formatPrice(product.price, "gbp")}</span>
           <div className="flex space-x-2">
             <Button variant="ghost" size="icon" className="rounded-full">
               <Heart className="h-4 w-4" />

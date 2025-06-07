@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import type { Product } from "@/types/product";
-import { formatPriceWithCode } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { SectionHeader } from "@/components/shared/SectionHeader";
 
 interface ProductCarouselProps {
@@ -74,13 +74,13 @@ export function ProductCarousel({ products, title, description, viewAllUrl, cent
                         <div className="flex items-center gap-2 mt-auto">
                           {isOnSale ? (
                             <>
-                              <span className="font-bold text-primary">{formatPriceWithCode(displayPrice, "GB")}</span>
+                              <span className="font-bold text-primary"> {formatPrice(displayPrice, "gbp")}</span>
                               <span className="text-sm text-muted-foreground line-through">
-                                {formatPriceWithCode(product.price, "GB")}
+                                {formatPrice(product.price, "gbp")}
                               </span>
                             </>
                           ) : (
-                            <span className="font-bold">{formatPriceWithCode(displayPrice, "GB")}</span>
+                            <span className="font-bold">{formatPrice(displayPrice, "gbp")}</span>
                           )}
                         </div>
                       </CardContent>

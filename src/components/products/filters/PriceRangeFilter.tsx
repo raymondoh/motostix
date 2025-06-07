@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { formatPriceWithCode } from "@/lib/utils";
+// 1. Import the new 'formatPrice' function
+import { formatPrice } from "@/lib/utils";
 
 interface PriceRangeFilterProps {
   minPrice: number;
@@ -38,7 +39,6 @@ export function PriceRangeFilter({ minPrice, maxPrice, priceRange, onPriceChange
   return (
     <div className="space-y-4">
       <div>
-        {/* <h3 className="text-sm font-medium mb-3">Price Range</h3> */}
         <Slider
           min={priceRange[0]}
           max={priceRange[1]}
@@ -49,8 +49,9 @@ export function PriceRangeFilter({ minPrice, maxPrice, priceRange, onPriceChange
           className="mb-6"
         />
         <div className="flex items-center justify-between">
-          <span className="text-sm">{formatPriceWithCode(localPriceRange[0], "GB")}</span>
-          <span className="text-sm">{formatPriceWithCode(localPriceRange[1], "GB")}</span>
+          {/* 2. Update the function calls to use 'formatPrice' and the currency code "gbp" */}
+          <span className="text-sm">{formatPrice(localPriceRange[0], "gbp")}</span>
+          <span className="text-sm">{formatPrice(localPriceRange[1], "gbp")}</span>
         </div>
       </div>
 

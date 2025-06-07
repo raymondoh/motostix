@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FilterBadge } from "./FilterBadge";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "../ProductsProvider";
-import { formatPriceWithCode } from "@/lib/utils";
+// 1. Import the new 'formatPrice' function
+import { formatPrice } from "@/lib/utils";
 
 export function ActiveFilterBadges() {
   const {
@@ -36,10 +37,8 @@ export function ActiveFilterBadges() {
           {isPriceFiltered && (
             <FilterBadge
               key="price-filter"
-              label={`Price: ${formatPriceWithCode(currentPriceRange[0], "GB")} - ${formatPriceWithCode(
-                currentPriceRange[1],
-                "GB"
-              )}`}
+              // 2. Update the function calls to use 'formatPrice' and the currency code "gbp"
+              label={`Price: ${formatPrice(currentPriceRange[0], "gbp")} - ${formatPrice(currentPriceRange[1], "gbp")}`}
               onRemove={() => updatePriceRange(priceRange[0], priceRange[1])}
             />
           )}

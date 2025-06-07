@@ -3,7 +3,7 @@
 "use client";
 
 import { formatDate } from "@/utils/date";
-import { formatPriceWithCode } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -41,7 +41,7 @@ export function getAdminOrderColumns(): ColumnDef<Order>[] {
         const shipping = amount > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
         const total = amount + tax + shipping;
 
-        return <span>{formatPriceWithCode(total, "GB")}</span>;
+        return <span>{formatPrice(total, "gbp")}</span>;
       }
     },
     {

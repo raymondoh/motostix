@@ -15,6 +15,7 @@ import type {
 
 export interface Product {
   id: string;
+  slug?: string;
 
   // Basic Information
   name: string;
@@ -74,6 +75,7 @@ export interface Product {
 
 export interface SerializedProduct {
   id: string;
+  slug?: string;
 
   // Basic Information
   name: string;

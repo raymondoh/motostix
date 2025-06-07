@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/types/product";
 import { ProductLikeButton } from "./ProductLikeButton";
 import { ProductCardButton } from "./ProductCardButton";
-import { formatPriceWithCode } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -62,13 +62,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center gap-2">
             {isOnSale ? (
               <>
-                <span className="font-bold text-primary">{formatPriceWithCode(displayPrice, "GB")}</span>
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPriceWithCode(product.price, "GB")}
-                </span>
+                <span className="font-bold text-primary">{formatPrice(displayPrice, "gbp")}</span>
+                <span className="text-sm text-muted-foreground line-through">{formatPrice(product.price, "gbp")}</span>
               </>
             ) : (
-              <span className="font-bold">{formatPriceWithCode(displayPrice, "GB")}</span>
+              <span className="font-bold">{formatPrice(displayPrice, "gbp")}</span>
             )}
           </div>
 

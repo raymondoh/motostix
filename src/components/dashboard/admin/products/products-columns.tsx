@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Product } from "@/types/product";
 import type { Category } from "@/types/category";
-import { formatPriceWithCode } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 // Define the allowed badge variant types
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | null | undefined;
 interface GetProductColumnsProps {
@@ -68,14 +68,14 @@ export function getProductColumns({ onEdit, onDelete }: GetProductColumnsProps):
       header: () => <div className="text-xs text-muted-foreground font-medium text-center">Price</div>,
       cell: ({ row }) => {
         const price = Number(row.getValue("price"));
-        const formatted = formatPriceWithCode(price, "GB");
+        // 2. Use the new 'formatPrice' function with the currency code
+        const formatted = formatPrice(price, "gbp");
 
-        // Check if product is on sale
         const onSale = row.original.onSale;
         const salePrice = row.original.salePrice;
 
         if (onSale && salePrice) {
-          const formattedSalePrice = formatPriceWithCode(Number(salePrice), "GB");
+          const formattedSalePrice = formatPrice(Number(salePrice), "gbp");
           return (
             <div className="text-center whitespace-nowrap">
               <span className="line-through text-muted-foreground mr-2">{formatted}</span>

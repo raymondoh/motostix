@@ -1,110 +1,70 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { X, ShoppingCart, ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CartItemCard } from "./cart-item-card";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetDescription } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import type { ShippingFormValues } from "@/schemas/ecommerce/stripe";
-import { formatPriceWithCode } from "@/lib/utils";
+import { CheckoutSummary } from "../checkout/checkout-summary";
 import { CheckoutButton } from "./checkout-button";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { Trash2, ShoppingBag } from "lucide-react"; // Import icons for buttons
 
-interface Props {
-  shippingDetails?: ShippingFormValues;
-}
+// 1. Import your new configuration
+import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
 
-export function CartSidebar({ shippingDetails }: Props) {
-  const router = useRouter();
-  const { isOpen, closeCart, items, subtotal, itemCount, clearCart } = useCart();
+export function CartSidebar() {
+  const { items, subtotal, itemCount, isOpen, closeCart, clearCart } = useCart();
+
+  // 2. Use the imported config for calculations
+  const tax = subtotal * TAX_RATE;
+  const shipping = subtotal > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
+  const total = subtotal + tax + shipping;
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>
-      <SheetContent className="flex w-full flex-col sm:max-w-lg p-0">
-        <SheetHeader className="p-6 border-b border-border/40">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="text-xl font-semibold flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5" />
-              Cart ({itemCount})
-            </SheetTitle>
-          </div>
-          <SheetDescription className="text-sm text-muted-foreground">
-            Review your items before proceeding to checkout
-          </SheetDescription>
+      <SheetContent className="w-full sm:max-w-md flex flex-col">
+        <SheetHeader>
+          <SheetTitle>Your Cart ({itemCount})</SheetTitle>
         </SheetHeader>
 
-        {items.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center space-y-4 p-6">
-            <div className="h-20 w-20 rounded-full bg-muted/50 flex items-center justify-center">
-              <ShoppingCart className="h-10 w-10 text-muted-foreground" />
-            </div>
-            <div className="text-xl font-medium">Your cart is empty</div>
-            <p className="text-center text-muted-foreground">Looks like you haven't added anything to your cart yet.</p>
-            <Button
-              onClick={() => {
-                closeCart();
-                router.push("/products");
-              }}
-              className="mt-4 h-12 px-6">
-              Browse Products
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-1">
+        {items.length > 0 ? (
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 overflow-y-auto pr-4 -mr-4">
+              <div className="flex flex-col gap-4">
                 {items.map(item => (
                   <CartItemCard key={item.id} item={item} />
                 ))}
               </div>
             </div>
+            <div className="mt-auto border-t pt-4">
+              {/* 3. Add the "Continue Shopping" and "Clear Cart" buttons */}
+              <div className="flex justify-between items-center text-sm mb-4">
+                <Button variant="ghost" className="text-muted-foreground" onClick={closeCart} asChild>
+                  <Link href="/products">
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Continue Shopping
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" onClick={clearCart}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear Cart
+                </Button>
+              </div>
 
-            <div className="border-t border-border/40 p-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Subtotal</span>
-                    <span className="text-sm font-medium">
-                      {formatPriceWithCode(subtotal, shippingDetails?.country ?? "GB")}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Shipping</span>
-                    <span className="text-sm">Calculated at checkout</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tax</span>
-                    <span className="text-sm">Calculated at checkout</span>
-                  </div>
-                  <Separator className="my-2" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-medium">Estimated Total</span>
-                    <span className="text-base font-medium">
-                      {formatPriceWithCode(subtotal, shippingDetails?.country ?? "GB")}
-                    </span>
-                  </div>
-                </div>
-
-                <SheetFooter className="flex-col gap-3 sm:flex-col">
-                  <CheckoutButton className="w-full h-12 text-base font-semibold" />
-
-                  <div className="flex gap-3 w-full">
-                    <Button variant="outline" className="flex-1" onClick={closeCart}>
-                      Continue Shopping
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      className="text-muted-foreground hover:text-destructive hover:border-destructive"
-                      onClick={clearCart}>
-                      Clear Cart
-                    </Button>
-                  </div>
-                </SheetFooter>
+              {/* The items prop is no longer needed here */}
+              <CheckoutSummary subtotal={subtotal} tax={tax} shipping={shipping} total={total} />
+              <div className="mt-4">
+                <CheckoutButton />
               </div>
             </div>
-          </>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <p className="text-muted-foreground mb-4">Your cart is empty.</p>
+            <Button asChild onClick={closeCart}>
+              <Link href="/products">Start Shopping</Link>
+            </Button>
+          </div>
         )}
       </SheetContent>
     </Sheet>
