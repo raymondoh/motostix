@@ -1,4 +1,4 @@
-// src/components/products/detail/ProductGallery.tsx
+// src/components/products/page-detail/ProductGallery.tsx
 "use client";
 
 import Image from "next/image";
