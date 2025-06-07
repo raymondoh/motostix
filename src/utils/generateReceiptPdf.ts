@@ -19,7 +19,7 @@ export async function generateReceiptPdf(order: Order) {
     });
   };
 
-  drawText("MotorStix Order Receipt", 0, 18);
+  drawText("MotoStix Order Receipt", 0, 18);
   drawText(`Order ID: ${order.id}`, 30);
   drawText(`Customer: ${order.customerName} (${order.customerEmail})`, 50);
   drawText(`Status: ${order.status}`, 70);

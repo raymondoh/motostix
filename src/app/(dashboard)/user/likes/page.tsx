@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { UserLikesClient } from "@/components/dashboard/user/likes/UserLikesClient";
 
 export const metadata: Metadata = {
-  title: "Your Likes | MotorStix",
+  title: "Your Likes | MotoStix",
   description: "View all your liked products"
 };
 
