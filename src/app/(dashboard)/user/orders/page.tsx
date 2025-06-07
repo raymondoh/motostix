@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { UserOrdersClient } from "@/components/dashboard/user/orders/UserOrdersClient";
 
 export const metadata: Metadata = {
-  title: "Your Orders | MotorStix",
+  title: "Your Orders | MotoStix",
   description: "View all your past orders"
 };
 
