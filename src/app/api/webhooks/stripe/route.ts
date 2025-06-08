@@ -1,68 +1,70 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
+//src/app/api/webhooks/stripe/route.ts
+import { Stripe } from "stripe";
 import { headers } from "next/headers";
-import { createOrderAction, createNewOrder } from "@/actions/orders/create-order";
+import { NextResponse } from "next/server";
+import { createOrderAction } from "@/actions/orders/create-order";
 import type { OrderData } from "@/types/order";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-05-28.basil"
 });
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
 export async function POST(req: Request) {
-  const body = await req.text();
-  const headerList = await headers();
-  const signature = headerList.get("stripe-signature");
-
-  if (!signature) {
-    console.error("❌ Stripe signature missing.");
-    return new Response("Missing Stripe signature", { status: 400 });
-  }
-
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    console.log("🎯 Stripe webhook received:", event.type);
-  } catch (err: any) {
-    console.error("❌ Error verifying webhook signature:", err.message);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    const headerList = await headers();
+    const stripeSignature = headerList.get("stripe-signature");
+
+    event = stripe.webhooks.constructEvent(
+      await req.text(), // ✅ DO NOT PARSE JSON
+      stripeSignature as string,
+      process.env.STRIPE_WEBHOOK_SECRET as string
+    );
+
+    console.log("✅ Webhook verified:", event.type);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    console.error("❌ Error verifying webhook signature:", errorMessage);
+    return NextResponse.json({ message: `Webhook Error: ${errorMessage}` }, { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
-    console.log("💡 Handling checkout.session.completed...");
-
     try {
-      const sessionId = (event.data.object as Stripe.Checkout.Session).id;
-      console.log("🔍 Session ID:", sessionId);
+      const session = event.data.object as Stripe.Checkout.Session;
+      console.log("📦 Checkout session completed:", session.id);
 
-      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      // If you're using `expand`, you can optionally fetch more detail here:
+      const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
         expand: ["line_items.data.price.product", "payment_intent"]
       });
 
-      const paymentIntent = session.payment_intent as Stripe.PaymentIntent;
-      const shipping = paymentIntent.shipping;
+      const paymentIntent = fullSession.payment_intent as Stripe.PaymentIntent;
+      const shipping = paymentIntent?.shipping;
 
-      if (!session) throw new Error("Session not found");
-
-      console.log("📦 Session retrieved:", session.id);
+      if (!session.metadata?.userId || !shipping?.address || !session.customer_details?.email) {
+        throw new Error("Missing required order data.");
+      }
 
       const orderData: OrderData = {
         paymentIntentId:
-          typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id ?? "N/A"),
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : (session.payment_intent?.id ?? "unknown"),
+
         amount: (session.amount_total ?? 0) / 100,
-        currency: session.currency ?? "gbp",
-        userId: session.metadata?.userId ?? null,
-        customerName: shipping?.name ?? session.customer_details?.name ?? "N/A",
-        customerEmail: session.customer_details?.email ?? "N/A",
+        customerEmail: session.customer_details.email,
+        customerName: shipping.name ?? session.customer_details.name ?? "N/A",
+        userId: session.metadata.userId,
+        status: "processing",
+
         shippingAddress: {
-          name: shipping?.name ?? "",
-          address: shipping?.address?.line1 ?? "",
-          city: shipping?.address?.city ?? "",
-          state: shipping?.address?.state ?? "",
-          zipCode: shipping?.address?.postal_code ?? "",
-          country: shipping?.address?.country ?? ""
+          name: shipping.name ?? "",
+          address: shipping.address.line1 ?? "",
+          city: shipping.address.city ?? "",
+          state: shipping.address.state ?? "",
+          zipCode: shipping.address.postal_code ?? "",
+          country: shipping.address.country ?? ""
         },
 
         items: (session.line_items?.data ?? []).map(item => {
@@ -71,31 +73,27 @@ export async function POST(req: Request) {
             name: product?.name ?? "Unknown Product",
             price: (item.price?.unit_amount ?? 0) / 100,
             quantity: item.quantity ?? 1,
-            image: product?.images?.[0] ?? "",
             productId: product?.id ?? "unknown"
           };
-        }),
-        status: "processing"
+        })
       };
 
-      console.log("📦 Prepared order data:", JSON.stringify(orderData, null, 2));
-
-      //const result = await createOrderAction(orderData);
-      const result = await createNewOrder(orderData);
+      const result = await createOrderAction(orderData);
+      console.log(result);
 
       if (!result.success) {
         console.error("❌ Order creation failed:", result.error);
-        throw new Error(result.error || "Unknown error");
+        return NextResponse.json({ message: result.error }, { status: 500 });
       }
 
-      console.log(`✅ Order ${result.orderId} created successfully.`);
+      console.log("✅ Order created:", result.orderId);
     } catch (err) {
-      console.error("❌ Failed to handle session:", err);
-      return new Response("Webhook handler failed to create order.", { status: 500 });
+      console.error("❌ Order handler error:", err);
+      return NextResponse.json({ message: "Failed to handle order" }, { status: 500 });
     }
   } else {
     console.log("ℹ️ Unhandled event type:", event.type);
   }
 
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true }, { status: 200 });
 }

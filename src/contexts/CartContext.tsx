@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { Product } from "@/types/product";
 
 // Define cart item type
@@ -76,47 +76,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // -------------------------
 
   // Add item to cart
-  const addItem = (product: Product, quantity = 1) => {
+  const addItem = useCallback((product: Product, quantity = 1) => {
     setItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
-
       if (existingItem) {
         return prevItems.map(item => (item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item));
-      } else {
-        return [...prevItems, { id: product.id, product, quantity }];
       }
+      return [...prevItems, { id: product.id, product, quantity }];
     });
     setIsOpen(true);
-  };
+  }, []);
 
   // Remove item from cart
-  const removeItem = (id: string) => {
+  const removeItem = useCallback((id: string) => {
     setItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
+  }, []);
 
   // Update item quantity
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity < 1) {
-      removeItem(id);
-      return;
-    }
-    setItems(prevItems => prevItems.map(item => (item.id === id ? { ...item, quantity } : item)));
-  };
+  const updateQuantity = useCallback(
+    (id: string, quantity: number) => {
+      if (quantity < 1) {
+        removeItem(id);
+        return;
+      }
+      setItems(prevItems => prevItems.map(item => (item.id === id ? { ...item, quantity } : item)));
+    },
+    [removeItem]
+  ); // removeItem is a dependency here
 
   // Clear cart
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setItems([]);
-  };
+  }, []);
 
   // Toggle cart visibility
-  const toggleCart = () => {
+  const toggleCart = useCallback(() => {
     setIsOpen(prev => !prev);
-  };
+  }, []);
 
   // Close cart
-  const closeCart = () => {
+  const closeCart = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
   return (
     <CartContext.Provider

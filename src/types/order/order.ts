@@ -1,6 +1,7 @@
-import { orderSchema } from "@/schemas/order";
 import { z } from "zod";
-// ✅ Type used when **fetching** an existing order from Firestore
+import { orderSchema } from "@/schemas/order";
+
+// This is the main Order type used when fetching from the database
 export type Order = {
   id: string;
   paymentIntentId: string;
@@ -12,32 +13,25 @@ export type Order = {
     name: string;
     price: number;
     quantity: number;
+    image?: string; // It's good practice to make this optional
   }[];
   shippingAddress: {
+    name: string; // <<< ADD THIS REQUIRED PROPERTY
     address: string;
     city: string;
     state: string;
     zipCode: string;
     country: string;
   };
-  userId: string;
+  userId: string | null; // Allow this to be null
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  createdAt?: Date; // ✅ Now correct — will match mapped Date
+  createdAt?: Date;
   updatedAt?: Date;
+  currency?: string; // It's good to have this here too
 };
 
-// src/types/order.ts
-
-export type StripeOrderInput = {
-  paymentIntentId: string;
-  amount: number;
-  customerEmail: string;
-  customerName: string;
-  // You can add `shipping?: ShippingDetails`, `items?: OrderItem[]`, etc. later
-};
-
-// ================== Order Types ==================
-
-// ✅ Type used when **creating** a new order (before Firestore writes it)
+// This is the type for data used to CREATE an order, inferred from your Zod schema
 export type OrderData = z.infer<typeof orderSchema>;
+
+// This is the enum for status, which you can use elsewhere if needed
 export type OrderStatus = Order["status"];
