@@ -2,6 +2,11 @@
 const config = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
+  globals: {
+    'ts-jest': {
+      tsconfig: './tsconfig.jest.json'
+    }
+  },
 
   // Transform TypeScript and JavaScript files using ts-jest
   transform: {
