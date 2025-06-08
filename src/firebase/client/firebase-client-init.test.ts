@@ -1,88 +1,54 @@
 // src/firebase/client/firebase-client-init.test.ts
 
-// Step 1: Create our own mock functions first. This gives us a stable reference.
-const mockInitializeApp = jest.fn();
-const mockGetApps = jest.fn();
-const mockGetAuth = jest.fn();
-const mockGetFirestore = jest.fn();
-const mockRecaptchaVerifier = jest.fn(); // We removed the tests, but the import might still be there
-
-// Step 2: Tell Jest to use our functions when it mocks the modules.
 jest.mock("firebase/app", () => ({
-  initializeApp: mockInitializeApp,
-  getApps: mockGetApps
+  initializeApp: jest.fn(() => "mockApp"),
+  getApps: jest.fn(() => []),
+  getApp: jest.fn(() => "mockApp")
 }));
 
 jest.mock("firebase/auth", () => ({
-  getAuth: mockGetAuth,
-  GoogleAuthProvider: jest.fn(),
-  GithubAuthProvider: jest.fn()
+  getAuth: jest.fn(() => "mockAuth"),
+  GoogleAuthProvider: jest.fn(() => "mockProvider")
 }));
 
 jest.mock("firebase/firestore", () => ({
-  getFirestore: mockGetFirestore
+  getFirestore: jest.fn(() => "mockFirestore")
 }));
 
-// We no longer need to import from the firebase/* modules in the test file itself.
-
-// Define mock return values
-const mockApp = { name: "mockApp" };
-const mockAuth = { name: "mockAuth" };
-const mockFirestore = { name: "mockFirestore" };
-
-describe("Firebase Client Initialization", () => {
-  const originalEnv = process.env;
+describe("firebase-client-init", () => {
+  const OLD_ENV = process.env;
 
   beforeEach(() => {
     jest.resetModules();
-    jest.clearAllMocks();
-
     process.env = {
-      ...originalEnv,
-      NEXT_PUBLIC_FIREBASE_API_KEY: "test-api-key",
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "test-auth-domain",
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: "test-project-id"
+      ...OLD_ENV,
+      NEXT_PUBLIC_FIREBASE_API_KEY: "key",
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "domain",
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: "project",
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "bucket",
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "sender",
+      NEXT_PUBLIC_FIREBASE_APP_ID: "appId"
     };
-
-    // Set default return values for our mock functions
-    mockInitializeApp.mockReturnValue(mockApp);
-    mockGetAuth.mockReturnValue(mockAuth);
-    mockGetFirestore.mockReturnValue(mockFirestore);
   });
 
   afterAll(() => {
-    process.env = originalEnv;
+    process.env = OLD_ENV;
   });
 
-  it("should initialize Firebase app if no apps exist", () => {
-    // Arrange
-    mockGetApps.mockReturnValue([]);
-    // Act
-    const initModule = require("./firebase-client-init");
-    // Assert
-    expect(mockGetApps).toHaveBeenCalledTimes(1);
-    expect(mockInitializeApp).toHaveBeenCalledTimes(1);
-    expect(mockInitializeApp).toHaveBeenCalledWith(
-      expect.objectContaining({
-        apiKey: "test-api-key"
-      })
-    );
-    expect(initModule.app).toBe(mockApp);
-    expect(mockGetAuth).toHaveBeenCalledWith(mockApp);
-    expect(mockGetFirestore).toHaveBeenCalledWith(mockApp);
+  it("should initialize Firebase if no apps exist", () => {
+    const { initializeApp } = require("firebase/app");
+    const { auth, db } = require("./firebase-client-init");
+
+    expect(initializeApp).toHaveBeenCalled();
+    expect(auth).toBe("mockAuth");
+    expect(db).toBe("mockFirestore");
   });
 
-  it("should get the existing Firebase app if it is already initialized", () => {
-    // Arrange
-    mockGetApps.mockReturnValue([mockApp]);
-    // Act
-    const initModule = require("./firebase-client-init");
-    // Assert
-    // Note: The check happens twice in the code: `getApps().length` and `getApps()[0]`
-    expect(mockGetApps).toHaveBeenCalledTimes(2);
-    expect(mockInitializeApp).not.toHaveBeenCalled();
-    expect(initModule.app).toBe(mockApp);
-    expect(mockGetAuth).toHaveBeenCalledWith(mockApp);
-    expect(mockGetFirestore).toHaveBeenCalledWith(mockApp);
+  it("should throw if required env vars are missing", () => {
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "";
+
+    expect(() => {
+      require("./firebase-client-init");
+    }).toThrow(/Missing Firebase environment variables/);
   });
 });

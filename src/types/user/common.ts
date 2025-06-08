@@ -27,7 +27,7 @@ export interface User {
   emailVerified?: boolean;
   hasPassword?: boolean;
   has2FA?: boolean;
-  provider?: "email" | "google" | "github" | string;
+  provider?: "email" | "google" | string;
   passwordHash?: string;
 
   createdAt?: Date | string | Timestamp;

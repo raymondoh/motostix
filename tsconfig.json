@@ -11,9 +11,12 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
+    "isolatedModules": false,
+    "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
+    "types": ["jest", "node"],
+
     "plugins": [
       {
         "name": "next"
@@ -23,16 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "types",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/firebase/security/firestore.rules",
-    "src/app/(dashboard)/admin/layout.tsx",
-    "src/app/(dashboard)/layout.tsx",
-    "jest.config.mjs"
-  ],
+  "include": ["next-env.d.ts", "types", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "jest.config.mjs"],
   "exclude": ["node_modules"]
 }

@@ -143,7 +143,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8 text-destructive rounded-md"
+              className="h-8 w-8 text-destructive rounded-md text-white"
               onClick={() => removeItem(product.id)}>
               <Trash2 className="h-4 w-4" />
               <span className="sr-only">Remove item</span>

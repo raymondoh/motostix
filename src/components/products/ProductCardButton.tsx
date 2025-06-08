@@ -22,7 +22,7 @@ export function ProductCardButton({ product, className }: ProductCardButtonProps
 
   return (
     <Button size="sm" className={`h-8 px-3 ${className || ""}`} onClick={handleAddToCart}>
-      <ShoppingCart className="h-3.5 w-3.5 mr-1" />
+      <ShoppingCart data-testid="lucide-icon" className="h-3.5 w-3.5 mr-1" />
       Add
     </Button>
   );
