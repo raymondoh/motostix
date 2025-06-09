@@ -435,6 +435,7 @@ import type { Product, ProductFilterOptions } from "@/types/product";
 import { serializeProduct, serializeProductArray } from "@/utils/serializeProduct";
 import { productSchema, productUpdateSchema } from "@/schemas/product";
 import { normalizeCategory, normalizeSubcategory } from "@/config/categories";
+import { average } from "firebase/firestore";
 //import type { FirebaseFirestore } from "firebase-admin/firestore";
 
 function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
@@ -481,7 +482,9 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
     isCustomizable: data?.isCustomizable ?? false,
     isNewArrival: data?.isNewArrival ?? false,
     createdAt: data?.createdAt,
-    updatedAt: data?.updatedAt
+    updatedAt: data?.updatedAt,
+    averageRating: data?.averageRating || 0,
+    reviewCount: data?.reviewCount || 0
   };
 }
 
@@ -750,8 +753,8 @@ export async function getProductById(id: string) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
-      ? error.message
-      : "Unknown error fetching product by ID";
+        ? error.message
+        : "Unknown error fetching product by ID";
 
     console.error(`[getProductById] Processed error message for ID '${id}': ${message}`);
     return { success: false as const, error: message };

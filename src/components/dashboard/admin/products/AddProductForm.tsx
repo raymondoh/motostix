@@ -1319,7 +1319,9 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
           shippingWeight: shippingWeight || undefined,
           shippingClass: shippingClass || "standard",
           image: imageUrl, // Use the uploaded image URL
-          additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined
+          additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined,
+          averageRating: 0,
+          reviewCount: 0
         };
 
         // Add product
@@ -1338,8 +1340,8 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
         const message = isFirebaseError(error)
           ? firebaseError(error)
           : error instanceof Error
-          ? error.message
-          : "Unknown error occurred.";
+            ? error.message
+            : "Unknown error occurred.";
         setFormError(message);
         toast.error(message);
         console.error("[AddProductForm]", error);

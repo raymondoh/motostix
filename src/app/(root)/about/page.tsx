@@ -62,6 +62,8 @@ const placeholderProducts: Product[] = [
     category: "Motorbikes",
     //slug: "bestselling-moto-sticker", // Added slug, often useful
     inStock: true,
+    averageRating: 4.8, // Assuming you want to include average rating
+    reviewCount: 150, // Assuming you want to include review count
     createdAt: new Date().toISOString()
   },
   {
@@ -73,6 +75,8 @@ const placeholderProducts: Product[] = [
     salePrice: 8.0,
     category: "Cars",
     //slug: "new-arrival-car-decal", // Added slug
+    averageRating: 4.5, // Assuming you want to include average rating
+    reviewCount: 75, // Assuming you want to include review count
     inStock: true,
     createdAt: new Date().toISOString()
   },
@@ -84,6 +88,8 @@ const placeholderProducts: Product[] = [
     onSale: false,
     category: "Other",
     //slug: "custom-design-example", // Added slug
+    averageRating: 4.2, // Assuming you want to include average rating
+    reviewCount: 50, // Assuming you want to include review count
     inStock: true,
     createdAt: new Date().toISOString()
   },
@@ -95,6 +101,8 @@ const placeholderProducts: Product[] = [
     onSale: false,
     category: "Motorbikes",
     //slug: "limited-edition-sticker", // Added slug
+    averageRating: 4.9, // Assuming you want to include average rating
+    reviewCount: 200, // Assuming you want to include review count
     inStock: true,
     createdAt: new Date().toISOString()
   }

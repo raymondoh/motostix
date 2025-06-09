@@ -68,6 +68,10 @@ export interface Product {
   isCustomizable?: boolean;
   isNewArrival?: boolean;
 
+  // New fields for ratings
+  averageRating: number; // Will store the calculated average (e.g., 4.5)
+  reviewCount: number; // Will store the total number of ratings
+
   // Metadata
   createdAt: Timestamp | string;
   updatedAt?: Timestamp | string;
@@ -127,6 +131,10 @@ export interface SerializedProduct {
   isLiked?: boolean;
   isCustomizable?: boolean;
   isNewArrival?: boolean;
+
+  // New fields for ratings
+  averageRating: number; // Will store the calculated average (e.g., 4.5)
+  reviewCount: number; // Will store the total number of ratings
 
   // Metadata
   createdAt: string; // Always a string after serialization

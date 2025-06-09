@@ -24,6 +24,8 @@ export * as Common from "./common";
 export * as Category from "./category";
 export * as Dashboard from "./dashboard";
 export * as Ecommerce from "./ecommerce";
+// Review types
+export * as Review from "./review";
 
 // Note on next-auth:
 // Types for next-auth module augmentation (from next-auth/index.d.ts)
