@@ -3,8 +3,8 @@ const config = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
   globals: {
-    'ts-jest': {
-      tsconfig: './tsconfig.jest.json'
+    "ts-jest": {
+      tsconfig: "./tsconfig.jest.json"
     }
   },
 
@@ -22,7 +22,8 @@ const config = {
   // Alias resolution for imports and CSS modules
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^server-only$": "<rootDir>/__mocks__/emptyModule.js" // ✅ moved here
   },
 
   // Include specific node_modules for transformation (ESM packages)

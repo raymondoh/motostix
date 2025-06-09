@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { NewsletterForm } from "@/components/forms/NewsletterForm";
 
 export function PromoSection() {
   return (
@@ -35,7 +36,7 @@ export function PromoSection() {
             <h3 className="text-xl font-bold mb-3">Join Our Community</h3>
             <div className="w-8 h-0.5 bg-primary mb-4"></div>
             <p className="text-muted-foreground mb-4">Sign up to receive updates, exclusive offers, and more!</p>
-            <div className="flex flex-col gap-3">
+            {/* <div className="flex flex-col gap-3">
               <input
                 type="email"
                 placeholder="Your email address"
@@ -44,7 +45,8 @@ export function PromoSection() {
               <Button className="bg-black text-white dark:bg-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 w-full">
                 SUBSCRIBE
               </Button>
-            </div>
+            </div> */}
+            <NewsletterForm />
           </div>
         </div>
       </div>
