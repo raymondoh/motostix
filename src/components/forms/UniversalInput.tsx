@@ -19,6 +19,7 @@ interface UniversalInputProps {
   min?: string;
   variant?: "standard" | "compact";
   className?: string;
+  disabled?: boolean;
 }
 
 export const UniversalInput = forwardRef<HTMLInputElement, UniversalInputProps>(

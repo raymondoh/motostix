@@ -4,7 +4,10 @@ import type { ActionResponse } from "../common";
 import type { User } from "./common";
 
 export interface UpdateProfileInput {
-  name?: string;
+  // Highlight: Replaced 'name' with 'firstName', 'lastName', and 'displayName'
+  firstName?: string;
+  lastName?: string;
+  displayName?: string; // Optional, as it might be derived or users set it later
   bio?: string;
   location?: string;
   website?: string;
