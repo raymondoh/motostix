@@ -1,427 +1,3 @@
-// // ===============================
-// // 📂 src/firebase/admin/products.ts
-// // ===============================
-
-//     name: data?.name || "",
-//     description: data?.description || "",
-//     details: data?.details || "",
-//     sku: data?.sku || "",
-//     barcode: data?.barcode || "",
-//     category: data.category || "",
-//     subcategory: data.subcategory || "",
-//     designThemes: data.designThemes || [],
-//     productType: data.productType || "",
-//     tags: data.tags || [],
-//     brand: data.brand || "",
-//     manufacturer: data.manufacturer || "",
-//     dimensions: data?.dimensions || "",
-//     weight: data?.weight || "",
-//     shippingWeight: data?.shippingWeight || "",
-//     material: data?.material || "",
-//     finish: data?.finish || undefined,
-//     color: data?.color || "",
-//     baseColor: data?.baseColor || "",
-//     colorDisplayName: data?.colorDisplayName || "",
-//     stickySide: data?.stickySide || undefined,
-//     size: data?.size || "",
-//     image: data?.image || "/placeholder.svg",
-//     additionalImages: data?.additionalImages || [],
-//     placements: data?.placements || [],
-//     price: data?.price || 0,
-//     salePrice: data?.salePrice || undefined,
-//     onSale: data?.onSale || false,
-//     costPrice: data?.costPrice || undefined,
-//     stockQuantity: data?.stockQuantity || undefined,
-//     lowStockThreshold: data?.lowStockThreshold || undefined,
-//     shippingClass: data?.shippingClass || "",
-//     inStock: data?.inStock ?? true,
-//     badge: data?.badge || "",
-//     isFeatured: data?.isFeatured ?? false,
-//     isHero: data?.isHero ?? false,
-//     isLiked: data?.isLiked ?? false,
-//     isCustomizable: data?.isCustomizable ?? false,
-//     isNewArrival: data?.isNewArrival ?? false,
-//     createdAt: data?.createdAt,
-//     updatedAt: data?.updatedAt
-//   };
-// }
-
-// // ===================
-// // ADD PRODUCT
-// // ===================
-// /**
-//  * Add a new product document.
-//  * Accepts all Product fields *except* id / createdAt / updatedAt (those are added here).
-//  */
-// // export async function addProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt">) {
-// //   try {
-// //     /* ── quick sanity-check (ignores unknown keys) ─────────────── */
-// //     const parsed = productSchema.safeParse(data);
-// //     if (!parsed.success) {
-// //       console.error("❌ Invalid product data:", parsed.error.flatten());
-// //       return { success: false as const, error: "Invalid product data" };
-// //     }
-
-// //     const now = Timestamp.now();
-
-// //     /* ── write to Firestore ────────────────────────────────────── */
-// //     const docRef = await adminDb.collection("products").add({
-// //       ...data,
-// //       createdAt: now,
-// //       updatedAt: now
-// //     });
-
-// //     /* ── ensure a SKU exists ───────────────────────────────────── */
-// //     const finalSku = data.sku ?? `SKU-${docRef.id.substring(0, 8).toUpperCase()}`; // generate simple SKU
-// //     if (!data.sku) await docRef.update({ sku: finalSku });
-
-// //     /* ── compose full product object for return ───────────────── */
-// //     const fullProduct: Product = {
-// //       id: docRef.id,
-// //       ...data,
-// //       sku: finalSku,
-// //       inStock: data.inStock ?? true, // default when caller omits it
-// //       createdAt: now,
-// //       updatedAt: now
-// //     };
-
-// //     return {
-// //       success: true as const,
-// //       id: docRef.id,
-// //       product: serializeProduct(fullProduct)
-// //     };
-// //   } catch (error) {
-// //     const message = isFirebaseError(error)
-// //       ? firebaseError(error)
-// //       : (error as Error)?.message || "Unknown error adding product";
-// //     console.error("Error adding product:", message);
-// //     return { success: false as const, error: message };
-// //   }
-// // }
-
-// //SKU!!!
-// // export async function addProduct(data: any) {
-// //   try {
-// //     console.log("🚀 addProduct - Starting creation");
-// //     console.log("📋 addProduct - Raw input data:", JSON.stringify(data, null, 2));
-
-// //     // Validate using the full product schema for creation
-// //     const validationResult = productSchema.safeParse(data);
-
-// //     if (!validationResult.success) {
-// //       console.error("❌ Schema validation failed:", validationResult.error.errors);
-// //       const errorMessages = validationResult.error.errors
-// //         .map(err => `${err.path.join(".")}: ${err.message}`)
-// //         .join(", ");
-// //       return { success: false as const, error: `Validation failed: ${errorMessages}` };
-// //     }
-
-// //     const validatedData = validationResult.data;
-// //     console.log("✅ Schema validation passed. Validated data:", JSON.stringify(validatedData, null, 2));
-
-// //     // Create the new product with timestamps
-// //     const newProduct = {
-// //       ...validatedData,
-// //       createdAt: new Date(),
-// //       updatedAt: new Date()
-// //     };
-
-// //     console.log("🔥 FINAL - Product data being sent to Firebase:", JSON.stringify(newProduct, null, 2));
-
-// //     const docRef = await adminDb().collection("products").add(newProduct);
-
-// //     console.log("✅ Firebase creation completed successfully with ID:", docRef.id);
-
-// //     return { success: true as const, data: docRef.id };
-// //   } catch (error) {
-// //     console.error("❌ addProduct error:", error);
-// //     const message = isFirebaseError(error)
-// //       ? firebaseError(error)
-// //       : (error as Error)?.message || "Unknown error adding product";
-// //     return { success: false as const, error: message };
-// //   }
-// // }
-
-// /**
-//  * Accepts all Product fields.
-//  * - Validates the incoming data against the product schema.
-//  * - Generates a unique SKU if one is not provided.
-//  * - Adds createdAt and updatedAt timestamps.
-//  * - Creates the product in the "products" collection.
-//  * - Returns the full product object, including the new ID and final SKU.
-//  */
-// export async function addProduct(data: any) {
-//   // Consider using a stricter type like Omit<Product, "id" | "createdAt" | "updatedAt">
-//   try {
-//     console.log("🚀 addProduct - Starting creation");
-//     console.log("📋 addProduct - Raw input data:", JSON.stringify(data, null, 2));
-
-//     // Validate using the full product schema
-//     const validationResult = productSchema.safeParse(data);
-
-//     if (!validationResult.success) {
-//       console.error("❌ Schema validation failed:", validationResult.error.errors);
-//       const errorMessages = validationResult.error.errors
-//         .map(err => `${err.path.join(".")}: ${err.message}`)
-//         .join(", ");
-//       return { success: false as const, error: `Validation failed: ${errorMessages}` };
-//     }
-
-//     const validatedData = validationResult.data;
-//     console.log("✅ Schema validation passed. Validated data:", JSON.stringify(validatedData, null, 2));
-
-//     const now = new Date(); // Or Timestamp.now() for native Firestore type
-
-//     // Data to be added to Firestore, excluding the SKU for now if it's missing
-//     const newProductData = {
-//       ...validatedData,
-//       createdAt: now,
-//       updatedAt: now
-//     };
-
-//     console.log("🔥 FINAL - Product data being sent to Firebase:", JSON.stringify(newProductData, null, 2));
-
-//     // Add the document to get its generated ID
-//     const docRef = await adminDb().collection("products").add(newProductData);
-//     console.log("✅ Firebase creation completed successfully with ID:", docRef.id);
-
-//     /* --- SKU Generation Logic --- */
-//     // Use the provided SKU or generate a new one from the document ID
-//     const finalSku = validatedData.sku ?? `SKU-${docRef.id.substring(0, 8).toUpperCase()}`;
-
-//     // If a new SKU was generated, update the document in Firestore
-//     if (!validatedData.sku) {
-//       console.log(`📦 SKU not provided. Generating and updating with: ${finalSku}`);
-//       await docRef.update({ sku: finalSku });
-//       console.log("✅ SKU updated in Firebase.");
-//     }
-
-//     // Construct the complete product object to return to the caller
-//     const fullProduct = {
-//       id: docRef.id,
-//       ...validatedData,
-//       sku: finalSku, // Ensure the final SKU is included
-//       createdAt: now,
-//       updatedAt: now
-//     };
-
-//     // Note: The previous function had a `serializeProduct` step.
-//     // You may want to apply a similar serialization here if needed.
-//     return {
-//       success: true as const,
-//       id: docRef.id,
-//       product: fullProduct
-//     };
-//   } catch (error) {
-//     console.error("❌ addProduct error:", error);
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error adding product";
-//     return { success: false as const, error: message };
-//   }
-// }
-
-//     // Assuming isFirebaseError and firebaseError are defined
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : error instanceof Error
-//       ? error.message
-//       : "Unknown error fetching product by ID";
-
-//     console.error(`[getProductById] Processed error message for ID '${id}': ${message}`);
-//     return { success: false as const, error: message };
-//   }
-// }
-
-// // ===================
-// // GET NEW ARRIVALS
-// // ===================
-// export async function getNewArrivals(limit = 10) {
-//   try {
-//     const snapshot = await adminDb()
-//       .collection("products")
-//       .where("isNewArrival", "==", true)
-//       .orderBy("createdAt", "desc")
-//       .limit(limit)
-//       .get();
-
-//     const products = snapshot.docs.map(mapDocToProduct);
-//     return { success: true as const, data: serializeProductArray(products) };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error fetching new arrivals";
-//     return { success: false as const, error: message };
-//   }
-// }
-
-// // ===================
-// // GET RELATED PRODUCTS
-// // ===================
-// interface GetRelatedProductsParams {
-//   productId: string;
-//   category?: string;
-//   subcategory?: string;
-//   designTheme?: string; // Keep this as string for flexibility
-//   productType?: string;
-//   brand?: string;
-//   tags?: string[];
-//   limit?: number;
-// }
-
-// export async function getRelatedProducts({
-//   productId,
-//   category,
-//   subcategory,
-//   designTheme,
-//   productType,
-//   brand,
-//   tags,
-//   limit = 4
-// }: GetRelatedProductsParams) {
-//   try {
-//     // Start with a collection reference
-//     let query = adminDb().collection("products") as FirebaseFirestore.Query<DocumentData>;
-
-//     // Apply category filter
-//     if (category) {
-//       query = query.where("category", "==", category);
-//     }
-
-//     // Apply subcategory filter if provided
-//     if (subcategory) {
-//       query = query.where("subcategory", "==", subcategory);
-//     }
-
-//     // Apply product type filter if provided
-//     if (productType) {
-//       query = query.where("productType", "==", productType);
-//     }
-
-//     // Apply brand filter if provided
-//     if (brand) {
-//       query = query.where("brand", "==", brand);
-//     }
-
-//     // Apply ordering and limit
-//     const snapshot = await query
-//       .orderBy("createdAt", "desc")
-//       .limit(limit + 1)
-//       .get();
-
-//     let related = snapshot.docs
-//       .map(doc => mapDocToProduct(doc))
-//       .filter(product => product.id !== productId)
-//       .slice(0, limit);
-
-//     // If design theme is provided, filter in memory
-//     if (designTheme && related.length > 0) {
-//       // Use type assertion to tell TypeScript that we're handling the type correctly
-//       const filteredByTheme = related.filter(product =>
-//         product.designThemes?.some(theme => theme === designTheme || theme.toLowerCase() === designTheme.toLowerCase())
-//       );
-
-//       // If we have enough products with the theme, use those
-//       if (filteredByTheme.length >= 2) {
-//         related = filteredByTheme.slice(0, limit);
-//       }
-//     }
-
-//     // If tags are provided, filter in memory
-//     if (tags && tags.length > 0 && related.length > 0) {
-//       const filteredByTags = related.filter(product => product.tags?.some(tag => tags.includes(tag)));
-
-//       // If we have enough products with matching tags, use those
-//       if (filteredByTags.length >= 2) {
-//         related = filteredByTags.slice(0, limit);
-//       }
-//     }
-
-//     // If no products found with the filters, try a broader search
-//     if (related.length === 0) {
-//       const fallbackQuery = adminDb().collection("products").orderBy("createdAt", "desc").limit(limit).get();
-
-//       const fallbackSnapshot = await fallbackQuery;
-//       const fallbackProducts = fallbackSnapshot.docs
-//         .map(doc => mapDocToProduct(doc))
-//         .filter(product => product.id !== productId)
-//         .slice(0, limit);
-
-//       return { success: true as const, products: serializeProductArray(fallbackProducts) };
-//     }
-
-//     return { success: true as const, products: serializeProductArray(related) };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error fetching related products";
-//     return { success: false as const, error: message };
-//   }
-// }
-
-// // ===================
-// // LIKE A PRODUCT
-// // ===================
-// export async function likeProduct(userId: string, productId: string) {
-//   try {
-//     const now = Timestamp.now();
-//     const likeRef = adminDb().collection("users").doc(userId).collection("likes").doc(productId);
-
-//     await likeRef.set({
-//       productId,
-//       createdAt: now
-//     });
-
-//     return { success: true as const };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error liking product";
-//     console.error("Error liking product:", message);
-//     return { success: false as const, error: message };
-//   }
-// }
-
-// // // ===================
-// // // UNLIKE A PRODUCT
-// // // ===================
-// export async function unlikeProduct(userId: string, productId: string) {
-//   try {
-//     const likeRef = adminDb().collection("users").doc(userId).collection("likes").doc(productId);
-//     await likeRef.delete();
-//     return { success: true as const };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error unliking product";
-//     console.error("Error unliking product:", message);
-//     return { success: false as const, error: message };
-//   }
-// }
-
-// // // ===================
-// // // GET LIKED PRODUCTS
-// // // ===================
-// export async function getUserLikedProducts(userId: string) {
-//   try {
-//     const snapshot = await adminDb().collection("users").doc(userId).collection("likes").get();
-//     const likedProductIds = snapshot.docs.map(doc => doc.id);
-
-//     if (likedProductIds.length === 0) return { success: true as const, data: [] };
-
-//     const productDocs = await Promise.all(likedProductIds.map(id => adminDb().collection("products").doc(id).get()));
-
-//     const products = productDocs.filter(doc => doc.exists).map(doc => mapDocToProduct(doc));
-
-//     return { success: true as const, data: serializeProductArray(products) };
-//   } catch (error) {
-//     const message = isFirebaseError(error)
-//       ? firebaseError(error)
-//       : (error as Error)?.message || "Unknown error fetching liked products";
-//     console.error("Error fetching liked products:", message);
-//     return { success: false as const, error: message };
-//   }
-// }
 // ===============================
 // 📂 src/firebase/admin/products.ts
 // ===============================
@@ -435,8 +11,7 @@ import type { Product, ProductFilterOptions } from "@/types/product";
 import { serializeProduct, serializeProductArray } from "@/utils/serializeProduct";
 import { productSchema, productUpdateSchema } from "@/schemas/product";
 import { normalizeCategory, normalizeSubcategory } from "@/config/categories";
-import { average } from "firebase/firestore";
-//import type { FirebaseFirestore } from "firebase-admin/firestore";
+//import { average } from "firebase/firestore"; // This import seems unused and can be removed
 
 function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
   const data = doc.data() ?? {};
@@ -453,7 +28,7 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
     productType: data.productType || "",
     tags: data.tags || [],
     brand: data.brand || "",
-    manufacturer: data.manufacturer || "",
+    manufacturer: data?.manufacturer || "",
     dimensions: data?.dimensions || "",
     weight: data?.weight || "",
     shippingWeight: data?.shippingWeight || "",
@@ -491,6 +66,7 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
 // ===================
 // GET ALL PRODUCTS
 // ===================
+// NEW: Update filters type to include query
 export async function getAllProducts(filters?: {
   category?: string;
   subcategory?: string;
@@ -507,11 +83,14 @@ export async function getAllProducts(filters?: {
   productType?: string;
   designThemes?: string[];
   limit?: number;
+  query?: string; // NEW: Added query parameter here
 }) {
+  // If any filters (including query) are provided, use getFilteredProducts
   if (filters && Object.keys(filters).some(key => key !== "limit")) {
     return await getFilteredProducts(filters);
   }
 
+  // Original logic for fetching all products if no specific filters are applied
   try {
     const db = getAdminFirestore();
     let query = db.collection("products").orderBy("createdAt", "desc");
@@ -558,9 +137,10 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
     }
 
     const db = getAdminFirestore();
+    // Start with the base query. We'll apply string-based filters in-memory later if needed.
     let query = db.collection("products").orderBy("createdAt", "desc");
 
-    // String equality filters
+    // Apply direct Firestore filters (exact matches, ranges, booleans)
     if (filters.category) {
       console.log("getFilteredProducts - Adding category filter:", filters.category);
       query = query.where("category", "==", filters.category);
@@ -622,7 +202,22 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
     const snapshot = await query.get();
     let products = snapshot.docs.map(mapDocToProduct);
 
-    // In-memory filters for array fields
+    // NEW: Apply in-memory search query filter
+    if (filters.query) {
+      const lowerCaseQuery = filters.query.toLowerCase();
+      products = products.filter(
+        product =>
+          // Safely access product.name and product.description
+          (product.name?.toLowerCase() || "").includes(lowerCaseQuery) || // FIX: Safely access name
+          (product.description?.toLowerCase() || "").includes(lowerCaseQuery) || // FIX: Safely access description
+          product.tags?.some(tag => tag.toLowerCase().includes(lowerCaseQuery))
+      );
+      console.log(
+        `getFilteredProducts - Applied in-memory search for "${filters.query}", found ${products.length} results.`
+      );
+    }
+
+    // In-memory filters for array fields (these were already here, keep them after the main query filter)
     if (filters.designThemes && filters.designThemes.length > 0) {
       products = products.filter(product => product.designThemes?.some(theme => filters.designThemes?.includes(theme)));
     }
@@ -632,6 +227,9 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
       );
     }
     if (filters.tags && filters.tags.length > 0) {
+      // Note: tags already handled in main query filter above if `filters.query` exists.
+      // This part ensures that if tags are used as a *direct filter* (e.g., `tags=sport,cars`), they are still applied.
+      // If `filters.query` also matches tags, some redundancy, but correct filtering logic.
       products = products.filter(product => product.tags?.some(tag => filters.tags?.includes(tag as string)));
     }
 
@@ -639,6 +237,7 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
     if (products.length > 0) {
       console.log("getFilteredProducts - Sample product:", {
         id: products[0].id,
+        name: products[0].name, // NEW: Include name for easier debugging
         category: products[0].category,
         subcategory: products[0].subcategory
       });
@@ -653,6 +252,8 @@ export async function getFilteredProducts(filters: ProductFilterOptions) {
     return { success: false as const, error: message };
   }
 }
+
+// ... (rest of your file, e.g., addProduct, getProductById, etc. remain unchanged)
 
 // ===================
 // ADD PRODUCT

@@ -20,4 +20,5 @@ export type ProductFilterOptions = {
   isNewArrival?: boolean;
   inStock?: boolean;
   baseColor?: string; // To explicitly filter by the base color
+  query?: string; // NEW: Add a general search query string
 };
