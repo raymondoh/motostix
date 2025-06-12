@@ -40,3 +40,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local development logs
+firestore-debug.log
+firestore-debug.*.log
+
+# scratch notes
+note.md
