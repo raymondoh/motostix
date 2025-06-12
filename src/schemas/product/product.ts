@@ -28,6 +28,7 @@ export const productSchema = z.object({
   /* Images */
   image: z.string().url("Image must be a valid URL").optional(),
   additionalImages: z.array(z.string().url("Must be a valid URL")).optional(),
+  images: z.array(z.string().url("Must be a valid URL")).optional(),
 
   /* Status flags */
   isFeatured: z.boolean().default(false).optional(),

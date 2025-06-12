@@ -1320,6 +1320,7 @@ export function AddProductForm({ onSuccess }: ProductFormProps) {
           shippingClass: shippingClass || "standard",
           image: imageUrl, // Use the uploaded image URL
           additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined,
+          images: [imageUrl, ...additionalImageUrls],
           averageRating: 0,
           reviewCount: 0
         };

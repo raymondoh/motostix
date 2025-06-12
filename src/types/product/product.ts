@@ -48,6 +48,7 @@ export interface Product {
   // Media
   image: string;
   additionalImages?: string[];
+  images?: string[];
   placements?: Placement[] | string[];
 
   // Pricing and Inventory
@@ -112,6 +113,7 @@ export interface SerializedProduct {
   // Media
   image: string;
   additionalImages?: string[];
+  images?: string[];
   placements?: Placement[] | string[];
 
   // Pricing and Inventory
