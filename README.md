@@ -57,6 +57,9 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+SITE_URL=http://localhost:3000
+SITE_TWITTER=https://twitter.com/example
+OG_IMAGE_URL=http://localhost:3000/og.jpg
 
 npm run dev
 
