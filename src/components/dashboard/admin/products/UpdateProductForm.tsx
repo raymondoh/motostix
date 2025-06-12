@@ -1232,7 +1232,8 @@ export function UpdateProductForm({ product }: UpdateProductFormProps) {
           shippingWeight: shippingWeight || undefined,
           shippingClass: shippingClass || "standard",
           image: imageUrl,
-          additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined
+          additionalImages: additionalImageUrls.length > 0 ? additionalImageUrls : undefined,
+          images: [imageUrl, ...additionalImageUrls]
         };
 
         console.log("Submitting product data:", JSON.stringify(productData, null, 2));
