@@ -6,7 +6,3 @@ export const accountDeletionSchema = z.object({
 });
 
 export type AccountDeletionInput = z.infer<typeof accountDeletionSchema>;
-
-// Remove these unused ones:
-// - deletionRequestSchema
-// - DeletionRequest type

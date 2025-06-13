@@ -5,6 +5,5 @@ export * from "./fetch-all-orders-client";
 export * from "./fetch-all-products";
 export * from "./fetch-user-likes-client";
 export * from "./fetch-user-orders-client";
-//export * from "./update-password";
 export * from "./update-product-client";
 export * from "./users";

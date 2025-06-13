@@ -32,20 +32,11 @@ export function PromoSection() {
             </div>
           </div>
 
-          <div className="border border-border/40 p-6 rounded-xl max-w-sm w-full bg-background shadow-sm">
+          <div className="hidden lg:block border border-border/40 p-6 rounded-xl max-w-sm w-full bg-background shadow-sm">
             <h3 className="text-xl font-bold mb-3">Join Our Community</h3>
             <div className="w-8 h-0.5 bg-primary mb-4"></div>
             <p className="text-muted-foreground mb-4">Sign up to receive updates, exclusive offers, and more!</p>
-            {/* <div className="flex flex-col gap-3">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="px-4 py-2 rounded-md bg-background border border-border focus:border-primary focus:outline-none"
-              />
-              <Button className="bg-black text-white dark:bg-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 w-full">
-                SUBSCRIBE
-              </Button>
-            </div> */}
+
             <NewsletterForm />
           </div>
         </div>
