@@ -13,7 +13,7 @@ import {
 import { useSession } from "next-auth/react"; // For user session data
 import { toast } from "sonner";
 
-import { shippingSchema, type ShippingFormValues } from "@/schemas/ecommerce/stripe";
+import { shippingFormSchema, type ShippingFormValues } from "@/schemas/ecommerce/stripe";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ export function CheckoutForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ShippingFormValues>({
-    resolver: zodResolver(shippingSchema),
+    resolver: zodResolver(shippingFormSchema),
     defaultValues: {
       fullName: "",
       email: "",
