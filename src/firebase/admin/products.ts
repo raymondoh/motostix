@@ -41,8 +41,8 @@ function mapDocToProduct(doc: FirebaseFirestore.DocumentSnapshot): Product {
     size: data?.size || "",
     image: data?.image || "/placeholder.svg",
     additionalImages: data?.additionalImages || [],
-    images: data?.images ||
-      (data?.image ? [data.image, ...(data?.additionalImages || [])] : data?.additionalImages || []),
+    images:
+      data?.images || (data?.image ? [data.image, ...(data?.additionalImages || [])] : data?.additionalImages || []),
     placements: data?.placements || [],
     price: data?.price || 0,
     salePrice: data?.salePrice || undefined,
@@ -81,6 +81,7 @@ export async function getAllProducts(filters?: {
   tags?: string[];
   onSale?: boolean;
   isNewArrival?: boolean;
+  isCustomizable?: boolean;
   baseColor?: string;
   productType?: string;
   designThemes?: string[];

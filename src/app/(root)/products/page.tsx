@@ -150,7 +150,10 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
 
     const parseArray = (value: string | string[] | undefined): string[] | undefined => {
       if (typeof value === "string") {
-        return value.split(",").map(v => v.trim()).filter(v => v.length > 0);
+        return value
+          .split(",")
+          .map(v => v.trim())
+          .filter(v => v.length > 0);
       }
       if (Array.isArray(value)) {
         return value
