@@ -6,7 +6,11 @@ import { TestimonialSection } from "@/components/homepage-sections/TestimonialSe
 import { PromoSection } from "@/components/homepage-sections/PromoSection";
 import StickerGridSectionsStatic from "@/components/homepage-sections/StickerGridSectionStatic";
 import { ProductCarousel } from "@/components/shared/ProductCarousel";
-import { getAllProducts, getOnSaleProducts, getNewArrivals } from "@/firebase/admin/products";
+import {
+  getAllProducts,
+  getOnSaleProducts,
+  getNewArrivals
+} from "@/firebase/admin/products";
 import { getDesignThemes } from "@/firebase/admin/categories";
 
 // Force dynamic rendering to get fresh data
@@ -45,21 +49,42 @@ async function getThemedProducts(limit = 6) {
 }
 
 export default async function HomePage() {
-  console.log("🏠 Homepage - Starting data fetch at:", new Date().toISOString());
+  console.log(
+    "🏠 Homepage - Starting data fetch at:",
+    new Date().toISOString()
+  );
 
   // Fetch all the different product collections
-  const [featuredProducts, saleProducts, newArrivals, themedProducts] = await Promise.all([
-    getAllProducts({ limit: 8 }),
-    getOnSaleProducts(6),
-    getNewArrivals(6),
-    getThemedProducts(8)
-  ]);
+  const [featuredProducts, trendingProducts, saleProducts, newArrivals, themedProducts] =
+    await Promise.all([
+      getAllProducts({ isFeatured: true, limit: 8 }),
+      getAllProducts({ limit: 8 }),
+      getOnSaleProducts(6),
+      getNewArrivals(6),
+      getThemedProducts(8)
+    ]);
 
   console.log("🏠 Homepage - Data fetch completed");
-  console.log("🏠 Featured products:", featuredProducts.success ? featuredProducts.data.length : 0);
-  console.log("🏠 Sale products:", saleProducts.success ? saleProducts.data.length : 0);
-  console.log("🏠 New arrivals:", newArrivals.success ? newArrivals.data.length : 0);
-  console.log("🏠 Themed products:", themedProducts.success ? themedProducts.data.length : 0);
+  console.log(
+    "🏠 Featured products:",
+    featuredProducts.success ? featuredProducts.data.length : 0
+  );
+  console.log(
+    "🏠 Trending products:",
+    trendingProducts.success ? trendingProducts.data.length : 0
+  );
+  console.log(
+    "🏠 Sale products:",
+    saleProducts.success ? saleProducts.data.length : 0
+  );
+  console.log(
+    "🏠 New arrivals:",
+    newArrivals.success ? newArrivals.data.length : 0
+  );
+  console.log(
+    "🏠 Themed products:",
+    themedProducts.success ? themedProducts.data.length : 0
+  );
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -70,10 +95,21 @@ export default async function HomePage() {
         {/* Featured Categories */}
         <CategoriesStatic />
 
-        {/* 1. TRENDING PRODUCTS - Always show if available */}
+        {/* Featured Products */}
         {featuredProducts.success && featuredProducts.data.length > 0 && (
           <ProductCarousel
             products={featuredProducts.data}
+            title="Featured Products"
+            description="Standout picks hand-chosen by our team"
+            viewAllUrl="/products?isFeatured=true"
+            centered={false}
+          />
+        )}
+
+        {/* 1. TRENDING PRODUCTS - Always show if available */}
+        {trendingProducts.success && trendingProducts.data.length > 0 && (
+          <ProductCarousel
+            products={trendingProducts.data}
             title="Trending Stickers"
             description="Discover the most popular designs loved by our community"
             viewAllUrl="/products?sort=trending"

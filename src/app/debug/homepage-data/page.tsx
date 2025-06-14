@@ -1,7 +1,11 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { getAllProducts, getOnSaleProducts, getNewArrivals } from "@/firebase/admin/products";
+import {
+  getAllProducts,
+  getOnSaleProducts,
+  getNewArrivals
+} from "@/firebase/admin/products";
 import { getDesignThemes } from "@/firebase/admin/categories";
 
 // Helper function to get themed products
@@ -29,12 +33,14 @@ export default async function HomepageDataDebugPage() {
   const fetchTime = new Date().toISOString();
 
   // Fetch the same data as the homepage
-  const [featuredProducts, saleProducts, newArrivals, themedProducts] = await Promise.all([
-    getAllProducts({ limit: 8 }),
-    getOnSaleProducts(6),
-    getNewArrivals(6),
-    getThemedProducts(6)
-  ]);
+  const [featuredProducts, trendingProducts, saleProducts, newArrivals, themedProducts] =
+    await Promise.all([
+      getAllProducts({ isFeatured: true, limit: 8 }),
+      getAllProducts({ limit: 8 }),
+      getOnSaleProducts(6),
+      getNewArrivals(6),
+      getThemedProducts(6)
+    ]);
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -59,6 +65,19 @@ export default async function HomepageDataDebugPage() {
             </p>
             <p>
               <strong>Count:</strong> {featuredProducts.success ? featuredProducts.data.length : 0}
+            </p>
+          </div>
+        </div>
+
+        {/* Trending Products */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Trending Products</h2>
+          <div className="space-y-2">
+            <p>
+              <strong>Success:</strong> {trendingProducts.success ? "✅ Yes" : "❌ No"}
+            </p>
+            <p>
+              <strong>Count:</strong> {trendingProducts.success ? trendingProducts.data.length : 0}
             </p>
           </div>
         </div>
