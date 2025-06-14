@@ -141,13 +141,43 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
     // NEW: Extract the 'q' (search query) parameter
     const searchQuery = typeof resolvedSearchParams?.q === "string" ? resolvedSearchParams.q : undefined;
 
+    // Extract additional filter parameters
+    const parseBoolean = (value: string | string[] | undefined): boolean | undefined => {
+      if (typeof value === "string") return value === "true";
+      if (Array.isArray(value)) return value[0] === "true";
+      return undefined;
+    };
+
+    const parseArray = (value: string | string[] | undefined): string[] | undefined => {
+      if (typeof value === "string") {
+        return value.split(",").map(v => v.trim()).filter(v => v.length > 0);
+      }
+      if (Array.isArray(value)) {
+        return value
+          .flatMap(v => v.split(","))
+          .map(v => v.trim())
+          .filter(v => v.length > 0);
+      }
+      return undefined;
+    };
+
+    const designThemes = parseArray(resolvedSearchParams?.designThemes);
+    const onSale = parseBoolean(resolvedSearchParams?.onSale);
+    const isCustomizable = parseBoolean(resolvedSearchParams?.isCustomizable);
+
     console.log(
       "ProductsPage - Render. currentCategory from URL:",
       currentCategory,
       "currentSubcategory from URL:",
       currentSubcategory,
-      "searchQuery from URL:", // NEW: Log the search query
-      searchQuery
+      "searchQuery from URL:",
+      searchQuery,
+      "designThemes from URL:",
+      designThemes,
+      "onSale from URL:",
+      onSale,
+      "isCustomizable from URL:",
+      isCustomizable
     );
 
     // Fetch initial products
@@ -155,7 +185,10 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
     const productsResult = await getAllProducts({
       category: currentCategory,
       subcategory: currentSubcategory,
-      query: searchQuery // Pass the search query
+      query: searchQuery,
+      designThemes,
+      onSale,
+      isCustomizable
     });
 
     const initialProducts = productsResult.success ? productsResult.data || [] : [];
