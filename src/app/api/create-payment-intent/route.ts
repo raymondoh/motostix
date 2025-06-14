@@ -11,7 +11,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amount, currency, shipping, receipt_email } = paymentIntentBodySchema.parse(body);
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntentParams: Stripe.PaymentIntentCreateParams & {
+      automatic_tax?: { enabled: boolean };
+    } = {
       amount: Math.round(amount),
       currency: currency || DEFAULT_CURRENCY.toLowerCase(),
       automatic_payment_methods: { enabled: true },
@@ -37,7 +39,11 @@ export async function POST(req: Request) {
         city: shipping.address.city,
         country: shipping.address.country
       }
-    });
+    };
+
+    const paymentIntent = await stripe.paymentIntents.create(
+      paymentIntentParams as Stripe.PaymentIntentCreateParams
+    );
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
   } catch (error: any) {
