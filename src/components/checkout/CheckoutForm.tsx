@@ -1,8 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import {
+  useStripe,
+  useElements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement
+} from "@stripe/react-stripe-js";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 import { shippingSchema, type ShippingFormValues } from "@/schemas/ecommerce/stripe";
@@ -17,6 +24,7 @@ import { formatPrice } from "@/lib/utils";
 export function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
+  const { data: session } = useSession();
   const { items, subtotal, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,6 +41,21 @@ export function CheckoutForm() {
       country: ""
     }
   });
+
+  useEffect(() => {
+    if (session?.user) {
+      if (session.user.displayName || session.user.name) {
+        form.setValue("fullName", session.user.displayName || session.user.name || "");
+      }
+      if (session.user.email) {
+        form.setValue("email", session.user.email);
+      }
+      const phone = (session.user as any).phone;
+      if (phone) {
+        form.setValue("phone", phone);
+      }
+    }
+  }, [session, form]);
 
   const tax = subtotal * TAX_RATE;
   const shippingCost = subtotal > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
@@ -51,7 +74,7 @@ export function CheckoutForm() {
       if (!res.ok) throw new Error(data.error || "Failed to create payment.");
       const { error } = await stripe.confirmCardPayment(data.clientSecret, {
         payment_method: {
-          card: elements.getElement(CardElement)!,
+          card: elements.getElement(CardNumberElement)!,
           billing_details: {
             name: values.fullName,
             email: values.email,
@@ -204,8 +227,12 @@ export function CheckoutForm() {
                 )}
               />
             </div>
-            <div className="mt-4">
-              <CardElement options={{ style: { base: { fontSize: '16px' } } }} />
+            <div className="mt-4 space-y-4">
+              <CardNumberElement options={{ style: { base: { fontSize: '16px' } } }} />
+              <div className="grid grid-cols-2 gap-4">
+                <CardExpiryElement options={{ style: { base: { fontSize: '16px' } } }} />
+                <CardCvcElement options={{ style: { base: { fontSize: '16px' } } }} />
+              </div>
             </div>
             <Button type="submit" disabled={isSubmitting || !stripe} className="w-full">
               {isSubmitting ? "Processing..." : `Pay ${formatPrice(total, DEFAULT_CURRENCY)}`}
