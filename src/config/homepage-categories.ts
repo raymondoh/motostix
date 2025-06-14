@@ -50,13 +50,13 @@ export const stickerGridSections = {
   customSection: {
     id: "custom",
     name: "Custom Designs",
-    url: "/products?custom=true",
+    url: "/products?isCustomizable=true",
     image: "/bike.jpg"
   },
   vintageSection: {
     id: "vintage",
     name: "Vintage Collection",
-    url: "/products?style=vintage",
+    url: "/products?designThemes=Vintage",
     image: "/car.jpg"
   }
 };
