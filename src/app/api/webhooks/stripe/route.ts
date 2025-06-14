@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers"; // Import headers to get Stripe-Signature
+import { createOrder } from "@/firebase/admin/orders";
+import type { OrderData } from "@/types/order";
 // REMOVE CartItem import, it's not relevant for webhooks
 // import type { CartItem } from "@/contexts/CartContext";
 // REMOVE checkout config imports, not directly used in webhook logic
@@ -37,13 +39,41 @@ export async function POST(req: Request) {
     case "payment_intent.succeeded":
       const paymentIntentSucceeded = event.data.object as Stripe.PaymentIntent;
       console.log(`💰 PaymentIntent succeeded: ${paymentIntentSucceeded.id}`);
-      // TODO: Here you would typically:
-      //  - Update your order status in your database (e.g., from 'pending' to 'paid')
-      //  - Send order confirmation emails to the customer
-      //  - Update inventory levels
-      //  - Create an order record if not already created
-      // You can access metadata: paymentIntentSucceeded.metadata.userId, etc.
-      // You can access shipping info: paymentIntentSucceeded.shipping
+      try {
+        const shipping = paymentIntentSucceeded.shipping;
+        if (!shipping) {
+          console.error("🚫 Missing shipping information on PaymentIntent");
+          break;
+        }
+
+        const orderData: OrderData = {
+          paymentIntentId: paymentIntentSucceeded.id,
+          amount: (paymentIntentSucceeded.amount_received ?? paymentIntentSucceeded.amount) / 100,
+          currency: paymentIntentSucceeded.currency ?? "gbp",
+          userId: paymentIntentSucceeded.metadata?.userId ?? null,
+          customerEmail: paymentIntentSucceeded.receipt_email ?? paymentIntentSucceeded.metadata?.email ?? "",
+          customerName: shipping.name ?? "",
+          shippingAddress: {
+            name: shipping.name ?? "",
+            address: shipping.address?.line1 ?? "",
+            city: shipping.address?.city ?? "",
+            state: shipping.address?.state ?? "",
+            zipCode: shipping.address?.postal_code ?? "",
+            country: shipping.address?.country ?? ""
+          },
+          items: paymentIntentSucceeded.metadata?.items ? JSON.parse(paymentIntentSucceeded.metadata.items) : [],
+          status: "processing"
+        };
+
+        const result = await createOrder(orderData);
+        if (!result.success) {
+          console.error("❌ Failed to create order:", result.error);
+        } else {
+          console.log(`✅ Order ${result.orderId} created from webhook.`);
+        }
+      } catch (hookErr) {
+        console.error("❌ Webhook order handling error:", hookErr);
+      }
       break;
 
     case "payment_intent.payment_failed":

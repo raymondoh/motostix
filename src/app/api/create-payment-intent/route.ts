@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       amount: Math.round(amount),
       currency: currency || DEFAULT_CURRENCY.toLowerCase(),
       automatic_payment_methods: { enabled: true },
-      //automatic_tax: { enabled: true },
+      automatic_tax: { enabled: true },
 
       shipping: {
         name: shipping.name,
