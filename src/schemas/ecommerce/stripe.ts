@@ -35,7 +35,16 @@ export const stripeShippingSchema = z.object({
 // 4. Define schema for the *entire request body* sent to /api/create-payment-intent
 //    This replaces the old 'paymentIntentSchema' which was too simplified.
 export const paymentIntentBodySchema = z.object({
-  amount: z.number().int().positive("Amount must be a positive integer (in cents)"), // Amount in cents
+  // The 'amount' is now removed from the client-side request for security.
+  // It should be calculated on the backend based on the items in the cart.
+  items: z
+    .array(
+      z.object({
+        id: z.string(),
+        quantity: z.number().int().positive()
+      })
+    )
+    .min(1, "The cart cannot be empty."),
   currency: z.string().length(3, "Currency must be a 3-character ISO code").optional(), // e.g., 'usd', 'gbp'
   shipping: stripeShippingSchema, // Uses the Stripe-specific shipping schema
   receipt_email: z.string().email("Invalid receipt email address").optional(), // Optional for receipt email

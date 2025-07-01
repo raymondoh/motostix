@@ -53,29 +53,27 @@ export async function createOrder(orderData: OrderData) {
   // Optional: confirm Admin SDK is in use
   console.log("📦 Is Admin SDK:", typeof db?.collection === "function");
   try {
-    const validatedData = orderSchema.parse(orderData);
+    const validatedData = orderSchema.parse(orderData); // Zod validation
     console.log("🧾 createOrderInDb validated data:", validatedData);
 
-    // FIX: The auth() check has been removed from this function.
-    // We trust the userId passed in from the webhook data.
-    if (!validatedData.userId) {
-      return { success: false, error: "No user ID provided in order data." };
+    const finalAmount = validatedData.amount;
+    console.log("🧾 createOrderInDb final amount:", finalAmount); // Log final amount
+    const existingOrder = await db
+      .collection("orders")
+      .where("paymentIntentId", "==", validatedData.paymentIntentId)
+      .limit(1)
+      .get();
+
+    if (!existingOrder.empty) {
+      console.log("Duplicate webhook received, order already exists:", existingOrder.docs[0].id);
+      return { success: true, orderId: existingOrder.docs[0].id }; // Acknowledge success
     }
 
-    // We already have the final amount from Stripe, no need to recalculate here.
-    const finalAmount = validatedData.amount;
-    console.log("🧾 createOrderInDb validated data:", validatedData);
-
-    const db = getAdminFirestore();
     const orderRef = await db.collection("orders").add({
       ...validatedData,
-
-      // Use the userId from the validated data, not from a session object
-      userId: validatedData.userId,
+      userId: validatedData.userId, // Can be null
       status: validatedData.status || "processing",
       amount: finalAmount,
-      // You can add tax/shipping here if you calculate it separately
-      // For now, we rely on the total amount from Stripe
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -86,9 +84,10 @@ export async function createOrder(orderData: OrderData) {
       orderId: orderRef.id
     };
   } catch (error) {
-    console.error("Error creating order:", error);
-    // ... (rest of your error handling)
-    const message = error instanceof Error ? error.message : "Unknown error while creating order";
+    // --- FIX: Log the full error object for detailed debugging ---
+    console.error("Error creating order in Firestore:", error);
+    // --- END FIX ---
+    const message = error instanceof Error ? error.message : "Unknown error while creating order in Firestore.";
     return { success: false, error: message };
   }
 }
@@ -110,7 +109,37 @@ export async function getUserOrders(userId: string) {
   }
 }
 
-// ================= Get All Orders Function (Admin Only) =================
+/**
+ * Fetches a single order by its Stripe Payment Intent ID
+ */
+export async function getOrderByPaymentIntentId(paymentIntentId: string) {
+  try {
+    const db = getAdminFirestore();
+    const snapshot = await db.collection("orders").where("paymentIntentId", "==", paymentIntentId).limit(1).get();
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    return mapDocToOrder(snapshot.docs[0]);
+  } catch (error) {
+    console.error("Error fetching order by Payment Intent ID:", error);
+    logger({
+      type: "error",
+      message: "Failed to fetch order by Payment Intent ID",
+      metadata: { error, paymentIntentId },
+      context: "orders"
+    });
+
+    const message = isFirebaseError(error)
+      ? firebaseError(error)
+      : error instanceof Error
+        ? error.message
+        : "Unknown error while fetching order by Payment Intent ID";
+
+    throw new Error(message);
+  }
+}
 
 /**
  * Fetches all orders (Admin use)

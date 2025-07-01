@@ -71,9 +71,9 @@ export function CheckoutForm() {
     }
   }, [session, form]);
 
-  const tax = subtotal * TAX_RATE;
+  const tax = subtotal * TAX_RATE; // Example tax calculation
   const shippingCost = subtotal > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
-  const total = subtotal + tax + shippingCost;
+  const total = subtotal + tax + shippingCost; // This is an estimate for display
 
   async function onSubmit(values: ShippingFormValues) {
     // Ensure Stripe and Elements are loaded before proceeding
@@ -88,16 +88,13 @@ export function CheckoutForm() {
       const isoCountry = countryNameToIso[values.country] || values.country; // Fallback
 
       // 1. Create Payment Intent on your backend
-      // IMPORTANT: Call your dedicated Payment Intent creation endpoint here
       const res = await fetch("/api/create-payment-intent", {
-        // CORRECT ENDPOINT
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: Math.round(total * 100), // Amount in cents
-          currency: DEFAULT_CURRENCY.toLowerCase(), // Ensure currency is passed to backend
+          items: items.map(item => ({ id: item.product.id, quantity: item.quantity })),
+          currency: DEFAULT_CURRENCY.toLowerCase(),
           shipping: {
-            // Pass shipping details to backend for Payment Intent creation
             name: values.fullName,
             phone: values.phone,
             address: {
@@ -135,8 +132,6 @@ export function CheckoutForm() {
             }
           }
         }
-        // IMPORTANT: DO NOT PASS 'shipping' HERE. It's set when Payment Intent is created on backend.
-        // DO NOT ADD 'redirect: 'if_required'' here either.
       });
 
       if (stripeConfirmError) {
@@ -145,14 +140,10 @@ export function CheckoutForm() {
 
       // If payment is successful (status: 'succeeded' or 'requires_action' which Stripe handles)
       if (paymentIntent?.status === "succeeded") {
-        clearCart(); // Clear the cart on successful payment
+        // --- FIX: Removed clearCart() from here. It will be cleared on the success page. ---
         window.location.href = `/checkout/success?payment_intent_id=${paymentIntent.id}`; // Redirect to success page with PI ID
       } else if (paymentIntent?.status === "requires_action") {
-        // Stripe.js typically handles 3D Secure redirects/modals automatically with confirmCardPayment.
-        // If it completes the action successfully, paymentIntent.status will eventually become 'succeeded'.
-        // For simplicity, we'll redirect to success if an action is required and Stripe.js handles it.
-        // You might want to show a loading state until the action is complete.
-        clearCart(); // Clear the cart when action is required and payment intent is valid
+        // --- FIX: Removed clearCart() from here. It will be cleared on the success page. ---
         window.location.href = `/checkout/success?payment_intent_id=${paymentIntent.id}`;
       } else {
         // Handle other statuses if necessary (e.g., 'requires_payment_method', 'canceled')

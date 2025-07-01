@@ -1,4 +1,4 @@
-//src/components/dashboard/user/orders/UserOrdersCard.tsx
+// src/components/dashboard/user/orders/UserOrdersCard.tsx
 "use client";
 import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,16 +7,27 @@ import { formatDate } from "@/utils/date";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils";
 import type { Order } from "@/types/order";
-import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout";
+import { TAX_RATE, SHIPPING_CONFIG } from "@/config/checkout"; // Ensure these are imported
 
 interface UserOrderCardProps {
   order: Order;
 }
 
 export function UserOrderCard({ order }: UserOrderCardProps) {
-  const tax = order.amount * TAX_RATE;
-  const shipping = order.amount > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
-  const total = order.amount + tax + shipping;
+  // 1. Calculate subtotal from the items in the order
+  const calculatedSubtotal = order.items.reduce((sum, item) => {
+    // Use the price stored with the item in the order, which should be accurate
+    return sum + item.price * item.quantity;
+  }, 0);
+
+  // 2. Calculate tax based on the derived subtotal
+  const calculatedTax = parseFloat((calculatedSubtotal * TAX_RATE).toFixed(2));
+
+  // 3. Calculate shipping based on the derived subtotal
+  const calculatedShipping = calculatedSubtotal > SHIPPING_CONFIG.freeShippingThreshold ? 0 : SHIPPING_CONFIG.flatRate;
+
+  // The 'order.amount' is the actual total paid to Stripe and saved in Firebase
+  const totalPaid = order.amount;
 
   return (
     <Card className="flex flex-col justify-between">
@@ -30,9 +41,28 @@ export function UserOrderCard({ order }: UserOrderCardProps) {
           <span>{order.createdAt ? formatDate(order.createdAt) : "-"}</span>
         </div>
 
-        <div className="flex justify-between text-sm">
+        {/* Display the breakdown of subtotal, tax, and shipping */}
+        <div className="space-y-1">
+          <div className="flex justify-between text-sm">
+            <span>Subtotal:</span>
+            <span>{formatPrice(calculatedSubtotal, "gbp")}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Tax ({TAX_RATE * 100}%):</span>
+            <span>{formatPrice(calculatedTax, "gbp")}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Shipping:</span>
+            <span>{formatPrice(calculatedShipping, "gbp")}</span>
+          </div>
+        </div>
+
+        <Separator className="my-2" />
+
+        {/* Display the true total paid from the order object */}
+        <div className="flex justify-between text-base font-semibold">
           <span>Total Paid:</span>
-          <span> {formatPrice(total, "gbp")}</span>
+          <span>{formatPrice(totalPaid, "gbp")}</span>
         </div>
 
         <div>
