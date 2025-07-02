@@ -90,7 +90,8 @@ export const authOptions: NextAuthConfig = {
         }
 
         try {
-          const { getAdminAuth } = await import("@/firebase/admin/firebase-admin-init");
+          // After
+          const { getAdminAuth } = await import("@/lib/firebase/admin/initialize");
 
           const decodedToken = await getAdminAuth().verifyIdToken(credentials.idToken);
           const uid = decodedToken.uid;
@@ -138,7 +139,6 @@ export const authOptions: NextAuthConfig = {
       console.log("  Account object:", account);
 
       // Highlight: Dynamic import adminAuth/adminDb here as well for usage in jwt callback
-      //const { adminAuth, adminDb } = await import("@/firebase/admin/firebase-admin-init");
       const { getAdminFirestore } = await import("@/lib/firebase/admin/initialize"); // Dynamically import getAdminFirestore
 
       // Highlight: Move Firestore data fetching OUTSIDE the 'if (user && account)' block.

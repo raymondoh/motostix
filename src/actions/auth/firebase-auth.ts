@@ -3,7 +3,6 @@
 import { getAdminAuth } from "@/lib/firebase/admin/initialize";
 // Keep the old import for now - it will use our compatibility layer
 // Later we can update this to import directly from initialize
-//import { adminAuth } from "@/firebase/admin/firebase-admin-init";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logActivity } from "@/firebase/actions";
 

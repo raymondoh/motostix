@@ -29,5 +29,3 @@ export async function createNewOrder(orderData: OrderData) {
   }
 }
 
-export { createNewOrder as createOrder };
-export const createOrderAction = createNewOrder;

@@ -1,6 +1,5 @@
 // src/lib/auth/syncUserWithFirebase.ts
-//import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
-import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { serverTimestamp } from "@/firebase/admin/firestore";
 import { logActivity } from "@/firebase/log/logActivity";
 

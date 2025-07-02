@@ -11,39 +11,6 @@ const passwordResetSchema = z.object({
 });
 
 // Request password reset
-export async function requestPasswordReset(formData: FormData) {
-  try {
-    const email = formData.get("email") as string;
-    const validatedFields = passwordResetSchema.safeParse({ email });
-
-    if (!validatedFields.success) {
-      return { success: false, error: "Please enter a valid email address" };
-    }
-
-    const auth = getAdminAuth();
-    const resetLink = await auth.generatePasswordResetLink(email);
-
-    // In a real app, you would send this link via email
-    console.log("Password reset link:", resetLink);
-
-    await logActivity({
-      userId: email, // We don't have the user ID yet
-      type: "password-reset-request",
-      description: "Password reset requested",
-      status: "success"
-    });
-
-    return { success: true };
-  } catch (error) {
-    const message = isFirebaseError(error)
-      ? firebaseError(error)
-      : error instanceof Error
-      ? error.message
-      : "Unknown error requesting password reset";
-    console.error("Error requesting password reset:", message);
-    return { success: false, error: message };
-  }
-}
 
 // Schema for password update
 const updatePasswordSchema = z
@@ -110,39 +77,3 @@ export async function updatePassword(prevState: any, formData: FormData) {
 }
 
 // Legacy function for backward compatibility
-export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
-  try {
-    const validatedFields = updatePasswordSchema.safeParse({
-      currentPassword,
-      newPassword,
-      confirmPassword: newPassword
-    });
-
-    if (!validatedFields.success) {
-      return { success: false, error: "Please check your password requirements" };
-    }
-
-    const auth = getAdminAuth();
-
-    await auth.updateUser(userId, {
-      password: newPassword
-    });
-
-    await logActivity({
-      userId,
-      type: "password-change",
-      description: "Password changed successfully",
-      status: "success"
-    });
-
-    return { success: true };
-  } catch (error) {
-    const message = isFirebaseError(error)
-      ? firebaseError(error)
-      : error instanceof Error
-      ? error.message
-      : "Unknown error changing password";
-    console.error("Error changing password:", message);
-    return { success: false, error: message };
-  }
-}

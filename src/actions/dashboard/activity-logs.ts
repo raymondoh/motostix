@@ -160,4 +160,3 @@ export async function fetchUserActivityLogs(userId?: string, limit = 100): Promi
 }
 
 // Alias for backward compatibility
-export const fetchActivityLogs = fetchAllActivityLogs;

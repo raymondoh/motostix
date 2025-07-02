@@ -1,4 +1,3 @@
-export { AuthModal } from "./AuthModal";
 export { ForgotPasswordForm } from "./ForgotPasswordForm";
 export { GoogleAuthButton } from "./GoogleAuthButton";
 export { LoginForm } from "./LoginForm";

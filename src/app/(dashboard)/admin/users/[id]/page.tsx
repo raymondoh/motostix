@@ -1,8 +1,7 @@
 import { DashboardShell, DashboardHeader } from "@/components";
 import { Separator } from "@/components/ui/separator";
 import { redirect } from "next/navigation";
-//import { adminDb } from "@/firebase/admin/firebase-admin-init";
-import { getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
+import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { AdminUserTabs } from "@/components/dashboard/admin/users/AdminUserTabs";
 import { serializeUser } from "@/utils/serializeUser";
 

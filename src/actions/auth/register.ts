@@ -1,7 +1,6 @@
 "use server";
 
-//import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
-import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { serverTimestamp } from "@/utils/date-server";
 import { logActivity } from "@/firebase/actions";
 import { registerSchema } from "@/schemas";

@@ -1,6 +1,5 @@
 // src/firebase/log/logActivity.ts
-//import { adminDb } from "@/firebase/admin/firebase-admin-init";
-import { getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
+import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { serverTimestamp } from "@/firebase/admin/firestore";
 import type { ActivityLogInput } from "@/types/dashboard/activity";
 

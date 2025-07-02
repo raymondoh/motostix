@@ -2,8 +2,7 @@
 
 // ================= Imports =================
 import bcryptjs from "bcryptjs";
-//import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
-import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { loginSchema } from "@/schemas/auth";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
 import { logServerEvent, logger } from "@/utils/logger";
