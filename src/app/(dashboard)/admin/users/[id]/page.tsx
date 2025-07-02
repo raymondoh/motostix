@@ -1,7 +1,8 @@
 import { DashboardShell, DashboardHeader } from "@/components";
 import { Separator } from "@/components/ui/separator";
 import { redirect } from "next/navigation";
-import { adminDb } from "@/firebase/admin/firebase-admin-init";
+//import { adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
 import { AdminUserTabs } from "@/components/dashboard/admin/users/AdminUserTabs";
 import { serializeUser } from "@/utils/serializeUser";
 
@@ -23,7 +24,7 @@ export default async function AdminUserTabsPage({ params }: { params: Promise<{ 
     const currentUserId = session.user.id;
     let isAdmin = false;
     try {
-      const currentUserDoc = await adminDb().collection("users").doc(currentUserId).get();
+      const currentUserDoc = await getAdminFirestore().collection("users").doc(currentUserId).get();
       if (currentUserDoc.exists && currentUserDoc.data()?.role === "admin") {
         isAdmin = true;
       }
@@ -36,7 +37,7 @@ export default async function AdminUserTabsPage({ params }: { params: Promise<{ 
     }
 
     // 3) Fetch the target user
-    const userDoc = await adminDb().collection("users").doc(userId).get();
+    const userDoc = await getAdminFirestore().collection("users").doc(userId).get();
     if (!userDoc.exists) {
       redirect("/admin/users");
     }

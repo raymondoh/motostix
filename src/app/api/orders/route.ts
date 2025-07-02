@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchUserOrders } from "@/actions/orders/fetch-user-orders";
+import { fetchUserOrders } from "@/actions/orders";
 import { auth } from "@/auth";
 import { logger } from "@/utils/logger";
 

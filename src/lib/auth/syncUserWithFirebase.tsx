@@ -1,5 +1,6 @@
 // src/lib/auth/syncUserWithFirebase.ts
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+//import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
 import { serverTimestamp } from "@/firebase/admin/firestore";
 import { logActivity } from "@/firebase/log/logActivity";
 
@@ -24,13 +25,13 @@ export async function syncUserWithFirebase(
     let firebaseUser = null;
 
     try {
-      firebaseUser = await adminAuth().getUser(firebaseUid);
+      firebaseUser = await getAdminAuth().getUser(firebaseUid);
       console.log(`Found existing Firebase Auth user: ${firebaseUid}`);
     } catch {
       console.log(`User ${firebaseUid} not found in Firebase Auth, attempting to create...`);
 
       try {
-        const userByEmail = await adminAuth().getUserByEmail(userData.email);
+        const userByEmail = await getAdminAuth().getUserByEmail(userData.email);
         if (userByEmail) {
           firebaseUid = userByEmail.uid;
           firebaseUser = userByEmail;
@@ -43,7 +44,7 @@ export async function syncUserWithFirebase(
       if (!firebaseUser) {
         console.log(`Creating new Firebase Auth user for ${userData.email}`);
 
-        const userRecord = await adminAuth().createUser({
+        const userRecord = await getAdminAuth().createUser({
           uid: firebaseUid,
           email: userData.email,
           displayName: userData.name ?? userData.email.split("@")[0],
@@ -55,7 +56,7 @@ export async function syncUserWithFirebase(
         console.log(`Created basic user in Firebase Auth: ${firebaseUid}`);
 
         if (userData.provider === "google") {
-          await adminDb()
+          await getAdminFirestore()
             .collection("accounts")
             .add({
               userId: firebaseUid,
@@ -75,11 +76,11 @@ export async function syncUserWithFirebase(
       }
     }
 
-    const userDocRef = adminDb().collection("users").doc(firebaseUid);
+    const userDocRef = getAdminFirestore().collection("users").doc(firebaseUid);
     const userDoc = await userDocRef.get();
 
     if (!userDoc.exists) {
-      const usersSnapshot = await adminDb().collection("users").count().get();
+      const usersSnapshot = await getAdminFirestore().collection("users").count().get();
       const isFirstUser = usersSnapshot.data().count === 0;
       const role = isFirstUser ? "admin" : "user";
 
@@ -97,7 +98,7 @@ export async function syncUserWithFirebase(
         lastLoginAt: serverTimestamp()
       });
 
-      await adminAuth().setCustomUserClaims(firebaseUid, { role });
+      await getAdminAuth().setCustomUserClaims(firebaseUid, { role });
 
       await logActivity({
         userId: firebaseUid,

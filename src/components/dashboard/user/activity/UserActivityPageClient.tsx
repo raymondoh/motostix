@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { UserActivityLogTable } from "./UserActivityLogTable";
-import { clientFetchActivityLogs } from "@/actions/client/fetch-activity";
+import { clientFetchActivityLogs } from "@/actions/client";
 import type { SerializedActivity } from "@/types/firebase/activity";
 
 interface UserActivityPageClientProps {

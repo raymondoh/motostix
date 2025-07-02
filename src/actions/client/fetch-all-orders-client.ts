@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchAllOrders } from "@/actions/orders/fetch-all-orders";
+import { fetchAllOrders } from "@/actions/orders";
 import type { Order } from "@/types/order";
 
 /**

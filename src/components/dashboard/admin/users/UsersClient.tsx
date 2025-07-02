@@ -7,7 +7,7 @@ import { toast } from "sonner"; // Assuming you use sonner for toasts
 
 import type { SerializedUser } from "@/types/user/common";
 import { getUserColumns } from "./users-columns";
-import { fetchAllUsersClient } from "@/actions/client/users";
+import { fetchAllUsersClient } from "@/actions/client";
 import { UsersDataTable } from "./UsersDataTable";
 
 interface UsersClientProps {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Product, ProductFilterOptions, GetAllProductsResult, GetAllProductsSuccess } from "@/types/product";
-import { fetchAllProductsClient } from "@/actions/client/fetch-all-products";
+import { fetchAllProductsClient } from "@/actions/client";
 
 // NEW: Add searchQuery to the hook's parameters
 export function useProductFilters(

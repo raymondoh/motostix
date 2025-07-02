@@ -3,7 +3,7 @@
 import { getAdminAuth } from "@/lib/firebase/admin/initialize";
 // Keep the old import for now - it will use our compatibility layer
 // Later we can update this to import directly from initialize
-import { adminAuth } from "@/firebase/admin/firebase-admin-init";
+//import { adminAuth } from "@/firebase/admin/firebase-admin-init";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import { logActivity } from "@/firebase/actions";
 
@@ -18,8 +18,8 @@ export async function verifyIdToken(token: string) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
-      ? error.message
-      : "Unknown error verifying token";
+        ? error.message
+        : "Unknown error verifying token";
     return { success: false, error: message };
   }
 }
@@ -28,14 +28,14 @@ export async function verifyIdToken(token: string) {
 export async function getUserByEmail(email: string) {
   try {
     // This still works because of our compatibility layer in auth.ts
-    const userRecord = await adminAuth().getUserByEmail(email);
+    const userRecord = await getAdminAuth().getUserByEmail(email);
     return { success: true, data: userRecord };
   } catch (error) {
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
-      ? error.message
-      : "Unknown error getting user by email";
+        ? error.message
+        : "Unknown error getting user by email";
     return { success: false, error: message };
   }
 }
@@ -84,8 +84,8 @@ export async function loginWithFirebaseCredentials(email: string, password: stri
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
-      ? error.message
-      : "Unknown error during login";
+        ? error.message
+        : "Unknown error during login";
 
     await logActivity({
       userId: "system",

@@ -90,15 +90,15 @@ export const authOptions: NextAuthConfig = {
         }
 
         try {
-          const { adminAuth } = await import("@/firebase/admin/firebase-admin-init");
+          const { getAdminAuth } = await import("@/firebase/admin/firebase-admin-init");
 
-          const decodedToken = await adminAuth().verifyIdToken(credentials.idToken);
+          const decodedToken = await getAdminAuth().verifyIdToken(credentials.idToken);
           const uid = decodedToken.uid;
           const email = decodedToken.email;
 
           if (!email) throw new Error("No email in token");
 
-          const userRecord = await adminAuth().getUser(uid);
+          const userRecord = await getAdminAuth().getUser(uid);
           const provider = decodedToken.firebase?.sign_in_provider || "unknown";
 
           const { role } = await syncUserWithFirebase(uid, {
@@ -139,14 +139,14 @@ export const authOptions: NextAuthConfig = {
 
       // Highlight: Dynamic import adminAuth/adminDb here as well for usage in jwt callback
       //const { adminAuth, adminDb } = await import("@/firebase/admin/firebase-admin-init");
-      const { adminDb } = await import("@/firebase/admin/firebase-admin-init");
+      const { getAdminFirestore } = await import("@/lib/firebase/admin/initialize"); // Dynamically import getAdminFirestore
 
       // Highlight: Move Firestore data fetching OUTSIDE the 'if (user && account)' block.
       // This ensures it runs on every JWT callback, including session refreshes.
       if (token.uid) {
         // Only fetch if we have a UID in the token
         try {
-          const userDoc = await adminDb()
+          const userDoc = await getAdminFirestore()
             .collection("users")
             .doc(token.uid as string)
             .get();

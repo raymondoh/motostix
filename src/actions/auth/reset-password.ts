@@ -1,7 +1,8 @@
 //src/actions/auth/reset-password.ts
 "use server";
 
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+//import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
 import { serverTimestamp } from "@/utils/date-server";
 import { logActivity } from "@/firebase/actions";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
@@ -30,7 +31,7 @@ export async function logPasswordResetActivity({
   }
 
   try {
-    const userRecord = await adminAuth().getUserByEmail(email);
+    const userRecord = await getAdminAuth().getUserByEmail(email);
 
     if (userRecord) {
       await logActivity({
@@ -76,7 +77,7 @@ export async function getUserIdByEmail({ email }: Auth.GetUserIdByEmailInput): P
   }
 
   try {
-    const userRecord = await adminAuth().getUserByEmail(email);
+    const userRecord = await getAdminAuth().getUserByEmail(email);
 
     logger({ type: "info", message: `Found UID for ${email}`, metadata: { uid: userRecord.uid }, context: "auth" });
 
@@ -121,7 +122,7 @@ export async function updatePasswordHash({
   try {
     const passwordHash = await hashPassword(newPassword);
 
-    await adminDb().collection("users").doc(userId).update({
+    await getAdminFirestore().collection("users").doc(userId).update({
       passwordHash,
       updatedAt: serverTimestamp()
     });
@@ -154,8 +155,8 @@ export async function updatePasswordHash({
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
-      ? error.message
-      : "Unknown error";
+        ? error.message
+        : "Unknown error";
 
     return { success: false, error: message };
   }

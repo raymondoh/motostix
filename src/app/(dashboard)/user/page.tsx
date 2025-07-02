@@ -3,7 +3,7 @@ import { getAdminFirestore } from "@/lib/firebase/admin/initialize";
 import { parseServerDate } from "@/utils/date-server";
 import type { User, SerializedUser } from "@/types/user";
 import { serializeUser } from "@/utils/serializeUser";
-import { fetchUserActivityLogs } from "@/actions/dashboard/activity-logs";
+import { fetchUserActivityLogs } from "@/actions/dashboard";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { UserAccountPreview } from "@/components/dashboard/user/overview/UserAccountPreview";

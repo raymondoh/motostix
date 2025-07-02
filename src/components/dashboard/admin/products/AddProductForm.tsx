@@ -30,7 +30,7 @@ import {
   tags as validTags,
   sizes
 } from "@/config/categories";
-import { addProductClient as addProduct } from "@/actions/client/add-product-client";
+import { addProductClient as addProduct } from "@/actions/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 

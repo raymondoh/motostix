@@ -1,7 +1,7 @@
 "use server";
 
 // ================= Imports =================
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
 import { serverTimestamp } from "@/utils/date-server";
 import { logActivity } from "@/firebase/actions";
 import { firebaseError, isFirebaseError } from "@/utils/firebase-error";
@@ -36,7 +36,7 @@ export async function updateEmailVerificationStatus({
 
   try {
     // 1. Check Firebase Auth user record
-    const userRecord = await adminAuth().getUser(userId);
+    const userRecord = await getAdminAuth().getUser(userId);
 
     if (verified && !userRecord.emailVerified) {
       logger({
@@ -48,7 +48,7 @@ export async function updateEmailVerificationStatus({
     }
 
     // 2. Update Firestore user document
-    await adminDb().collection("users").doc(userId).update({
+    await getAdminFirestore().collection("users").doc(userId).update({
       emailVerified: verified,
       updatedAt: serverTimestamp()
     });
@@ -83,8 +83,8 @@ export async function updateEmailVerificationStatus({
     const message = isFirebaseError(error)
       ? firebaseError(error)
       : error instanceof Error
-      ? error.message
-      : "Unexpected error updating email verification status";
+        ? error.message
+        : "Unexpected error updating email verification status";
 
     logger({
       type: "error",

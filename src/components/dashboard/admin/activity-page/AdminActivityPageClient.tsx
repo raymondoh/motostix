@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AdminActivityLogClient } from "./AdminActivityLogClient";
 import type { Firebase } from "@/types";
-import { clientFetchActivityLogs } from "@/actions/client/fetch-activity";
+import { clientFetchActivityLogs } from "@/actions/client";
 
 interface AdminActivityPageClientProps {
   initialLogs: Firebase.SerializedActivity[];

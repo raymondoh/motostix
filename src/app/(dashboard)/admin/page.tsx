@@ -1,6 +1,6 @@
 // src/app/(dashboard)/admin/page.tsx
 import type { Metadata } from "next";
-import { fetchAllActivityLogs } from "@/actions/dashboard/activity-logs";
+import { fetchAllActivityLogs } from "@/actions/dashboard";
 import { Separator } from "@/components/ui/separator";
 import {
   DashboardShell,

@@ -68,6 +68,6 @@ export function getAdminStorage() {
 }
 
 // Legacy compatibility - these match your current function names
-export const adminDb = getAdminFirestore;
-export const adminAuth = getAdminAuth;
-export const adminStorage = getAdminStorage;
+// export const adminDb = getAdminFirestore;
+// export const adminAuth = getAdminAuth;
+// export const adminStorage = getAdminStorage;

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { DashboardShell, DashboardHeader } from "@/components";
 import { UserActivityPageClient } from "@/components";
-import { fetchUserActivityLogs } from "@/actions/dashboard/activity-logs";
+import { fetchUserActivityLogs } from "@/actions/dashboard";
 import type { Firebase } from "@/types";
 
 // Helper function to convert ActivityLog to SerializedActivity

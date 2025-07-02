@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { fetchUserLikesClient } from "@/actions/client/fetch-user-likes-client"; // Fetches full product details of liked items
+import { fetchUserLikesClient } from "@/actions/client"; // Fetches full product details of liked items
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Loader } from "lucide-react";

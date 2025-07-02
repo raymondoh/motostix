@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 import { CheckoutSuccess } from "./checkoutSuccess";
-import { fetchOrderByPaymentIntentId } from "@/actions/orders/fetch-order-by-intent-id"; // Import the new action
+import { fetchOrderByPaymentIntentId } from "@/actions/orders"; // Import the new action
 import type { Order } from "@/types/order"; // Import Order type
 
 export function CheckoutSuccessClient() {

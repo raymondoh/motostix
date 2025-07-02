@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { DashboardShell, DashboardHeader } from "@/components";
 import { AdminOrdersClient } from "@/components/dashboard/admin/orders/AdminOrdersClient";
 import { redirect } from "next/navigation";
-import { fetchAllOrders } from "@/actions/orders/fetch-all-orders";
+import { fetchAllOrders } from "@/actions/orders";
 import { UserService } from "@/lib/services/user-service";
 
 export const metadata: Metadata = {

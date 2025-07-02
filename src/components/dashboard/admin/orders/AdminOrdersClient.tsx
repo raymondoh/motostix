@@ -4,7 +4,7 @@
 import { useState, useTransition } from "react";
 import { OrdersDataTable } from "./OrdersDataTable"; // Uses the refactored version
 import { getAdminOrderColumns } from "./admin-order-columns";
-import { fetchAllOrdersClient } from "@/actions/client/fetch-all-orders-client";
+import { fetchAllOrdersClient } from "@/actions/client";
 import type { Order } from "@/types/order";
 
 interface AdminOrdersClientProps {

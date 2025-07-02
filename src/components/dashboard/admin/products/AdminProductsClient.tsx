@@ -12,8 +12,8 @@ import { getProductColumns } from "./products-columns";
 import { isFirebaseError, firebaseError } from "@/utils/firebase-error";
 import type { Product, GetAllProductsSuccess } from "@/types/product";
 import type { Category } from "@/types/category"; // Make sure this type is correctly defined
-import { deleteProductClient as deleteProduct } from "@/actions/client/delete-product-client";
-import { fetchAllProductsClient } from "@/actions/client/fetch-all-products";
+import { deleteProductClient as deleteProduct } from "@/actions/client";
+import { fetchAllProductsClient } from "@/actions/client";
 
 import {
   AlertDialog,

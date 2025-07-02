@@ -1,6 +1,7 @@
 "use server";
 
-import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+//import { adminAuth, adminDb } from "@/firebase/admin/firebase-admin-init";
+import { getAdminAuth, getAdminFirestore } from "@/firebase/admin/firebase-admin-init";
 import { serverTimestamp } from "@/utils/date-server";
 import { logActivity } from "@/firebase/actions";
 import { registerSchema } from "@/schemas";
@@ -34,7 +35,7 @@ export async function registerUser(
 
     let userRecord;
     try {
-      userRecord = await adminAuth().createUser({
+      userRecord = await getAdminAuth().createUser({
         email,
         password,
         //displayName: name || email.split("@")[0],
@@ -62,16 +63,16 @@ export async function registerUser(
       };
     }
 
-    const usersSnapshot = await adminDb().collection("users").count().get();
+    const usersSnapshot = await getAdminFirestore().collection("users").count().get();
     const isFirstUser = usersSnapshot.data().count === 0;
     const role = isFirstUser ? "admin" : "user";
 
     if (isFirstUser) {
-      await adminAuth().setCustomUserClaims(userRecord.uid, { role: "admin" });
+      await getAdminAuth().setCustomUserClaims(userRecord.uid, { role: "admin" });
       logger({ type: "info", message: `First user promoted to admin: ${email}`, context: "auth" });
     }
 
-    await adminDb().collection("users").doc(userRecord.uid).set({
+    await getAdminFirestore().collection("users").doc(userRecord.uid).set({
       //name: name || email.split("@")[0],
       email,
       role,

@@ -50,21 +50,21 @@ function initializeAdminApp(): App | null {
 
 const firebaseAdminApp: App | null = initializeAdminApp();
 
-export function adminDb(): Firestore {
+export function getAdminFirestore(): Firestore {
   if (!firebaseAdminApp) {
     throw new Error("Firebase Admin not initialized");
   }
   return getFirestore(firebaseAdminApp);
 }
 
-export function adminAuth(): Auth {
+export function getAdminAuth(): Auth {
   if (!firebaseAdminApp) {
     throw new Error("Firebase Admin not initialized");
   }
   return getAuth(firebaseAdminApp);
 }
 
-export function adminStorage(): Storage {
+export function getAdminStorage(): Storage {
   if (!firebaseAdminApp) {
     throw new Error("Firebase Admin not initialized");
   }

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { fetchAllActivityLogs } from "@/actions/dashboard/activity-logs";
+import { fetchAllActivityLogs } from "@/actions/dashboard";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
